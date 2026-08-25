@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img" aria-labelledby="title">
+  <title id="title">Стрелка компаса</title>
+  <g transform="translate(300 300)">
+    <!-- south-west counterweight -->
+    <path d="M-10 10L-206 206L-45 24Z" fill="#565452" stroke="#171615" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M-206 206L-42 15L-15 42Z" fill="#b7b3aa" opacity=".58"/>
+    <!-- north-east pointer -->
+    <path d="M-14-14L202-202L30-8Z" fill="#2b2a28" stroke="#171615" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M-7-30L202-202L14-14Z" fill="#e0ded8" opacity=".9"/>
+    <path d="M195-202L221-222L204-191Z" fill="#bf2e26" stroke="#8b241e" stroke-width="1.2"/>
+    <!-- pivot -->
+    <circle r="19" fill="#f4f1ed" stroke="#171615" stroke-width="2"/>
+    <circle r="13" fill="#262523" stroke="#f4f1ed" stroke-width="2"/>
+    <circle r="5" fill="#f4f1ed"/>
+  </g>
+</svg>
