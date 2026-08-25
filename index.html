@@ -23,12 +23,11 @@
     .menu b { letter-spacing:.45px; }.menu a { color:inherit; text-decoration:none; transition:color .2s,transform .2s; }.menu a:hover { color:var(--gold); transform:translateX(4px); }.menu .active { position:relative; padding-left:10px; }.menu .active:before { content:""; position:absolute; top:4px; left:0; width:4px; height:4px; background:var(--gold); }
     .cta { position:absolute; top:22px; right:30px; display:flex; align-items:center; justify-content:space-between; width:196px; height:45px; padding:0 16px; border:1px solid var(--ink); color:var(--ink); background:transparent; cursor:pointer; transition:.2s; }.cta:hover { border-color:var(--gold); color:var(--paper); background:var(--ink); }.cta span { font-size:22px; font-weight:300; }
     .copy { position:absolute; top:22.3%; left:0; width:100%; text-align:center; }.eyebrow { margin:0 0 13px; letter-spacing:.48px; }.title { margin:0; font-family:Anticva,serif; font-size:clamp(49px,4.85vw,70px); font-weight:400; line-height:.98; letter-spacing:-2.8px; }.title span { display:block; white-space:nowrap; }.title span+span { margin-top:10px; }.side-note { position:absolute; top:57px; width:112px; text-align:left; line-height:1.38; letter-spacing:.48px; }.side-note span,.meta span { display:block; }.side-note--left { left:calc(50% - clamp(230px,19.17vw,276px)); }.side-note--right { left:calc(50% + clamp(195px,16.25vw,234px)); }
-    .compass { position:absolute; top:50.4%; left:50%; width:clamp(300px,32vw,460px); aspect-ratio:1; transform:translateX(-50%); }.compass__base,.compass__needle { position:absolute; inset:0; width:100%; height:100%; }.compass__needle { transform-origin:50% 50%; animation:find-direction 13s cubic-bezier(.28,.05,.12,1) infinite; }
-    @keyframes find-direction { 0%,13% { transform:rotate(-12deg); } 27% { transform:rotate(4deg); } 41% { transform:rotate(-2.2deg); } 58%,82% { transform:rotate(0deg); } 91% { transform:rotate(.7deg); } 100% { transform:rotate(0deg); } }
+    .compass { position:absolute; top:50.4%; left:50%; width:clamp(300px,32vw,460px); aspect-ratio:1; transform:translateX(-50%); }.compass__base,.compass__needle,.compass__patina { position:absolute; inset:0; width:100%; height:100%; }.compass__needle { z-index:2; transform-origin:50% 50%; will-change:transform; }.compass__patina { z-index:3; opacity:.34; mix-blend-mode:multiply; pointer-events:none; }
     .meta { position:absolute; bottom:45px; line-height:1.5; letter-spacing:.24px; }.meta--left { left:22px; }.meta--right { right:30px; text-align:right; }.cross { position:absolute; top:58.2%; font-family:Anticva,serif; font-size:32px; font-weight:300; opacity:.55; }.cross--left { left:11px; }.cross--right { right:11px; }
     @media (max-width:1120px) { .menu { grid-template-columns:repeat(4,106px); gap:20px; }.side-note--left { left:calc(50% - 23vw); }.side-note--right { left:calc(50% + 18vw); } }
     @media (max-width:780px) { .brand { top:22px; left:20px; width:99px; }.brand__mark { width:21px; height:28px; font-size:16px; line-height:26px; }.brand__name { font-size:11px; }.brand__sub { font-size:4.8px; }.menu { display:none; }.cta { top:20px; right:20px; width:160px; height:43px; font-size:8px; }.copy { top:18%; }.eyebrow { font-size:8px; }.title { font-size:clamp(37px,11.2vw,61px); letter-spacing:-1.7px; }.title span+span { margin-top:7px; }.side-note { top:calc(100% + 24px); font-size:8px; }.side-note--left { left:25px; }.side-note--right { left:auto; right:17px; }.compass { top:51%; width:min(86vw,440px); }.meta { bottom:30px; font-size:7px; }.meta--left { left:18px; }.meta--right { right:18px; }.cross { display:none; } }
-    @media (prefers-reduced-motion:reduce) { .compass__needle { animation:none; } }
+    @media (prefers-reduced-motion:reduce) { .compass__needle { transition:none; } }
   </style>
 </head>
 <body>
@@ -37,9 +36,42 @@
     <nav class="menu" aria-label="Основная навигация"><div class="menu__group"><b>Институт</b><a class="active" href="#">Манифест</a><a href="#">Методология</a></div><div class="menu__group"><b>Развитие</b><a href="#">Направления</a><a href="#">Пути</a></div><div class="menu__group"><b>Пространство</b><a href="#">События</a><a href="#">Истории</a></div><div class="menu__group"><b>Медиа</b><a href="#">Публикации</a><a href="#">FAQ</a></div></nav>
     <button class="cta" type="button">Запросить участие <span aria-hidden="true">↗</span></button>
     <section class="copy" aria-labelledby="hero-title"><p class="eyebrow">The Performance&nbsp;&nbsp;—&nbsp;&nbsp;Est. 2016</p><h1 class="title" id="hero-title"><span>Институт</span><span>Культуры влияния</span></h1><p class="side-note side-note--left"><span>Видеть</span><span>иначе</span></p><p class="side-note side-note--right"><span>Говорить</span><span>убедительно</span></p></section>
-    <div class="compass" aria-label="Анимированный компас"><img class="compass__base" src="compass-base.svg" alt=""><img class="compass__needle" src="compass-needle.svg" alt=""></div>
+    <div class="compass" aria-label="Интерактивный компас"><img class="compass__base" src="compass-base.svg" alt=""><img class="compass__needle" src="compass-needle.svg" alt=""><img class="compass__patina" src="compass-patina-v1.png" alt=""></div>
     <i class="cross cross--left" aria-hidden="true">＋</i><i class="cross cross--right" aria-hidden="true">＋</i>
     <p class="meta meta--left"><span>＋&nbsp; Листайте и исследуйте</span><span>&nbsp;&nbsp;&nbsp;&nbsp;пространство института</span></p><p class="meta meta--right"><span>Москва&nbsp; /&nbsp; Online</span><span>Приём заявок открыт</span></p>
   </main>
+  <script>
+    (() => {
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      const hero = document.querySelector('.hero');
+      const needle = document.querySelector('.compass__needle');
+      let current = 0;
+      let target = 0;
+      let frame;
+
+      const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+      const render = () => {
+        current += (target - current) * .085;
+        needle.style.transform = `rotate(${current.toFixed(3)}deg)`;
+        frame = requestAnimationFrame(render);
+      };
+      const followPointer = (event) => {
+        const rect = needle.getBoundingClientRect();
+        const x = event.clientX - (rect.left + rect.width / 2);
+        const y = event.clientY - (rect.top + rect.height / 2);
+        const pointerAngle = Math.atan2(y, x) * 180 / Math.PI;
+        // The native arrow rests toward north-east; it follows the cursor only
+        // within a refined 38° arc, preserving the instrument-like composition.
+        target = clamp(pointerAngle + 45, -19, 19);
+      };
+      hero.addEventListener('pointermove', followPointer, { passive:true });
+      // `mousemove` keeps the interaction reliable for trackpads and browsers
+      // that do not expose pointer events to a page.
+      hero.addEventListener('mousemove', followPointer, { passive:true });
+      hero.addEventListener('pointerleave', () => { target = 0; });
+      render();
+      window.addEventListener('pagehide', () => cancelAnimationFrame(frame), { once:true });
+    })();
+  </script>
 </body>
 </html>
