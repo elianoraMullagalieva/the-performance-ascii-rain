@@ -60,7 +60,7 @@
   <i class="cursor-mark" aria-hidden="true"></i>
   <script>
     (() => {
-      const HOLD_GLOBE = 1700;
+      const HOLD_GLOBE = 2000;
       const TRANSITION = 7400;
       const BG = 0xF5F1EF;
       const INK = '#2B2B29';
@@ -303,15 +303,15 @@
           stage.updateMatrixWorld(true);
           // This is a stencil dissolve, never a global alpha fade: individual
           // glyph cells disappear as their matching particles are released.
-          material.uniforms.dissolve.value = clamp01(e / .27);
-          compass.style.opacity = String(clamp01((e - .745) / .103));
-          compassNeedle.style.opacity = String(clamp01((e - .775) / .08));
+          material.uniforms.dissolve.value = clamp01(e / .257);
+          compass.style.opacity = String(clamp01((e - .87) / .103));
+          compassNeedle.style.opacity = String(clamp01((e - .90) / .08));
           if (!contentRevealStarted && e >= .32) {
             contentRevealStarted = true;
             hero.classList.add('is-revealing');
             requestAnimationFrame(() => hero.classList.add('is-revealed'));
           }
-          if (!needleArrivalStarted && e >= .775) {
+          if (!needleArrivalStarted && e >= .90) {
             needleArrivalStarted = true;
             compass.classList.add('is-arriving');
             setTimeout(() => compass.classList.remove('is-arriving'), 760);
@@ -319,10 +319,10 @@
           context.clearRect(0, 0, innerWidth, innerHeight);
           if (!reduceMotion) {
             particles.forEach(particle => {
-              const released = ease(clamp01((material.uniforms.dissolve.value - particle.dissolve - particle.releaseJitter) / .18));
+              const released = ease(clamp01((material.uniforms.dissolve.value - particle.dissolve - particle.releaseJitter) / .171));
               if (released <= .001) return;
               const sourcePoint = projectGlobePoint(particle.u, particle.v, projector);
-              const spread = ease(clamp01((e - .05 - particle.releaseJitter) / .20));
+              const spread = ease(clamp01((e - .05 - particle.releaseJitter) / .190));
           const assembly = ease(clamp01((e - .31 - particle.buildDelay) / .225));
               const driftX = Math.cos((particle.u + e * .28) * 17) * particle.bend * (1 - assembly);
               const driftY = Math.sin((particle.v - e * .22) * 19) * particle.bend * .55 * (1 - assembly);
@@ -357,7 +357,7 @@
       });
 
       (async () => {
-        await Promise.race([criticalAssets, wait(1800)]);
+        await Promise.race([criticalAssets, wait(2000)]);
         await wait(Math.max(0, HOLD_GLOBE - (performance.now() - startedAt)));
         animateTransition();
       })();
