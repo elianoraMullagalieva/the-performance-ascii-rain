@@ -17,10 +17,8 @@
     html,body { min-width:320px; min-height:100%; margin:0; }
     body { overflow:hidden; background:var(--paper); color:var(--ink); font-family:Manrope,Arial,sans-serif; }
     .hero { position:relative; min-height:100svh; overflow:hidden; }
-    .brand { position:absolute; top:26px; left:5.9vw; display:flex; flex-direction:column; align-items:center; width:142px; color:inherit; text-align:center; text-decoration:none; text-transform:uppercase; }
-    .brand__mark { display:block; flex:none; width:28px; height:auto; margin:0 0 7px; object-fit:contain; }
-    .brand__name { width:100%; font-family:Anticva,serif; font-size:14px; line-height:1; letter-spacing:.035em; white-space:nowrap; }
-    .brand__sub { width:100%; margin-top:3px; font-size:9px; font-weight:400; line-height:1.2; letter-spacing:.015em; white-space:nowrap; }
+    .brand { position:absolute; top:26px; left:5.9vw; display:block; width:127px; color:inherit; text-decoration:none; }
+    .brand__art { display:block; width:100%; height:auto; }
     .menu { position:absolute; top:26px; left:50%; display:grid; grid-template-columns:repeat(4,130px); gap:38px; transform:translateX(-50%); }
     .menu__group { display:grid; gap:8px; align-content:start; }
     .menu b,.menu a,.cta,.eyebrow,.side-note,.meta { font-size:clamp(11px,1vw,13px); font-weight:500; line-height:1.32; letter-spacing:.08px; text-transform:uppercase; }
@@ -49,7 +47,7 @@
   </section>
   <main class="hero">
     <button class="menu-toggle" type="button" aria-label="Открыть меню" aria-expanded="false"><i></i><i></i><i></i></button>
-    <a class="brand" href="#" aria-label="The Performance — на главную"><img class="brand__mark" src="figma-logo-mark.svg" alt=""><div class="brand__name">The Performance</div><div class="brand__sub">Институт культуры влияния</div></a>
+    <a class="brand" href="#" aria-label="The Performance — на главную"><img class="brand__art" src="HERO/10%20%E2%80%94%20EYE/%D0%9B%D0%9E%D0%93%D0%9E%D0%9B%D0%9E%D0%93%D0%9E.svg" alt=""></a>
     <nav class="menu" aria-label="Основная навигация"><div class="menu__group"><b>Институт</b><a class="active" href="#">Манифест</a><a href="#">Методология</a></div><div class="menu__group"><b>Развитие</b><a href="#">Направления</a><a href="#">Пути</a></div><div class="menu__group"><b>Пространство</b><a href="#">События</a><a href="#">Истории</a></div><div class="menu__group"><b>Медиа</b><a href="#">Публикации</a><a href="#">FAQ</a></div></nav>
     <button class="cta" type="button"><span class="cta__label cta__label--desktop">Запросить участие</span><span class="cta__label cta__label--mobile">Участие</span><img class="cta__arrow" src="figma-arrow.svg" alt="" aria-hidden="true"></button>
     <section class="copy" aria-labelledby="hero-title"><p class="eyebrow">The Performance&nbsp;&nbsp;—&nbsp;&nbsp;Est. 2016</p><h1 class="title" id="hero-title"><span class="title__line title__line--primary"><span class="side-note side-note--left"><span>Видеть</span><span>иначе</span></span><span class="title__word">Институт</span><span class="side-note side-note--right"><span>Говорить</span><span>убедительно</span></span></span><span class="title__line title__line--secondary">Культуры <br class="mobile-only">влияния</span></h1></section>
