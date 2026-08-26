@@ -27,7 +27,9 @@
     .meta { position:absolute; bottom:45px; line-height:1.5; letter-spacing:.24px; }.meta--left { left:22px; }.meta--right { right:30px; text-align:right; }.cross { position:absolute; top:58.2%; font-family:Anticva,serif; font-size:32px; font-weight:300; opacity:.55; }.cross--left { left:11px; }.cross--right { right:11px; }
     @media (max-width:1120px) { .menu { grid-template-columns:repeat(4,106px); gap:20px; }.side-note--left { left:calc(50% - 23vw); }.side-note--right { left:calc(50% + 18vw); } }
     @media (max-width:780px) { .brand { top:22px; left:20px; width:99px; }.brand__mark { width:21px; height:28px; font-size:16px; line-height:26px; }.brand__name { font-size:11px; }.brand__sub { font-size:4.8px; }.menu { display:none; }.cta { top:20px; right:20px; width:160px; height:43px; font-size:8px; }.copy { top:18%; }.eyebrow { font-size:8px; }.title { font-size:clamp(37px,11.2vw,61px); letter-spacing:-1.7px; }.title span+span { margin-top:7px; }.side-note { top:calc(100% + 24px); font-size:8px; }.side-note--left { left:25px; }.side-note--right { left:auto; right:17px; }.compass { top:51%; width:min(86vw,440px); }.meta { bottom:30px; font-size:7px; }.meta--left { left:18px; }.meta--right { right:18px; }.cross { display:none; } }
-    @media (prefers-reduced-motion:reduce) { .compass__needle { transition:none; } }
+    @media (hover:none), (pointer:coarse) { .compass__needle { animation:needle-drift 6.6s cubic-bezier(.45,0,.55,1) infinite alternate; } }
+    @keyframes needle-drift { from { transform:rotate(-13deg); } to { transform:rotate(13deg); } }
+    @media (prefers-reduced-motion:reduce) { .compass__needle { animation:none; transition:none; } }
   </style>
 </head>
 <body>
@@ -42,7 +44,7 @@
   </main>
   <script>
     (() => {
-      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || window.matchMedia('(hover: none), (pointer: coarse)').matches) return;
       const hero = document.querySelector('.hero');
       const needle = document.querySelector('.compass__needle');
       let current = 0;
@@ -50,6 +52,7 @@
       let frame;
 
       const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+      const normalizeAngle = (angle) => ((angle + 180) % 360 + 360) % 360 - 180;
       const render = () => {
         current += (target - current) * .085;
         needle.style.transform = `rotate(${current.toFixed(3)}deg)`;
@@ -60,9 +63,9 @@
         const x = event.clientX - (rect.left + rect.width / 2);
         const y = event.clientY - (rect.top + rect.height / 2);
         const pointerAngle = Math.atan2(y, x) * 180 / Math.PI;
-        // The native arrow rests toward north-east; it follows the cursor only
-        // within a refined 38° arc, preserving the instrument-like composition.
-        target = clamp(pointerAngle + 45, -19, 19);
+        // The arrow's resting direction is north-east (-45°). Normalize before
+        // clamping so a cursor on the left of the compass correctly turns it left.
+        target = clamp(normalizeAngle(pointerAngle + 45), -68, 68);
       };
       hero.addEventListener('pointermove', followPointer, { passive:true });
       // `mousemove` keeps the interaction reliable for trackpads and browsers
