@@ -36,7 +36,7 @@
     @keyframes needle-arrival { 0% { transform:rotate(-4deg); } 56% { transform:rotate(2.2deg); } 78% { transform:rotate(-1deg); } 100% { transform:rotate(0deg); } }
     @media (prefers-reduced-motion:reduce) { .compass__needle { animation:none; transition:none; } }
     @media (hover:hover) and (pointer:fine) { body.has-cursor-mark a:not(.brand),body.has-cursor-mark button { cursor:none; }body.has-cursor-mark .brand { cursor:pointer; }.cursor-mark { position:fixed; z-index:20; top:0; left:0; width:8px; height:8px; background:var(--accent); pointer-events:none; opacity:0; transform:translate3d(var(--cursor-x,-20px),var(--cursor-y,-20px),0) translate(-50%,-50%) scale(.35); transition:opacity .16s ease,transform .18s cubic-bezier(.16,1,.3,1); will-change:transform,opacity; }.cursor-mark.is-active { opacity:1; transform:translate3d(var(--cursor-x,-20px),var(--cursor-y,-20px),0) translate(-50%,-50%) scale(1); }.menu-toggle:hover i { background:var(--accent); }.menu-toggle i { transition:background .24s cubic-bezier(.16,1,.3,1); } }
-    .preloader { position:fixed; z-index:30; inset:0; overflow:hidden; background:var(--paper); opacity:1; visibility:visible; transition:background-color .42s ease,opacity .32s ease,visibility .32s step-end; }.preloader.is-transitioning { background-color:transparent; }.preloader.is-complete { opacity:0; visibility:hidden; pointer-events:none; }.preloader__globe,.preloader__particles { position:absolute; inset:0; display:block; width:100%; height:100%; }.preloader__particles { pointer-events:none; }.loader-counter { position:absolute; left:50%; bottom:clamp(32px,8.9vh,96px); color:#2B2B29; font:300 clamp(22px,1.56vw,30px)/1 Onest,sans-serif; letter-spacing:-.03em; transform:translateX(-50%); transition:opacity .26s ease; user-select:none; }.preloader.is-transitioning .loader-counter { opacity:0; }.is-preloading .hero > * { opacity:0; }.hero > * { transition:opacity .46s cubic-bezier(.16,1,.3,1),transform .46s cubic-bezier(.16,1,.3,1); }.hero.is-assembly > * { opacity:0; }.hero.is-assembly .compass { opacity:1; transition-delay:.42s; }.hero.is-revealing .copy { opacity:1; }.hero.is-revealing .brand,.hero.is-revealing .menu,.hero.is-revealing .cta,.hero.is-revealing .meta,.hero.is-revealing .cross { opacity:0; }.hero.is-revealing .eyebrow,.hero.is-revealing .title__word,.hero.is-revealing .title__line--secondary,.hero.is-revealing .side-note { opacity:0; transform:translateY(8px); }.hero.is-revealing.is-revealed .brand,.hero.is-revealing.is-revealed .menu,.hero.is-revealing.is-revealed .cta { opacity:1; transition-delay:.08s; }.hero.is-revealing.is-revealed .eyebrow { opacity:1; transform:none; transition:opacity .34s ease .04s,transform .46s cubic-bezier(.16,1,.3,1) .04s; }.hero.is-revealing.is-revealed .title__word { opacity:1; transform:none; transition:opacity .38s ease .14s,transform .52s cubic-bezier(.16,1,.3,1) .14s; }.hero.is-revealing.is-revealed .title__line--secondary { opacity:1; transform:none; transition:opacity .38s ease .24s,transform .52s cubic-bezier(.16,1,.3,1) .24s; }.hero.is-revealing.is-revealed .side-note { opacity:1; transform:translateY(-50%); transition:opacity .34s ease .34s,transform .46s cubic-bezier(.16,1,.3,1) .34s; }.hero.is-revealing.is-revealed .meta,.hero.is-revealing.is-revealed .cross { opacity:1; transition-delay:.22s; }
+    .preloader { position:fixed; z-index:30; inset:0; overflow:hidden; background:var(--paper); opacity:1; visibility:visible; transition:background-color .42s ease,opacity .62s cubic-bezier(.16,1,.3,1),visibility .62s step-end; }.preloader.is-transitioning { background-color:transparent; }.preloader.is-complete { opacity:0; visibility:hidden; pointer-events:none; }.preloader__globe,.preloader__particles { position:absolute; inset:0; display:block; width:100%; height:100%; }.preloader__particles { pointer-events:none; }.loader-counter { position:absolute; left:50%; bottom:clamp(32px,8.9vh,96px); color:#2B2B29; font:300 clamp(22px,1.56vw,30px)/1 Onest,sans-serif; letter-spacing:-.03em; transform:translateX(-50%); transition:opacity .26s ease; user-select:none; }.preloader.is-transitioning .loader-counter { opacity:0; }.is-preloading .hero > * { opacity:0; }.hero > * { transition:opacity .46s cubic-bezier(.16,1,.3,1),transform .46s cubic-bezier(.16,1,.3,1); }.hero.is-assembly > * { opacity:0; }.hero.is-assembly .compass { transition:none; }.hero.is-revealing .copy { opacity:1; }.hero.is-revealing .brand,.hero.is-revealing .menu,.hero.is-revealing .cta,.hero.is-revealing .meta,.hero.is-revealing .cross { opacity:0; }.hero.is-revealing .eyebrow,.hero.is-revealing .title__word,.hero.is-revealing .title__line--secondary,.hero.is-revealing .side-note { opacity:0; transform:translateY(8px); }.hero.is-revealing.is-revealed .brand,.hero.is-revealing.is-revealed .menu,.hero.is-revealing.is-revealed .cta { opacity:1; transition-delay:.08s; }.hero.is-revealing.is-revealed .eyebrow { opacity:1; transform:none; transition:opacity .34s ease .04s,transform .46s cubic-bezier(.16,1,.3,1) .04s; }.hero.is-revealing.is-revealed .title__word { opacity:1; transform:none; transition:opacity .38s ease .14s,transform .52s cubic-bezier(.16,1,.3,1) .14s; }.hero.is-revealing.is-revealed .title__line--secondary { opacity:1; transform:none; transition:opacity .38s ease .24s,transform .52s cubic-bezier(.16,1,.3,1) .24s; }.hero.is-revealing.is-revealed .side-note { opacity:1; transform:translateY(-50%); transition:opacity .34s ease .34s,transform .46s cubic-bezier(.16,1,.3,1) .34s; }.hero.is-revealing.is-revealed .meta,.hero.is-revealing.is-revealed .cross { opacity:1; transition-delay:.22s; }
     @media (prefers-reduced-motion:reduce) { .preloader__particles { display:none; } }
   </style>
 </head>
@@ -62,7 +62,7 @@
     (() => {
       const MIN_TOTAL = 1700;
       const MAX_TOTAL = 3600;
-      const TRANSITION = 1450;
+      const TRANSITION = 2100;
       const BG = 0xF5F1EF;
       const INK = '#2B2B29';
       const preloader = document.querySelector('.preloader');
@@ -182,11 +182,27 @@
         const target = { x:rect.left + rect.width / 2, y:rect.top + rect.height / 2 };
         const originWorld = new THREE.Vector3();
         const targetWorld = toWorld(target.x, target.y);
-        const particles = Array.from({ length:190 }, (_, index) => {
-          const angle = Math.random() * Math.PI * 2;
-          const band = [-.46,-.23,.02,.27,.48][index % 5] + (Math.random() - .5) * .09;
-          const ring = index % 5;
-          return { angle, band, ring, letterOffset:(Math.random() - .5) * .88, targetRadius:rect.width * ([.13,.20,.28,.36,.44][ring] + (Math.random() - .5) * .026), drift:(Math.random() - .5) * 15, red:index % 47 === 0 };
+        // The particles are not a separate "effect": each one has a precise
+        // resting point on a compass contour. Its source is a band of the
+        // descending type-globe, then it makes one soft orbital turn before
+        // settling into that exact point. This keeps one continuous material.
+        const radii = [.105,.145,.185,.225,.265,.305,.345,.385,.425,.465];
+        const particles = Array.from({ length:760 }, (_, index) => {
+          const ring = index % radii.length;
+          const angle = (index / 760) * Math.PI * 34 + ring * .83 + (Math.random() - .5) * .024;
+          const band = [-.46,-.23,.02,.27,.48][index % 5] + (Math.random() - .5) * .12;
+          const isRay = index % 29 === 0;
+          return {
+            angle,
+            band,
+            ring,
+            letterOffset:(Math.random() - .5) * .92,
+            targetRadius:rect.width * (isRay ? (.05 + Math.random() * .48) : radii[ring]),
+            drift:(Math.random() - .5) * 10,
+            orbit:1.05 + Math.random() * 1.45,
+            size:Math.random() < .12 ? 1.45 : .82 + Math.random() * .26,
+            red:index % 173 === 0
+          };
         });
         const transitionStart = performance.now();
         transitionStarted = true;
@@ -197,56 +213,47 @@
         const tick = now => {
           const t = Math.min(1, (now - transitionStart) / TRANSITION);
           const e = reduceMotion ? 1 : ease(t);
-          const lowering = ease(clamp01((e - .04) / .64));
-          const particleProgress = ease(clamp01((e - .14) / .76));
+          const lowering = ease(clamp01((e - .02) / .68));
+          const particleProgress = ease(clamp01((e - .08) / .82));
           stage.position.lerpVectors(originWorld, targetWorld, lowering);
           stage.scale.setScalar(1 - lowering * .12);
-          material.uniforms.fade.value = 1 - ease(clamp01((e - .34) / .55));
-          compass.style.opacity = String(clamp01((e - .68) / .24));
-          compassNeedle.style.opacity = String(clamp01((e - .82) / .12));
-          if (!contentRevealStarted && e >= .55) {
+          material.uniforms.fade.value = 1 - ease(clamp01((e - .24) / .68));
+          // The SVG is already present below the particle field long before
+          // the field finishes. It strengthens the same rings instead of
+          // replacing a cleared canvas at the very end.
+          compass.style.opacity = String(.035 + clamp01((e - .28) / .72) * .965);
+          compassNeedle.style.opacity = String(clamp01((e - .78) / .18));
+          if (!contentRevealStarted && e >= .47) {
             contentRevealStarted = true;
             hero.classList.add('is-revealing');
             requestAnimationFrame(() => hero.classList.add('is-revealed'));
           }
-          if (!needleArrivalStarted && e >= .86) {
+          if (!needleArrivalStarted && e >= .83) {
             needleArrivalStarted = true;
             compass.classList.add('is-arriving');
             setTimeout(() => compass.classList.remove('is-arriving'), 760);
           }
           context.clearRect(0, 0, innerWidth, innerHeight);
           if (!reduceMotion) {
-            const rings = [0.13, 0.20, 0.28, 0.36, 0.44];
-            context.lineWidth = 1;
-            context.strokeStyle = '#2B2B29';
-            rings.forEach((ratio, index) => {
-              const ringProgress = ease(clamp01((e - (.30 + index * .075)) / .40));
-              context.globalAlpha = ringProgress * .34;
-              context.beginPath();
-              context.arc(target.x, target.y, rect.width * ratio, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * ringProgress);
-              context.stroke();
-            });
-            const lineLength = rect.width * Math.min(.5, clamp01((e - .76) / .18) * .5);
-            if (lineLength) {
-              context.globalAlpha = clamp01((e - .76) / .16) * .52;
-              context.beginPath();
-              context.moveTo(target.x, target.y);
-              context.lineTo(target.x + lineLength * .72, target.y - lineLength * .72);
-              context.stroke();
-            }
             particles.forEach(particle => {
               const loweredX = source.x + (target.x - source.x) * lowering;
               const loweredY = source.y + (target.y - source.y) * lowering;
               const originX = loweredX + particle.letterOffset * Math.min(innerWidth, innerHeight) * .24;
               const originY = loweredY + particle.band * Math.min(innerWidth, innerHeight) * .22;
-              const ringExpansion = ease(clamp01((e - (.26 + particle.ring * .055)) / .58));
-              const endX = target.x + Math.cos(particle.angle) * particle.targetRadius * ringExpansion;
-              const endY = target.y + Math.sin(particle.angle) * particle.targetRadius * ringExpansion;
-              const x = originX + (endX - originX) * particleProgress + Math.sin(t * Math.PI) * particle.drift;
-              const y = originY + (endY - originY) * particleProgress - Math.sin(t * Math.PI) * 9;
-              context.globalAlpha = Math.sin(Math.PI * particleProgress) * .68;
+              const ringExpansion = ease(clamp01((e - (.19 + particle.ring * .032)) / .64));
+              const settling = ease(clamp01((e - (.17 + particle.ring * .026)) / .72));
+              const radius = particle.targetRadius * ringExpansion;
+              const spin = (1 - settling) * particle.orbit * Math.PI * 2;
+              const endX = target.x + Math.cos(particle.angle + spin) * radius;
+              const endY = target.y + Math.sin(particle.angle + spin) * radius;
+              const arcX = target.x + Math.cos(particle.angle + spin + .7) * radius * (1 - settling) * .34;
+              const arcY = target.y + Math.sin(particle.angle + spin + .7) * radius * (1 - settling) * .34;
+              const x = originX + (arcX - originX) * particleProgress + (endX - arcX) * settling + Math.sin(t * Math.PI) * particle.drift;
+              const y = originY + (arcY - originY) * particleProgress + (endY - arcY) * settling - Math.sin(t * Math.PI) * 7;
+              context.globalAlpha = Math.sin(Math.PI * particleProgress) * (.34 + settling * .42);
               context.fillStyle = particle.red ? '#D12F3F' : '#2B2B29';
-              context.fillRect(x, y, particle.red ? 1.8 : 1.05, particle.red ? 1.8 : 1.05);
+              const size = particle.red ? particle.size * 1.45 : particle.size;
+              context.fillRect(x - size / 2, y - size / 2, size, size);
             });
           }
           if (t < 1) requestAnimationFrame(tick); else {
@@ -258,11 +265,9 @@
               hero.classList.add('is-revealing');
               requestAnimationFrame(() => hero.classList.add('is-revealed'));
             }
-            // The last drawn rings stay visible while the actual SVG compass
-            // settles underneath them. This prevents a blank frame between
-            // the particle layer and the finished illustration.
-            requestAnimationFrame(() => preloader.classList.add('is-complete'));
-            setTimeout(() => context.clearRect(0, 0, innerWidth, innerHeight), 380);
+            // Keep the final particle constellation over the already-visible
+            // compass during the fade. Nothing gets cleared or redrawn here.
+            setTimeout(() => preloader.classList.add('is-complete'), 120);
             resolve();
           }
         };
