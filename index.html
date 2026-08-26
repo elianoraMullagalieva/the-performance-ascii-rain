@@ -60,8 +60,8 @@
   <i class="cursor-mark" aria-hidden="true"></i>
   <script>
     (() => {
-      const HOLD_GLOBE = 900;
-      const TRANSITION = 5400;
+      const HOLD_GLOBE = 1700;
+      const TRANSITION = 7400;
       const BG = 0xF5F1EF;
       const INK = '#2B2B29';
       const preloader = document.querySelector('.preloader');
@@ -79,9 +79,9 @@
       const camera = new THREE.PerspectiveCamera(46, innerWidth / innerHeight, .1, 100);
       const stage = new THREE.Group();
       const material = new THREE.ShaderMaterial({
-        uniforms:{ map:{ value:null }, fade:{ value:1 } },
+        uniforms:{ map:{ value:null }, dissolve:{ value:0 } },
         vertexShader:'varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }',
-        fragmentShader:'uniform sampler2D map; uniform float fade; varying vec2 vUv; void main(){ vec4 c=texture2D(map,vUv); if(c.a<.04) discard; float a=smoothstep(.04,.11,c.a)*fade; if(gl_FrontFacing){gl_FragColor=vec4(c.rgb*a,a);}else{gl_FragColor=vec4(mix(c.rgb,vec3(.68),.72)*a,a*.42);}}',
+        fragmentShader:'uniform sampler2D map; uniform float dissolve; varying vec2 vUv; float hash(vec2 p){ return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453123); } void main(){ vec4 c=texture2D(map,vUv); if(c.a<.04) discard; float cell=hash(floor(vUv*vec2(256.,144.))); if(cell<dissolve) discard; float a=smoothstep(.04,.11,c.a); if(gl_FrontFacing){gl_FragColor=vec4(c.rgb*a,a);}else{gl_FragColor=vec4(mix(c.rgb,vec3(.68),.72)*a,a*.42);}}',
         transparent:true, side:THREE.DoubleSide, depthWrite:false
       });
       const globe = new THREE.Mesh(new THREE.SphereGeometry(.98, 96, 64), material);
@@ -104,6 +104,7 @@
         camera.updateProjectionMatrix();
         renderer.setSize(innerWidth, innerHeight);
       };
+      let globeTextureCanvas;
       const createTexture = () => {
         const canvas = document.createElement('canvas');
         const resolution = 2;
@@ -128,6 +129,7 @@
         texture.wrapT = THREE.ClampToEdgeWrapping;
         texture.minFilter = texture.magFilter = THREE.LinearFilter;
         texture.generateMipmaps = false;
+        globeTextureCanvas = canvas;
         return texture;
       };
       material.uniforms.map.value = createTexture();
@@ -175,34 +177,82 @@
       updateCounter();
 
       const mix = (from, to, progress) => from + (to - from) * progress;
-      // Sample the actual supplied compass SVG. The particles' final positions
-      // come from this artwork's own lines, ticks and etched dots — not from
-      // substitute mathematical circles.
-      const sampleCompassBase = () => {
+      const shuffle = values => {
+        for (let index = values.length - 1; index > 0; index--) {
+          const swap = Math.floor(Math.random() * (index + 1));
+          [values[index], values[swap]] = [values[swap], values[index]];
+        }
+        return values;
+      };
+      const cellHash = (u, v) => {
+        const x = Math.floor(u * 256);
+        const y = Math.floor(v * 144);
+        const value = Math.sin(x * 127.1 + y * 311.7) * 43758.5453123;
+        return value - Math.floor(value);
+      };
+      // The source points are sampled only from the dark pixels of the actual
+      // globe typography. Their UV cell is the same cell that dissolves in the
+      // globe shader, so letters visibly break into the very points that leave.
+      const sampleGlobeTypography = count => {
+        const context = globeTextureCanvas.getContext('2d', { willReadFrequently:true });
+        const { width, height } = globeTextureCanvas;
+        const pixels = context.getImageData(0, 0, width, height).data;
+        const candidates = [];
+        const occupied = new Set();
+        for (let y = 3; y < height; y += 4) {
+          for (let x = 3; x < width; x += 4) {
+            const offset = (y * width + x) * 4;
+            if (pixels[offset + 3] < 60 || pixels[offset] > 186) continue;
+            const u = x / width;
+            const v = y / height;
+            const key = `${Math.floor(u * 256)}:${Math.floor(v * 144)}`;
+            if (occupied.has(key)) continue;
+            occupied.add(key);
+            candidates.push({ u, v, dissolve:cellHash(u, v) });
+          }
+        }
+        const picked = shuffle(candidates).slice(0, count);
+        return Array.from({ length:count }, (_, index) => picked[index % picked.length]);
+      };
+      // Final coordinates are sampled from compass-base.svg itself. A small
+      // grid guard prevents a pile of fat dots on dark, thicker SVG strokes.
+      const sampleCompassBase = count => {
         const base = compass.querySelector('.compass__base');
         const map = document.createElement('canvas');
         map.width = map.height = 600;
         const mapContext = map.getContext('2d', { willReadFrequently:true });
         mapContext.drawImage(base, 0, 0, 600, 600);
+        const points = [];
+        const grid = new Set();
         try {
           const pixels = mapContext.getImageData(0, 0, 600, 600).data;
-          const points = [];
-          for (let y = 1; y < 600; y += 2) {
-            for (let x = 1; x < 600; x += 2) {
+          for (let y = 1; y < 599; y += 2) {
+            for (let x = 1; x < 599; x += 2) {
               const offset = (y * 600 + x) * 4;
               const alpha = pixels[offset + 3];
               const brightness = (pixels[offset] + pixels[offset + 1] + pixels[offset + 2]) / 3;
-              if (alpha > 18 && brightness < 205 && Math.random() < .48) {
-                points.push({ x, y });
-              }
+              const key = `${Math.floor(x / 3)}:${Math.floor(y / 3)}`;
+              if (alpha < 22 || brightness > 210 || grid.has(key) || Math.random() > .86) continue;
+              grid.add(key);
+              points.push({ x, y });
             }
           }
-          return points;
-        } catch (error) {
-          // Local file previews can restrict canvas reads. The deployed page
-          // reads the SVG normally; this fallback keeps the local preview alive.
-          return [];
-        }
+        } catch (error) { /* the asset remains visible even if a file preview blocks pixel reads */ }
+        const fallback = Array.from({ length:count }, (_, index) => {
+          const angle = index * 2.399963;
+          const radius = 60 + (index % 310);
+          return { x:300 + Math.cos(angle) * radius, y:300 + Math.sin(angle) * radius };
+        });
+        const picked = shuffle(points);
+        return Array.from({ length:count }, (_, index) => picked[index % picked.length] || fallback[index]);
+      };
+      const projectGlobePoint = (u, v, output) => {
+        const phi = u * Math.PI * 2;
+        const theta = v * Math.PI;
+        output.set(-Math.cos(phi) * Math.sin(theta), Math.cos(theta), Math.sin(phi) * Math.sin(theta));
+        globe.localToWorld(output);
+        output.project(camera);
+        return { x:(output.x + 1) * innerWidth * .5, y:(1 - output.y) * innerHeight * .5 };
       };
       const animateTransition = () => new Promise(resolve => {
         const context = sizeParticles();
@@ -211,29 +261,30 @@
         const target = { x:rect.left + rect.width / 2, y:rect.top + rect.height / 2 };
         const originWorld = new THREE.Vector3();
         const targetWorld = toWorld(target.x, target.y);
-        const svgPoints = sampleCompassBase();
-        const particleCount = innerWidth < 768 ? 1800 : 3400;
-        const globeSize = innerWidth < 768 ? Math.min(innerWidth * .72, 280) : Math.min(innerWidth * .31, 440);
-        const particles = Array.from({ length:particleCount }, (_, index) => {
-          const point = svgPoints.length ? svgPoints[(index * 97 + Math.floor(Math.random() * svgPoints.length)) % svgPoints.length] : { x:300 + Math.cos(index) * 160, y:300 + Math.sin(index) * 160 };
+        const particleCount = innerWidth < 768 ? 2300 : 4300;
+        const sourcePoints = sampleGlobeTypography(particleCount);
+        const targetPoints = sampleCompassBase(particleCount);
+        const particles = sourcePoints.map((sourcePoint, index) => {
+          const point = targetPoints[index];
           const dx = point.x - 300;
           const dy = point.y - 300;
-          const distance = Math.hypot(dx, dy);
-          const targetAngle = Math.atan2(dy, dx);
-          const routeRadius = 18 + distance * (.28 + Math.random() * .38);
-          const routeAngle = targetAngle + (Math.random() - .5) * 1.7;
+          const radius = Math.hypot(dx, dy);
+          const angle = Math.atan2(dy, dx);
+          const fieldRadius = Math.min(rect.width * .49, Math.max(radius / 600 * rect.width, rect.width * (.08 + Math.random() * .44)));
+          const fieldAngle = angle + (Math.random() - .5) * 1.45;
           return {
-            band:[-.44,-.26,-.08,.1,.28,.46][index % 6] + (Math.random() - .5) * .10,
-            horizontal:(Math.random() - .5) * .95,
-            phase:Math.random() * Math.PI * 2,
-            size:.58 + Math.random() * .78,
-            targetX:dx / 600 * rect.width,
-            targetY:dy / 600 * rect.height,
-            routeX:Math.cos(routeAngle) * routeRadius / 600 * rect.width,
-            routeY:Math.sin(routeAngle) * routeRadius / 600 * rect.height,
-            delay:distance / 300 * .15 + Math.random() * .08
+            ...sourcePoint,
+            targetX:target.x + dx / 600 * rect.width,
+            targetY:target.y + dy / 600 * rect.height,
+            fieldX:target.x + Math.cos(fieldAngle) * fieldRadius,
+            fieldY:target.y + Math.sin(fieldAngle) * fieldRadius,
+            releaseJitter:Math.random() * .09,
+            buildDelay:radius / 300 * .13 + Math.random() * .16,
+            bend:(Math.random() - .5) * rect.width * .09,
+            size:.34 + Math.random() * .27
           };
         });
+        const projector = new THREE.Vector3();
         const transitionStart = performance.now();
         transitionStarted = true;
         hero.classList.add('is-assembly');
@@ -243,57 +294,44 @@
         const tick = now => {
           const t = Math.min(1, (now - transitionStart) / TRANSITION);
           const e = reduceMotion ? 1 : ease(t);
-          // 1. The real globe descends while retaining enough of its surface
-          // to remain legible. It never shares a full-opacity frame with the
-          // finished compass.
-          const lowering = ease(clamp01((e - .04) / .42));
-          const finalGlobeScale = innerWidth < 768 ? .78 : .86;
+          const lowering = ease(clamp01((e - .03) / .54));
+          const finalGlobeScale = innerWidth < 768 ? .83 : .9;
           stage.position.lerpVectors(originWorld, targetWorld, lowering);
           stage.scale.setScalar(mix(1, finalGlobeScale, lowering));
-          material.uniforms.fade.value = 1 - ease(clamp01((e - .20) / .32));
-          // 2. The final drawing is only allowed to strengthen after the
-          // particle rings already exist. This is a texture consolidation,
-          // never a replacement illustration.
-          compass.style.opacity = String(clamp01((e - .73) / .23));
-          compassNeedle.style.opacity = String(clamp01((e - .86) / .08));
-          if (!contentRevealStarted && e >= .52) {
+          stage.updateMatrixWorld(true);
+          // This is a stencil dissolve, never a global alpha fade: individual
+          // glyph cells disappear as their matching particles are released.
+          material.uniforms.dissolve.value = clamp01((e - .13) / .31);
+          compass.style.opacity = String(clamp01((e - .80) / .20));
+          compassNeedle.style.opacity = String(clamp01((e - .90) / .08));
+          if (!contentRevealStarted && e >= .32) {
             contentRevealStarted = true;
             hero.classList.add('is-revealing');
             requestAnimationFrame(() => hero.classList.add('is-revealed'));
           }
-          if (!needleArrivalStarted && e >= .86) {
+          if (!needleArrivalStarted && e >= .90) {
             needleArrivalStarted = true;
             compass.classList.add('is-arriving');
             setTimeout(() => compass.classList.remove('is-arriving'), 760);
           }
           context.clearRect(0, 0, innerWidth, innerHeight);
           if (!reduceMotion) {
-            const globeX = mix(source.x, target.x, lowering);
-            const globeY = mix(source.y, target.y, lowering);
             particles.forEach(particle => {
-              // Release is deliberately quicker and noisier than the descent.
-              // The particles do not collapse to one visible dot: each gets a
-              // broad waypoint inside the future compass before finding its
-              // exact coordinate sampled from compass-base.svg.
-              const release = ease(clamp01((e - (.075 + particle.delay * .3)) / .15));
-              const route = ease(clamp01((e - (.20 + particle.delay * .38)) / .24));
-              const build = ease(clamp01((e - (.42 + particle.delay)) / .34));
-              const sourceX = globeX + particle.horizontal * globeSize * .48;
-              const sourceY = globeY + particle.band * globeSize * .38;
-              const looseX = sourceX + Math.cos(particle.phase * 1.37 + e * 13) * (24 + particle.size * 16) * release;
-              const looseY = sourceY + Math.sin(particle.phase * 1.91 + e * 11) * (19 + particle.size * 12) * release + release * 16;
-              const waypointX = target.x + particle.routeX;
-              const waypointY = target.y + particle.routeY;
-              const targetX = target.x + particle.targetX;
-              const targetY = target.y + particle.targetY;
-              const routedX = mix(looseX, waypointX, route);
-              const routedY = mix(looseY, waypointY, route);
-              const x = mix(routedX, targetX, build);
-              const y = mix(routedY, targetY, build);
-              const alpha = Math.min(1, release * .84) * (build > .02 ? .80 : .54);
+              const released = ease(clamp01((material.uniforms.dissolve.value - particle.dissolve - particle.releaseJitter) / .18));
+              if (released <= .001) return;
+              const sourcePoint = projectGlobePoint(particle.u, particle.v, projector);
+              const spread = ease(clamp01((e - .19 - particle.releaseJitter) / .34));
+              const assembly = ease(clamp01((e - .48 - particle.buildDelay) / .36));
+              const driftX = Math.cos((particle.u + e * .28) * 17) * particle.bend * (1 - assembly);
+              const driftY = Math.sin((particle.v - e * .22) * 19) * particle.bend * .55 * (1 - assembly);
+              const fieldX = mix(sourcePoint.x, particle.fieldX + driftX, spread);
+              const fieldY = mix(sourcePoint.y, particle.fieldY + driftY, spread);
+              const x = mix(fieldX, particle.targetX, assembly);
+              const y = mix(fieldY, particle.targetY, assembly);
+              const alpha = (.38 + assembly * .42) * released;
               context.globalAlpha = alpha;
               context.fillStyle = INK;
-              context.fillRect(x - particle.size / 2, y - particle.size / 2, particle.size, particle.size);
+              context.fillRect(x - particle.size * .5, y - particle.size * .5, particle.size, particle.size);
             });
           }
           if (t < 1) requestAnimationFrame(tick); else {
@@ -305,13 +343,11 @@
               hero.classList.add('is-revealing');
               requestAnimationFrame(() => hero.classList.add('is-revealed'));
             }
-            // The last particle frame and the SVG texture overlap while the
-            // preloader fades. There is deliberately no canvas clear here.
-            setTimeout(() => preloader.classList.add('is-complete'), 260);
+            setTimeout(() => preloader.classList.add('is-complete'), 480);
             setTimeout(() => {
               compass.classList.add('is-idle');
               window.dispatchEvent(new Event('compass:interaction-ready'));
-            }, 2760);
+            }, 2980);
             resolve();
           }
         };
