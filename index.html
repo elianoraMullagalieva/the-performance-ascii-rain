@@ -22,10 +22,10 @@
     .menu { position:absolute; top:26px; left:50%; display:grid; grid-template-columns:repeat(4,130px); gap:38px; transform:translateX(-50%); }
     .menu__group { display:grid; gap:8px; align-content:start; }
     .menu b,.menu a,.cta,.eyebrow,.side-note,.meta { font-size:clamp(11px,1vw,13px); font-weight:500; line-height:1.32; letter-spacing:.08px; text-transform:uppercase; }
-    .menu b,.menu a { font-size:clamp(10px,.92vw,12px); font-weight:400; letter-spacing:.01em; }.menu a { color:inherit; text-decoration:none; transition:color .24s cubic-bezier(.16,1,.3,1),transform .24s cubic-bezier(.16,1,.3,1); }.menu a:hover { color:var(--accent); transform:translateX(4px); }.menu .active { position:relative; padding-left:11px; }.menu .active:before { content:""; position:absolute; top:5px; left:0; width:4px; height:4px; background:var(--ink); transition:background .24s cubic-bezier(.16,1,.3,1); }.menu .active:hover:before { background:var(--accent); }
+    .menu b,.menu a { font-size:clamp(10px,.92vw,12px); font-weight:400; letter-spacing:.01em; }.menu a { position:relative; color:inherit; text-decoration:none; transition:color .24s cubic-bezier(.16,1,.3,1),transform .24s cubic-bezier(.16,1,.3,1); }.menu a:before { content:""; position:absolute; top:50%; left:-10px; width:4px; height:4px; background:var(--accent); opacity:0; transform:translateY(-50%) scale(.3); transition:opacity .18s ease,transform .24s cubic-bezier(.16,1,.3,1); }.menu a:hover { color:var(--accent); transform:translateX(4px); }.menu a:hover:before { opacity:1; transform:translateY(-50%) scale(1); }
     .cta { position:absolute; top:21px; right:30px; display:flex; align-items:center; justify-content:space-between; width:224px; height:50px; padding:0 17px; border:1px solid var(--ink); color:var(--ink); background:transparent; cursor:pointer; transition:border-color .24s cubic-bezier(.16,1,.3,1),color .24s cubic-bezier(.16,1,.3,1),background .24s cubic-bezier(.16,1,.3,1),transform .24s cubic-bezier(.16,1,.3,1); }.cta:hover { border-color:var(--accent); color:var(--paper); background:var(--accent); transform:translateY(-1px); }.cta:active { transform:translateY(0) scale(.98); }.cta:hover .cta__arrow { filter:brightness(0) invert(1); }.cta__label--mobile,.menu-toggle,.mobile-mantra { display:none; }.cta__arrow { width:12px; height:12px; object-fit:contain; transition:filter .24s cubic-bezier(.16,1,.3,1); }
     .copy { position:absolute; top:22.3%; left:0; width:100%; text-align:center; }.eyebrow { margin:0 0 14px; letter-spacing:.32px; }.title { margin:0; display:flex; flex-direction:column; align-items:center; font-family:Anticva,serif; font-size:clamp(49px,4.85vw,70px); font-weight:400; line-height:.98; letter-spacing:-2.8px; }.title__line,.title__word { display:block; white-space:nowrap; }.title__line--primary { position:relative; }.title > .title__line + .title__line { margin-top:10px; }.side-note { position:absolute; top:50%; width:max-content; font-family:Onest,Manrope,sans-serif; font-size:clamp(11px,.86vw,12px); font-weight:300; text-align:left; line-height:1.35; letter-spacing:.03em; transform:translateY(-50%); }.side-note span,.meta span { display:block; }.side-note--left { right:calc(100% + clamp(18px,1.857vw,32px)); }.side-note--right { left:calc(100% + clamp(18px,1.857vw,32px)); }
-    .compass { position:absolute; top:50.4%; left:50%; width:clamp(300px,32vw,460px); aspect-ratio:1; transform:translateX(-50%); }.compass__base,.compass__needle,.compass__patina { position:absolute; inset:0; width:100%; height:100%; }.compass__needle { z-index:2; transform-origin:50% 50%; will-change:transform; }.compass__patina { z-index:3; opacity:.34; mix-blend-mode:multiply; pointer-events:none; }
+    .compass { position:absolute; top:50.4%; left:50%; width:clamp(300px,32vw,460px); aspect-ratio:1; transform:translateX(-50%); }.compass__base,.compass__needle,.compass__patina { position:absolute; inset:0; width:100%; height:100%; }.compass__needle { z-index:2; transform-origin:50% 50%; transition:opacity .28s cubic-bezier(.16,1,.3,1); will-change:transform,opacity; }.compass.is-arriving .compass__needle { animation:needle-arrival .72s cubic-bezier(.22,1,.36,1) both; }.compass__patina { z-index:3; opacity:.34; mix-blend-mode:multiply; pointer-events:none; }
     .meta { position:absolute; bottom:38px; line-height:1.45; letter-spacing:.08px; }.meta--left { left:24px; }.meta--right { right:30px; text-align:right; }.cross { position:absolute; top:58.2%; font-family:Anticva,serif; font-size:32px; font-weight:300; opacity:.55; }.cross--left { left:11px; }.cross--right { right:11px; }
     @media (max-width:1120px) { .menu { grid-template-columns:repeat(4,108px); gap:20px; } }
     @media (max-width:960px) { .menu { display:none; }.copy { top:19%; }.menu-toggle { position:absolute; z-index:4; top:32px; left:30px; display:flex; flex-direction:column; gap:6px; width:27px; padding:0; border:0; background:transparent; cursor:pointer; }.menu-toggle i { display:block; width:27px; height:1px; background:var(--ink); }.menu-toggle i:nth-child(2) { width:16px; }.hero.menu-open .menu { position:absolute; z-index:3; top:84px; left:20px; display:grid; grid-template-columns:repeat(2,minmax(120px,1fr)); width:calc(100% - 40px); gap:24px; padding:18px; background:rgba(245,241,239,.96); border:1px solid rgba(22,21,20,.25); transform:none; } }
@@ -33,6 +33,7 @@
     @media (max-width:360px) { .brand { width:110px; }.menu-toggle { left:14px; }.cta { right:12px; width:64px; padding:0 10px; }.title { width:calc(100% - 28px); font-size:clamp(36px,12.56vw,42px); }.side-note--left { left:14px; }.side-note--right { right:12px; }.meta--left { left:12px; }.meta--right { right:12px; } }
     @media (hover:none), (pointer:coarse) { .compass__needle { animation:needle-drift 6.6s cubic-bezier(.45,0,.55,1) infinite alternate; } }
     @keyframes needle-drift { from { transform:rotate(-13deg); } to { transform:rotate(13deg); } }
+    @keyframes needle-arrival { 0% { transform:rotate(-4deg); } 56% { transform:rotate(2.2deg); } 78% { transform:rotate(-1deg); } 100% { transform:rotate(0deg); } }
     @media (prefers-reduced-motion:reduce) { .compass__needle { animation:none; transition:none; } }
     @media (hover:hover) and (pointer:fine) { body.has-cursor-mark a:not(.brand),body.has-cursor-mark button { cursor:none; }body.has-cursor-mark .brand { cursor:pointer; }.cursor-mark { position:fixed; z-index:20; top:0; left:0; width:8px; height:8px; background:var(--accent); pointer-events:none; opacity:0; transform:translate3d(var(--cursor-x,-20px),var(--cursor-y,-20px),0) translate(-50%,-50%) scale(.35); transition:opacity .16s ease,transform .18s cubic-bezier(.16,1,.3,1); will-change:transform,opacity; }.cursor-mark.is-active { opacity:1; transform:translate3d(var(--cursor-x,-20px),var(--cursor-y,-20px),0) translate(-50%,-50%) scale(1); }.menu-toggle:hover i { background:var(--accent); }.menu-toggle i { transition:background .24s cubic-bezier(.16,1,.3,1); } }
     .preloader { position:fixed; z-index:30; inset:0; overflow:hidden; background:var(--paper); opacity:1; visibility:visible; transition:background-color .42s ease,opacity .32s ease,visibility .32s step-end; }.preloader.is-transitioning { background-color:transparent; }.preloader.is-complete { opacity:0; visibility:hidden; pointer-events:none; }.preloader__globe,.preloader__particles { position:absolute; inset:0; display:block; width:100%; height:100%; }.preloader__particles { pointer-events:none; }.loader-counter { position:absolute; left:50%; bottom:clamp(32px,8.9vh,96px); color:#2B2B29; font:300 clamp(22px,1.56vw,30px)/1 Onest,sans-serif; letter-spacing:-.03em; transform:translateX(-50%); transition:opacity .26s ease; user-select:none; }.preloader.is-transitioning .loader-counter { opacity:0; }.is-preloading .hero > * { opacity:0; }.hero > * { transition:opacity .46s cubic-bezier(.16,1,.3,1),transform .46s cubic-bezier(.16,1,.3,1); }.hero.is-assembly > * { opacity:0; }.hero.is-assembly .compass { opacity:1; transition-delay:.42s; }.hero.is-revealing .copy { opacity:1; }.hero.is-revealing .brand,.hero.is-revealing .menu,.hero.is-revealing .cta,.hero.is-revealing .meta,.hero.is-revealing .cross { opacity:0; }.hero.is-revealing .eyebrow,.hero.is-revealing .title__word,.hero.is-revealing .title__line--secondary,.hero.is-revealing .side-note { opacity:0; transform:translateY(8px); }.hero.is-revealing.is-revealed .brand,.hero.is-revealing.is-revealed .menu,.hero.is-revealing.is-revealed .cta { opacity:1; transition-delay:.08s; }.hero.is-revealing.is-revealed .eyebrow { opacity:1; transform:none; transition:opacity .34s ease .04s,transform .46s cubic-bezier(.16,1,.3,1) .04s; }.hero.is-revealing.is-revealed .title__word { opacity:1; transform:none; transition:opacity .38s ease .14s,transform .52s cubic-bezier(.16,1,.3,1) .14s; }.hero.is-revealing.is-revealed .title__line--secondary { opacity:1; transform:none; transition:opacity .38s ease .24s,transform .52s cubic-bezier(.16,1,.3,1) .24s; }.hero.is-revealing.is-revealed .side-note { opacity:1; transform:translateY(-50%); transition:opacity .34s ease .34s,transform .46s cubic-bezier(.16,1,.3,1) .34s; }.hero.is-revealing.is-revealed .meta,.hero.is-revealing.is-revealed .cross { opacity:1; transition-delay:.22s; }
@@ -61,7 +62,7 @@
     (() => {
       const MIN_TOTAL = 1700;
       const MAX_TOTAL = 3600;
-      const TRANSITION = 1150;
+      const TRANSITION = 1450;
       const BG = 0xF5F1EF;
       const INK = '#2B2B29';
       const preloader = document.querySelector('.preloader');
@@ -70,6 +71,7 @@
       const particlesCanvas = document.querySelector('#preloader-particles');
       const counter = document.querySelector('#counter');
       const compass = document.querySelector('.compass');
+      const compassNeedle = document.querySelector('.compass__needle');
       const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
       const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
       const startedAt = performance.now();
@@ -88,6 +90,8 @@
       let pointerY = 0;
       let frame;
       let transitionStarted = false;
+      let contentRevealStarted = false;
+      let needleArrivalStarted = false;
       renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
       renderer.setClearColor(BG, 0);
       scene.add(stage);
@@ -178,10 +182,11 @@
         const target = { x:rect.left + rect.width / 2, y:rect.top + rect.height / 2 };
         const originWorld = new THREE.Vector3();
         const targetWorld = toWorld(target.x, target.y);
-        const particles = Array.from({ length:180 }, (_, index) => {
+        const particles = Array.from({ length:190 }, (_, index) => {
           const angle = Math.random() * Math.PI * 2;
           const band = [-.46,-.23,.02,.27,.48][index % 5] + (Math.random() - .5) * .09;
-          return { angle, band, letterOffset:(Math.random() - .5) * .88, targetRadius:rect.width * (.17 + Math.random() * .36), drift:(Math.random() - .5) * 16, red:index % 43 === 0 };
+          const ring = index % 5;
+          return { angle, band, ring, letterOffset:(Math.random() - .5) * .88, targetRadius:rect.width * ([.13,.20,.28,.36,.44][ring] + (Math.random() - .5) * .026), drift:(Math.random() - .5) * 15, red:index % 47 === 0 };
         });
         const transitionStart = performance.now();
         transitionStarted = true;
@@ -192,26 +197,38 @@
         const tick = now => {
           const t = Math.min(1, (now - transitionStart) / TRANSITION);
           const e = reduceMotion ? 1 : ease(t);
-          const lowering = ease(clamp01((e - .03) / .60));
-          const particleProgress = ease(clamp01((e - .28) / .72));
+          const lowering = ease(clamp01((e - .04) / .64));
+          const particleProgress = ease(clamp01((e - .14) / .76));
           stage.position.lerpVectors(originWorld, targetWorld, lowering);
           stage.scale.setScalar(1 - lowering * .12);
-          material.uniforms.fade.value = 1 - ease(clamp01((e - .38) / .54));
-          compass.style.opacity = String(clamp01((e - .62) / .28));
+          material.uniforms.fade.value = 1 - ease(clamp01((e - .34) / .55));
+          compass.style.opacity = String(clamp01((e - .68) / .24));
+          compassNeedle.style.opacity = String(clamp01((e - .82) / .12));
+          if (!contentRevealStarted && e >= .55) {
+            contentRevealStarted = true;
+            hero.classList.add('is-revealing');
+            requestAnimationFrame(() => hero.classList.add('is-revealed'));
+          }
+          if (!needleArrivalStarted && e >= .86) {
+            needleArrivalStarted = true;
+            compass.classList.add('is-arriving');
+            setTimeout(() => compass.classList.remove('is-arriving'), 760);
+          }
           context.clearRect(0, 0, innerWidth, innerHeight);
           if (!reduceMotion) {
-            const rings = [0.17, 0.26, 0.35, 0.44];
+            const rings = [0.13, 0.20, 0.28, 0.36, 0.44];
             context.lineWidth = 1;
             context.strokeStyle = '#2B2B29';
-            context.globalAlpha = clamp01((e - .47) / .34) * .32;
             rings.forEach((ratio, index) => {
+              const ringProgress = ease(clamp01((e - (.30 + index * .075)) / .40));
+              context.globalAlpha = ringProgress * .34;
               context.beginPath();
-              context.arc(target.x, target.y, rect.width * ratio, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * clamp01((e - .42 - index * .045) / .46));
+              context.arc(target.x, target.y, rect.width * ratio, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * ringProgress);
               context.stroke();
             });
-            const lineLength = rect.width * Math.min(.5, clamp01((e - .61) / .30) * .5);
+            const lineLength = rect.width * Math.min(.5, clamp01((e - .76) / .18) * .5);
             if (lineLength) {
-              context.globalAlpha = clamp01((e - .61) / .22) * .52;
+              context.globalAlpha = clamp01((e - .76) / .16) * .52;
               context.beginPath();
               context.moveTo(target.x, target.y);
               context.lineTo(target.x + lineLength * .72, target.y - lineLength * .72);
@@ -222,8 +239,9 @@
               const loweredY = source.y + (target.y - source.y) * lowering;
               const originX = loweredX + particle.letterOffset * Math.min(innerWidth, innerHeight) * .24;
               const originY = loweredY + particle.band * Math.min(innerWidth, innerHeight) * .22;
-              const endX = target.x + Math.cos(particle.angle) * particle.targetRadius;
-              const endY = target.y + Math.sin(particle.angle) * particle.targetRadius;
+              const ringExpansion = ease(clamp01((e - (.26 + particle.ring * .055)) / .58));
+              const endX = target.x + Math.cos(particle.angle) * particle.targetRadius * ringExpansion;
+              const endY = target.y + Math.sin(particle.angle) * particle.targetRadius * ringExpansion;
               const x = originX + (endX - originX) * particleProgress + Math.sin(t * Math.PI) * particle.drift;
               const y = originY + (endY - originY) * particleProgress - Math.sin(t * Math.PI) * 9;
               context.globalAlpha = Math.sin(Math.PI * particleProgress) * .68;
@@ -234,9 +252,12 @@
           if (t < 1) requestAnimationFrame(tick); else {
             cancelAnimationFrame(frame);
             compass.style.opacity = '1';
+            compassNeedle.style.opacity = '1';
             hero.classList.remove('is-assembly');
-            hero.classList.add('is-revealing');
-            requestAnimationFrame(() => hero.classList.add('is-revealed'));
+            if (!contentRevealStarted) {
+              hero.classList.add('is-revealing');
+              requestAnimationFrame(() => hero.classList.add('is-revealed'));
+            }
             // The last drawn rings stay visible while the actual SVG compass
             // settles underneath them. This prevents a blank frame between
             // the particle layer and the finished illustration.
