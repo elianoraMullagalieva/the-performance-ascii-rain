@@ -81,7 +81,7 @@
       const material = new THREE.ShaderMaterial({
         uniforms:{ map:{ value:null }, dissolve:{ value:0 } },
         vertexShader:'varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }',
-        fragmentShader:'uniform sampler2D map; uniform float dissolve; varying vec2 vUv; float hash(vec2 p){ return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453123); } void main(){ vec4 c=texture2D(map,vUv); if(c.a<.04) discard; float cell=hash(floor(vUv*vec2(256.,144.))); if(cell<dissolve) discard; float a=smoothstep(.04,.11,c.a); if(gl_FrontFacing){gl_FragColor=vec4(c.rgb*a,a);}else{gl_FragColor=vec4(mix(c.rgb,vec3(.68),.72)*a,a*.42);}}',
+        fragmentShader:'uniform sampler2D map; uniform float dissolve; varying vec2 vUv; float hash(vec2 p){ return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453123); } void main(){ vec4 c=texture2D(map,vUv); if(c.a<.04) discard; float cell=hash(floor(vUv*vec2(256.,144.))); float threshold=cell*.20+(1.-vUv.y)*.58; if(threshold<dissolve) discard; float a=smoothstep(.04,.11,c.a); if(gl_FrontFacing){gl_FragColor=vec4(c.rgb*a,a);}else{gl_FragColor=vec4(mix(c.rgb,vec3(.68),.72)*a,a*.42);}}',
         transparent:true, side:THREE.DoubleSide, depthWrite:false
       });
       const globe = new THREE.Mesh(new THREE.SphereGeometry(.98, 96, 64), material);
@@ -188,7 +188,7 @@
         const x = Math.floor(u * 256);
         const y = Math.floor(v * 144);
         const value = Math.sin(x * 127.1 + y * 311.7) * 43758.5453123;
-        return value - Math.floor(value);
+        return (value - Math.floor(value)) * .20 + (1 - v) * .58;
       };
       // The source points are sampled only from the dark pixels of the actual
       // globe typography. Their UV cell is the same cell that dissolves in the
@@ -218,10 +218,12 @@
       // grid guard prevents a pile of fat dots on dark, thicker SVG strokes.
       const sampleCompassBase = count => {
         const base = compass.querySelector('.compass__base');
+        const patina = compass.querySelector('.compass__patina');
         const map = document.createElement('canvas');
         map.width = map.height = 600;
         const mapContext = map.getContext('2d', { willReadFrequently:true });
         mapContext.drawImage(base, 0, 0, 600, 600);
+        mapContext.drawImage(patina, 0, 0, 600, 600);
         const points = [];
         const grid = new Set();
         try {
@@ -261,7 +263,7 @@
         const target = { x:rect.left + rect.width / 2, y:rect.top + rect.height / 2 };
         const originWorld = new THREE.Vector3();
         const targetWorld = toWorld(target.x, target.y);
-        const particleCount = innerWidth < 768 ? 2300 : 4300;
+        const particleCount = innerWidth < 768 ? 2600 : 4800;
         const sourcePoints = sampleGlobeTypography(particleCount);
         const targetPoints = sampleCompassBase(particleCount);
         const particles = sourcePoints.map((sourcePoint, index) => {
@@ -270,7 +272,7 @@
           const dy = point.y - 300;
           const radius = Math.hypot(dx, dy);
           const angle = Math.atan2(dy, dx);
-          const fieldRadius = Math.min(rect.width * .49, Math.max(radius / 600 * rect.width, rect.width * (.08 + Math.random() * .44)));
+          const fieldRadius = Math.min(rect.width * .40, Math.max(radius / 600 * rect.width, rect.width * (.07 + Math.random() * .34)));
           const fieldAngle = angle + (Math.random() - .5) * 1.45;
           return {
             ...sourcePoint,
@@ -278,10 +280,10 @@
             targetY:target.y + dy / 600 * rect.height,
             fieldX:target.x + Math.cos(fieldAngle) * fieldRadius,
             fieldY:target.y + Math.sin(fieldAngle) * fieldRadius,
-            releaseJitter:Math.random() * .09,
-            buildDelay:radius / 300 * .13 + Math.random() * .16,
-            bend:(Math.random() - .5) * rect.width * .09,
-            size:.34 + Math.random() * .27
+            releaseJitter:Math.random() * .055,
+            buildDelay:radius / 300 * .07 + Math.random() * .09,
+            bend:(Math.random() - .5) * rect.width * .045,
+            size:.40 + Math.random() * .31
           };
         });
         const projector = new THREE.Vector3();
@@ -301,8 +303,8 @@
           stage.updateMatrixWorld(true);
           // This is a stencil dissolve, never a global alpha fade: individual
           // glyph cells disappear as their matching particles are released.
-          material.uniforms.dissolve.value = clamp01((e - .13) / .31);
-          compass.style.opacity = String(clamp01((e - .80) / .20));
+          material.uniforms.dissolve.value = clamp01((e - .020) / .27);
+          compass.style.opacity = String(clamp01((e - .87) / .114));
           compassNeedle.style.opacity = String(clamp01((e - .90) / .08));
           if (!contentRevealStarted && e >= .32) {
             contentRevealStarted = true;
@@ -320,15 +322,15 @@
               const released = ease(clamp01((material.uniforms.dissolve.value - particle.dissolve - particle.releaseJitter) / .18));
               if (released <= .001) return;
               const sourcePoint = projectGlobePoint(particle.u, particle.v, projector);
-              const spread = ease(clamp01((e - .19 - particle.releaseJitter) / .34));
-              const assembly = ease(clamp01((e - .48 - particle.buildDelay) / .36));
+              const spread = ease(clamp01((e - .085 - particle.releaseJitter) / .20));
+              const assembly = ease(clamp01((e - .31 - particle.buildDelay) / .225));
               const driftX = Math.cos((particle.u + e * .28) * 17) * particle.bend * (1 - assembly);
               const driftY = Math.sin((particle.v - e * .22) * 19) * particle.bend * .55 * (1 - assembly);
               const fieldX = mix(sourcePoint.x, particle.fieldX + driftX, spread);
               const fieldY = mix(sourcePoint.y, particle.fieldY + driftY, spread);
               const x = mix(fieldX, particle.targetX, assembly);
               const y = mix(fieldY, particle.targetY, assembly);
-              const alpha = (.38 + assembly * .42) * released;
+              const alpha = (.64 + assembly * .25) * released;
               context.globalAlpha = alpha;
               context.fillStyle = INK;
               context.fillRect(x - particle.size * .5, y - particle.size * .5, particle.size, particle.size);
