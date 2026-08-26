@@ -61,7 +61,7 @@
   <script>
     (() => {
       const HOLD_GLOBE = 1700;
-      const TRANSITION = 7400;
+      const TRANSITION = 7180;
       const BG = 0xF5F1EF;
       const INK = '#2B2B29';
       const preloader = document.querySelector('.preloader');
@@ -303,7 +303,7 @@
           stage.updateMatrixWorld(true);
           // This is a stencil dissolve, never a global alpha fade: individual
           // glyph cells disappear as their matching particles are released.
-          material.uniforms.dissolve.value = clamp01((e - .020) / .27);
+          material.uniforms.dissolve.value = clamp01((e - .020) / .245);
           compass.style.opacity = String(clamp01((e - .87) / .103));
           compassNeedle.style.opacity = String(clamp01((e - .90) / .08));
           if (!contentRevealStarted && e >= .32) {
@@ -319,7 +319,7 @@
           context.clearRect(0, 0, innerWidth, innerHeight);
           if (!reduceMotion) {
             particles.forEach(particle => {
-              const released = ease(clamp01((material.uniforms.dissolve.value - particle.dissolve - particle.releaseJitter) / .18));
+              const released = ease(clamp01((material.uniforms.dissolve.value - particle.dissolve - particle.releaseJitter) / .164));
               if (released <= .001) return;
               const sourcePoint = projectGlobePoint(particle.u, particle.v, projector);
               const spread = ease(clamp01((e - .085 - particle.releaseJitter) / .20));
