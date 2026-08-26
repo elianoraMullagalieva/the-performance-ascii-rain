@@ -61,7 +61,7 @@
   <script>
     (() => {
       const HOLD_GLOBE = 1700;
-      const TRANSITION = 7180;
+      const TRANSITION = 7400;
       const BG = 0xF5F1EF;
       const INK = '#2B2B29';
       const preloader = document.querySelector('.preloader');
@@ -303,15 +303,15 @@
           stage.updateMatrixWorld(true);
           // This is a stencil dissolve, never a global alpha fade: individual
           // glyph cells disappear as their matching particles are released.
-          material.uniforms.dissolve.value = clamp01((e - .020) / .245);
-          compass.style.opacity = String(clamp01((e - .87) / .051));
-          compassNeedle.style.opacity = String(clamp01((e - .885) / .08));
+          material.uniforms.dissolve.value = clamp01((e - .020) / .27);
+          compass.style.opacity = String(clamp01((e - .87) / .103));
+          compassNeedle.style.opacity = String(clamp01((e - .90) / .08));
           if (!contentRevealStarted && e >= .32) {
             contentRevealStarted = true;
             hero.classList.add('is-revealing');
             requestAnimationFrame(() => hero.classList.add('is-revealed'));
           }
-          if (!needleArrivalStarted && e >= .885) {
+          if (!needleArrivalStarted && e >= .90) {
             needleArrivalStarted = true;
             compass.classList.add('is-arriving');
             setTimeout(() => compass.classList.remove('is-arriving'), 760);
@@ -319,7 +319,7 @@
           context.clearRect(0, 0, innerWidth, innerHeight);
           if (!reduceMotion) {
             particles.forEach(particle => {
-              const released = ease(clamp01((material.uniforms.dissolve.value - particle.dissolve - particle.releaseJitter) / .164));
+              const released = ease(clamp01((material.uniforms.dissolve.value - particle.dissolve - particle.releaseJitter) / .18));
               if (released <= .001) return;
               const sourcePoint = projectGlobePoint(particle.u, particle.v, projector);
               const spread = ease(clamp01((e - .085 - particle.releaseJitter) / .20));
