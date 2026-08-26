@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Anticva&family=Cormorant+Garamond:wght@400&family=Manrope:wght@300;400;500;600&family=Onest:wght@300&display=swap" rel="stylesheet">
   <script>document.documentElement.classList.add('is-preloading');</script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.min.js"></script>
   <style>
     :root { --paper:#f5f1ef; --ink:#161514; --accent:#D12F3F; }
     * { box-sizing:border-box; }
@@ -29,21 +30,21 @@
     .meta { position:absolute; bottom:38px; line-height:1.45; letter-spacing:.08px; }.meta--left { left:24px; }.meta--right { right:30px; text-align:right; }.cross { position:absolute; top:58.2%; font-family:Anticva,serif; font-size:32px; font-weight:300; opacity:.55; }.cross--left { left:11px; }.cross--right { right:11px; }
     @media (max-width:1120px) { .menu { grid-template-columns:repeat(4,108px); gap:20px; } }
     @media (max-width:960px) { .menu { display:none; }.copy { top:19%; }.menu-toggle { position:absolute; z-index:4; top:32px; left:30px; display:flex; flex-direction:column; gap:6px; width:27px; padding:0; border:0; background:transparent; cursor:pointer; }.menu-toggle i { display:block; width:27px; height:1px; background:var(--ink); }.menu-toggle i:nth-child(2) { width:16px; }.hero.menu-open .menu { position:absolute; z-index:3; top:84px; left:20px; display:grid; grid-template-columns:repeat(2,minmax(120px,1fr)); width:calc(100% - 40px); gap:24px; padding:18px; background:rgba(245,241,239,.96); border:1px solid rgba(22,21,20,.25); transform:none; } }
-    @media (max-width:780px) { .brand { top:24px; left:50%; width:119px; transform:translateX(-50%); }.brand__mark { width:22px; height:27px; margin-bottom:6px; }.brand__name { font-size:10.73px; letter-spacing:.429px; }.brand__sub { margin-top:3px; font-size:5.11px; font-weight:300; letter-spacing:-.15px; }.menu-toggle { top:42px; left:20px; }.cta { top:36px; right:20px; width:71px; height:28px; padding:0 12px; font-size:7px; }.cta__label--desktop { display:none; }.cta__label--mobile { display:block; }.cta__arrow { width:5px; height:5px; }.copy { top:clamp(156px,22.75svh,192px); }.eyebrow { margin-bottom:14px; font-size:10px; letter-spacing:.4px; }.title { width:calc(100% - 40px); margin:0 auto; font-size:clamp(38px,12.56vw,49px); line-height:1.01; letter-spacing:-1.47px; }.title > .title__line + .title__line { margin-top:0; }.title__line--primary { position:static; }.title br.mobile-only { display:block; }.side-note { top:35.3svh; width:70px; font-size:9px; line-height:1.2; letter-spacing:.04em; transform:none; }.side-note--left { left:20px; right:auto; }.side-note--right { left:auto; right:18px; }.mobile-mantra { position:absolute; z-index:2; top:clamp(370px,47.6svh,402px); left:50%; display:flex; flex-direction:column; align-items:center; transform:translateX(-50%); color:#474540; font-family:Onest,Manrope,sans-serif; font-size:18px; font-weight:300; line-height:1; white-space:nowrap; }.mobile-mantra__dots { display:flex; flex-direction:column; align-items:center; gap:3px; height:19px; margin-bottom:12px; }.mobile-mantra__dots img { display:block; object-fit:contain; }.mobile-mantra__dots img:nth-child(1) { width:5px; height:5px; }.mobile-mantra__dots img:nth-child(2) { width:3px; height:3px; }.mobile-mantra__dots img:nth-child(3) { width:1.5px; height:1.5px; }.compass { top:clamp(515px,67.3svh,568px); width:min(52vw,200px); }.meta { bottom:clamp(20px,3.1svh,26px); font-size:8px; line-height:1.5; letter-spacing:.24px; }.meta--left { left:20px; }.meta--right { right:20px; }.cross { display:none; } }
+    @media (max-width:780px) { .brand { top:24px; left:50%; width:119px; transform:translateX(-50%); }.brand__mark { width:22px; height:27px; margin-bottom:6px; }.brand__name { font-size:10.73px; letter-spacing:.429px; }.brand__sub { margin-top:3px; font-size:5.11px; font-weight:300; letter-spacing:-.15px; }.menu-toggle { top:42px; left:20px; }.cta { top:36px; right:20px; width:71px; height:28px; padding:0 12px; font-size:7px; }.cta__label--desktop { display:none; }.cta__label--mobile { display:block; }.cta__arrow { width:5px; height:5px; }.copy { top:clamp(156px,22.75svh,192px); }.eyebrow { margin-bottom:14px; font-size:10px; letter-spacing:.4px; }.title { width:calc(100% - 40px); margin:0 auto; font-size:clamp(38px,12.56vw,49px); line-height:1.01; letter-spacing:-1.47px; }.title > .title__line + .title__line { margin-top:0; }.title__line--primary { position:static; }.title br.mobile-only { display:block; }.side-note { top:35.3svh; width:70px; font-size:9px; line-height:1.2; letter-spacing:.04em; transform:none; }.hero.is-revealing.is-revealed .side-note { transform:none; }.side-note--left { left:20px; right:auto; }.side-note--right { left:auto; right:18px; }.mobile-mantra { position:absolute; z-index:2; top:clamp(370px,47.6svh,402px); left:50%; display:flex; flex-direction:column; align-items:center; transform:translateX(-50%); color:#474540; font-family:Onest,Manrope,sans-serif; font-size:18px; font-weight:300; line-height:1; white-space:nowrap; }.mobile-mantra__dots { display:flex; flex-direction:column; align-items:center; gap:3px; height:19px; margin-bottom:12px; }.mobile-mantra__dots img { display:block; object-fit:contain; }.mobile-mantra__dots img:nth-child(1) { width:5px; height:5px; }.mobile-mantra__dots img:nth-child(2) { width:3px; height:3px; }.mobile-mantra__dots img:nth-child(3) { width:1.5px; height:1.5px; }.compass { top:clamp(515px,67.3svh,568px); width:min(52vw,200px); }.meta { bottom:clamp(20px,3.1svh,26px); font-size:8px; line-height:1.5; letter-spacing:.24px; }.meta--left { left:20px; }.meta--right { right:20px; }.cross { display:none; } }
     @media (max-width:360px) { .brand { width:110px; }.menu-toggle { left:14px; }.cta { right:12px; width:64px; padding:0 10px; }.title { width:calc(100% - 28px); font-size:clamp(36px,12.56vw,42px); }.side-note--left { left:14px; }.side-note--right { right:12px; }.meta--left { left:12px; }.meta--right { right:12px; } }
     @media (hover:none), (pointer:coarse) { .compass__needle { animation:needle-drift 6.6s cubic-bezier(.45,0,.55,1) infinite alternate; } }
     @keyframes needle-drift { from { transform:rotate(-13deg); } to { transform:rotate(13deg); } }
     @media (prefers-reduced-motion:reduce) { .compass__needle { animation:none; transition:none; } }
     @media (hover:hover) and (pointer:fine) { body.has-cursor-mark a,body.has-cursor-mark button { cursor:none; }.cursor-mark { position:fixed; z-index:20; top:0; left:0; width:8px; height:8px; background:var(--accent); pointer-events:none; opacity:0; transform:translate3d(var(--cursor-x,-20px),var(--cursor-y,-20px),0) translate(-50%,-50%) scale(.35); transition:opacity .16s ease,transform .18s cubic-bezier(.16,1,.3,1); will-change:transform,opacity; }.cursor-mark.is-active { opacity:1; transform:translate3d(var(--cursor-x,-20px),var(--cursor-y,-20px),0) translate(-50%,-50%) scale(1); }.menu-toggle:hover i { background:var(--accent); }.menu-toggle i { transition:background .24s cubic-bezier(.16,1,.3,1); } }
-    .preloader { position:fixed; z-index:30; inset:0; overflow:hidden; background:var(--paper); opacity:1; visibility:visible; transition:background-color .42s ease,opacity .36s ease,visibility .36s step-end; }.preloader.is-transitioning { background-color:transparent; }.preloader.is-transitioning .preloader__globe,.preloader.is-transitioning .preloader__label { opacity:0; transition:opacity .38s cubic-bezier(.16,1,.3,1) .12s; }.preloader.is-complete { opacity:0; visibility:hidden; pointer-events:none; }.preloader__globe,.preloader__particles { position:absolute; inset:0; width:100%; height:100%; }.preloader__particles { pointer-events:none; }.preloader__label { position:absolute; left:50%; bottom:clamp(28px,8vh,84px); color:var(--ink); font:300 clamp(12px,1vw,16px)/1 Onest,sans-serif; letter-spacing:.08em; text-transform:uppercase; transform:translateX(-50%); }.is-preloading .hero > * { opacity:0; }.hero > * { transition:opacity .46s cubic-bezier(.16,1,.3,1); }
+    .preloader { position:fixed; z-index:30; inset:0; overflow:hidden; background:var(--paper); opacity:1; visibility:visible; transition:background-color .42s ease,opacity .32s ease,visibility .32s step-end; }.preloader.is-transitioning { background-color:transparent; }.preloader.is-complete { opacity:0; visibility:hidden; pointer-events:none; }.preloader__globe,.preloader__particles { position:absolute; inset:0; display:block; width:100%; height:100%; }.preloader__particles { pointer-events:none; }.loader-counter { position:absolute; left:50%; bottom:clamp(32px,8.9vh,96px); color:#2B2B29; font:300 clamp(22px,1.56vw,30px)/1 Onest,sans-serif; letter-spacing:-.03em; transform:translateX(-50%); transition:opacity .26s ease; user-select:none; }.preloader.is-transitioning .loader-counter { opacity:0; }.is-preloading .hero > * { opacity:0; }.hero > * { transition:opacity .46s cubic-bezier(.16,1,.3,1),transform .46s cubic-bezier(.16,1,.3,1); }.hero.is-assembly > * { opacity:0; }.hero.is-assembly .compass { opacity:1; transition-delay:.42s; }.hero.is-revealing .copy { opacity:1; }.hero.is-revealing .brand,.hero.is-revealing .menu,.hero.is-revealing .cta,.hero.is-revealing .meta,.hero.is-revealing .cross { opacity:0; }.hero.is-revealing .eyebrow,.hero.is-revealing .title__word,.hero.is-revealing .title__line--secondary,.hero.is-revealing .side-note { opacity:0; transform:translateY(8px); }.hero.is-revealing.is-revealed .brand,.hero.is-revealing.is-revealed .menu,.hero.is-revealing.is-revealed .cta { opacity:1; transition-delay:.08s; }.hero.is-revealing.is-revealed .eyebrow { opacity:1; transform:none; transition:opacity .34s ease .04s,transform .46s cubic-bezier(.16,1,.3,1) .04s; }.hero.is-revealing.is-revealed .title__word { opacity:1; transform:none; transition:opacity .38s ease .14s,transform .52s cubic-bezier(.16,1,.3,1) .14s; }.hero.is-revealing.is-revealed .title__line--secondary { opacity:1; transform:none; transition:opacity .38s ease .24s,transform .52s cubic-bezier(.16,1,.3,1) .24s; }.hero.is-revealing.is-revealed .side-note { opacity:1; transform:translateY(-50%); transition:opacity .34s ease .34s,transform .46s cubic-bezier(.16,1,.3,1) .34s; }.hero.is-revealing.is-revealed .meta,.hero.is-revealing.is-revealed .cross { opacity:1; transition-delay:.22s; }
     @media (prefers-reduced-motion:reduce) { .preloader__particles { display:none; } }
   </style>
 </head>
 <body>
   <section class="preloader" aria-label="Загрузка">
-    <canvas class="preloader__globe" id="preloader-globe" aria-hidden="true"></canvas>
+    <canvas class="preloader__globe" id="three-canvas" aria-hidden="true"></canvas>
     <canvas class="preloader__particles" id="preloader-particles" aria-hidden="true"></canvas>
-    <p class="preloader__label">The Performance</p>
+    <span class="loader-counter" id="counter" aria-live="polite">0%</span>
   </section>
   <main class="hero">
     <button class="menu-toggle" type="button" aria-label="Открыть меню" aria-expanded="false"><i></i><i></i><i></i></button>
@@ -59,120 +60,185 @@
   <i class="cursor-mark" aria-hidden="true"></i>
   <script>
     (() => {
-      const MIN_TOTAL = 1600;
-      const MAX_TOTAL = 3500;
-      const TRANSITION = 860;
+      const MIN_TOTAL = 1700;
+      const MAX_TOTAL = 3600;
+      const TRANSITION = 1000;
+      const BG = 0xF5F1EF;
+      const INK = '#2B2B29';
       const preloader = document.querySelector('.preloader');
-      const globeCanvas = document.querySelector('#preloader-globe');
+      const hero = document.querySelector('.hero');
+      const globeCanvas = document.querySelector('#three-canvas');
       const particlesCanvas = document.querySelector('#preloader-particles');
-      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+      const counter = document.querySelector('#counter');
+      const compass = document.querySelector('.compass');
+      const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
       const startedAt = performance.now();
-      let globeFrame;
+      const renderer = new THREE.WebGLRenderer({ canvas:globeCanvas, antialias:true, alpha:true });
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(46, innerWidth / innerHeight, .1, 100);
+      const stage = new THREE.Group();
+      const material = new THREE.ShaderMaterial({
+        uniforms:{ map:{ value:null }, fade:{ value:1 } },
+        vertexShader:'varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }',
+        fragmentShader:'uniform sampler2D map; uniform float fade; varying vec2 vUv; void main(){ vec4 c=texture2D(map,vUv); if(c.a<.04) discard; float a=smoothstep(.04,.11,c.a)*fade; if(gl_FrontFacing){gl_FragColor=vec4(c.rgb*a,a);}else{gl_FragColor=vec4(mix(c.rgb,vec3(.68),.72)*a,a*.42);}}',
+        transparent:true, side:THREE.DoubleSide, depthWrite:false
+      });
+      const globe = new THREE.Mesh(new THREE.SphereGeometry(.98, 96, 64), material);
+      let pointerX = 0;
+      let pointerY = 0;
+      let frame;
+      let transitionStarted = false;
+      renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+      renderer.setClearColor(BG, 0);
+      scene.add(stage);
+      stage.add(globe);
+      globe.rotation.x = -.56;
 
-      const sizeCanvas = (canvas) => {
-        const ratio = Math.min(window.devicePixelRatio || 1, 2);
-        canvas.width = Math.round(innerWidth * ratio);
-        canvas.height = Math.round(innerHeight * ratio);
+      const fitCamera = () => {
+        camera.fov = innerWidth < 768 ? 54 : 46;
+        camera.aspect = innerWidth / innerHeight;
+        camera.position.z = innerWidth < 768 ? 6.2 : 6;
+        camera.updateProjectionMatrix();
+        renderer.setSize(innerWidth, innerHeight);
+      };
+      const createTexture = () => {
+        const canvas = document.createElement('canvas');
+        const resolution = 2;
+        canvas.width = 2048 * resolution;
+        canvas.height = 1024 * resolution;
         const context = canvas.getContext('2d');
+        context.setTransform(resolution, 0, 0, resolution, 0, 0);
+        context.textAlign = 'center';
+        context.textBaseline = 'middle';
+        context.fontKerning = 'normal';
+        const bands = [{ y:115,title:45,sub:20 },{ y:340,title:62,sub:25 },{ y:595,title:75,sub:29 },{ y:840,title:52,sub:22 }];
+        bands.forEach(({ y,title,sub }) => {
+          context.font = `400 ${title}px "Cormorant Garamond"`;
+          context.fillStyle = INK;
+          [340,1024,1708].forEach(x => context.fillText('PERFORMANCE', x, y));
+          context.font = `300 ${sub}px "Onest", sans-serif`;
+          context.fillStyle = 'rgba(43,43,41,.64)';
+          [341,1024,1707].forEach(x => context.fillText('ИНСТИТУТ КУЛЬТУРЫ ВЛИЯНИЯ', x, y + 61));
+        });
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.ClampToEdgeWrapping;
+        texture.minFilter = texture.magFilter = THREE.LinearFilter;
+        texture.generateMipmaps = false;
+        return texture;
+      };
+      material.uniforms.map.value = createTexture();
+      fitCamera();
+      addEventListener('pointermove', event => {
+        pointerX = (event.clientX / innerWidth - .5) * 2;
+        pointerY = (event.clientY / innerHeight - .5) * 2;
+      }, { passive:true });
+      addEventListener('resize', fitCamera, { passive:true });
+
+      const render = (now) => {
+        globe.rotation.y = now * .00019;
+        globe.rotation.z = .12 + Math.sin(now * .00022) * .018;
+        globe.position.y = .05 * Math.sin(now * .00031);
+        stage.rotation.y += (pointerX * .18 - stage.rotation.y) * .045;
+        stage.rotation.x += (-pointerY * .10 - stage.rotation.x) * .045;
+        renderer.render(scene, camera);
+        frame = requestAnimationFrame(render);
+      };
+      render(performance.now());
+      const textureReady = Promise.all([document.fonts.load('400 80px "Cormorant Garamond"'), document.fonts.load('300 24px "Onest"')]).then(() => { material.uniforms.map.value = createTexture(); });
+      const criticalAssets = Promise.all([textureReady, document.fonts.ready, ...[...document.querySelectorAll('.compass img')].map(image => image.decode?.().catch(() => undefined) || Promise.resolve())]);
+
+      const sizeParticles = () => {
+        const ratio = Math.min(devicePixelRatio || 1, 2);
+        particlesCanvas.width = Math.round(innerWidth * ratio);
+        particlesCanvas.height = Math.round(innerHeight * ratio);
+        const context = particlesCanvas.getContext('2d');
         context.setTransform(ratio, 0, 0, ratio, 0, 0);
         return context;
       };
-      let globeContext = sizeCanvas(globeCanvas);
-
-      const drawGlobe = (now) => {
-        const w = innerWidth;
-        const h = innerHeight;
-        const cx = w / 2;
-        const cy = h / 2 - Math.min(h * .03, 28);
-        const radius = Math.min(w, h) * .22;
-        globeContext.clearRect(0, 0, w, h);
-        globeContext.save();
-        globeContext.translate(cx, cy);
-        globeContext.strokeStyle = 'rgba(43,43,41,.58)';
-        globeContext.lineWidth = 1;
-        globeContext.beginPath();
-        globeContext.ellipse(0, 0, radius, radius, 0, 0, Math.PI * 2);
-        globeContext.stroke();
-        for (let i = -3; i <= 3; i += 1) {
-          const tilt = i * .18 + Math.sin(now * .00018) * .035;
-          globeContext.beginPath();
-          globeContext.ellipse(0, 0, radius * Math.cos(tilt), radius, 0, 0, Math.PI * 2);
-          globeContext.globalAlpha = .35;
-          globeContext.stroke();
-        }
-        for (let i = -3; i <= 3; i += 1) {
-          const y = i * radius * .23;
-          const rx = Math.sqrt(Math.max(0, radius * radius - y * y));
-          globeContext.globalAlpha = .38;
-          globeContext.beginPath();
-          globeContext.ellipse(0, y, rx, radius * .115, 0, 0, Math.PI * 2);
-          globeContext.stroke();
-        }
-        globeContext.globalAlpha = .9;
-        globeContext.fillStyle = '#2B2B29';
-        globeContext.textAlign = 'center';
-        globeContext.textBaseline = 'middle';
-        globeContext.font = `400 ${Math.round(radius * .14)}px "Cormorant Garamond", serif`;
-        [-.47, 0, .47].forEach((row, index) => globeContext.fillText('PERFORMANCE', Math.sin(now * .00022 + index) * radius * .11, row * radius));
-        globeContext.font = `300 ${Math.max(10, Math.round(radius * .052))}px Onest, sans-serif`;
-        globeContext.globalAlpha = .56;
-        [-.34, .13, .6].forEach((row) => globeContext.fillText('ИНСТИТУТ КУЛЬТУРЫ ВЛИЯНИЯ', 0, row * radius));
-        globeContext.restore();
-        globeFrame = requestAnimationFrame(drawGlobe);
+      const ease = value => value * value * (3 - 2 * value);
+      const updateCounter = () => {
+        if (transitionStarted) return;
+        const elapsed = performance.now() - startedAt;
+        counter.textContent = `${Math.min(94, Math.floor(elapsed / (MAX_TOTAL - TRANSITION) * 94))}%`;
+        requestAnimationFrame(updateCounter);
       };
-      drawGlobe(performance.now());
-      addEventListener('resize', () => { globeContext = sizeCanvas(globeCanvas); }, { passive:true });
+      updateCounter();
 
-      const animateParticles = () => new Promise((resolve) => {
-        if (reduceMotion) { resolve(); return; }
-        const context = sizeCanvas(particlesCanvas);
-        const rect = document.querySelector('.compass').getBoundingClientRect();
-        const sourceX = innerWidth / 2;
-        const sourceY = innerHeight / 2 - Math.min(innerHeight * .03, 28);
-        const destinationX = rect.left + rect.width / 2;
-        const destinationY = rect.top + rect.height / 2;
-        const particles = Array.from({ length: 170 }, (_, index) => {
-          const angle = (index / 170) * Math.PI * 2 + Math.random() * .13;
-          const startRadius = Math.min(innerWidth, innerHeight) * (.08 + Math.random() * .16);
-          const endRadius = rect.width * (.12 + Math.random() * .42);
-          return { angle, startRadius, endRadius, drift:(Math.random() - .5) * 56, red:index % 29 === 0 };
+      const animateTransition = () => new Promise(resolve => {
+        const context = sizeParticles();
+        const rect = compass.getBoundingClientRect();
+        const source = { x:innerWidth / 2, y:innerHeight / 2 };
+        const target = { x:rect.left + rect.width / 2, y:rect.top + rect.height / 2 };
+        const particles = Array.from({ length:180 }, (_, index) => {
+          const angle = Math.random() * Math.PI * 2;
+          return { angle, sourceRadius:Math.min(innerWidth, innerHeight) * (.075 + Math.random() * .16), targetRadius:rect.width * (.17 + Math.random() * .36), drift:(Math.random() - .5) * 24, red:index % 43 === 0 };
         });
-        const started = performance.now();
-        const frame = (now) => {
-          const t = Math.min(1, (now - started) / TRANSITION);
-          const eased = t * t * (3 - 2 * t);
+        const transitionStart = performance.now();
+        transitionStarted = true;
+        hero.classList.add('is-assembly');
+        document.documentElement.classList.remove('is-preloading');
+        preloader.classList.add('is-transitioning');
+        counter.textContent = '100%';
+        const tick = now => {
+          const t = Math.min(1, (now - transitionStart) / TRANSITION);
+          const e = reduceMotion ? 1 : ease(t);
+          stage.position.set(0, 0, 0);
+          stage.scale.setScalar(1 - e * .035);
+          material.uniforms.fade.value = Math.max(0, 1 - Math.max(0, (e - .14) / .62));
+          compass.style.opacity = String(Math.max(0, Math.min(1, (e - .38) / .38)));
           context.clearRect(0, 0, innerWidth, innerHeight);
-          particles.forEach((particle) => {
-            const sx = sourceX + Math.cos(particle.angle) * particle.startRadius;
-            const sy = sourceY + Math.sin(particle.angle) * particle.startRadius;
-            const tx = destinationX + Math.cos(particle.angle) * particle.endRadius;
-            const ty = destinationY + Math.sin(particle.angle) * particle.endRadius;
-            const x = sx + (tx - sx) * eased + Math.sin(t * Math.PI) * particle.drift;
-            const y = sy + (ty - sy) * eased - Math.sin(t * Math.PI) * 24;
-            context.fillStyle = particle.red ? '#D12F3F' : 'rgba(43,43,41,.7)';
-            context.globalAlpha = Math.sin(t * Math.PI) * .78;
-            context.fillRect(x, y, particle.red ? 2 : 1.2, particle.red ? 2 : 1.2);
-          });
-          if (t < 1) requestAnimationFrame(frame); else { context.clearRect(0, 0, innerWidth, innerHeight); resolve(); }
+          if (!reduceMotion) {
+            const rings = [0.17, 0.26, 0.35, 0.44];
+            context.lineWidth = 1;
+            context.strokeStyle = '#2B2B29';
+            context.globalAlpha = Math.max(0, Math.min(1, (e - .22) / .42)) * .32;
+            rings.forEach((ratio, index) => {
+              context.beginPath();
+              context.arc(target.x, target.y, rect.width * ratio, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * Math.min(1, Math.max(0, (e - index * .045) / .55)));
+              context.stroke();
+            });
+            const lineLength = rect.width * Math.max(0, Math.min(.5, (e - .45) * .9));
+            if (lineLength) {
+              context.globalAlpha = Math.max(0, Math.min(1, (e - .46) / .3)) * .52;
+              context.beginPath();
+              context.moveTo(target.x, target.y);
+              context.lineTo(target.x + lineLength * .72, target.y - lineLength * .72);
+              context.stroke();
+            }
+            particles.forEach(particle => {
+              const originX = source.x + Math.cos(particle.angle) * particle.sourceRadius * (1 - e * .18);
+              const originY = source.y + Math.sin(particle.angle) * particle.sourceRadius * (1 - e * .18);
+              const endX = target.x + Math.cos(particle.angle) * particle.targetRadius;
+              const endY = target.y + Math.sin(particle.angle) * particle.targetRadius;
+              const x = originX + (endX - originX) * e + Math.sin(t * Math.PI) * particle.drift;
+              const y = originY + (endY - originY) * e - Math.sin(t * Math.PI) * 12;
+              context.globalAlpha = Math.sin(t * Math.PI) * .72;
+              context.fillStyle = particle.red ? '#D12F3F' : '#2B2B29';
+              context.fillRect(x, y, particle.red ? 1.8 : 1.05, particle.red ? 1.8 : 1.05);
+            });
+          }
+          if (t < 1) requestAnimationFrame(tick); else {
+            context.clearRect(0, 0, innerWidth, innerHeight);
+            cancelAnimationFrame(frame);
+            preloader.classList.add('is-complete');
+            hero.classList.remove('is-assembly');
+            hero.classList.add('is-revealing');
+            requestAnimationFrame(() => hero.classList.add('is-revealed'));
+            resolve();
+          }
         };
-        requestAnimationFrame(frame);
+        requestAnimationFrame(tick);
       });
 
-      const criticalAssets = Promise.all([
-        document.fonts.ready,
-        ...[...document.querySelectorAll('.compass img')].map((image) => image.decode?.().catch(() => undefined) || Promise.resolve())
-      ]);
       (async () => {
         const latestStart = MAX_TOTAL - TRANSITION;
         await Promise.race([criticalAssets, wait(latestStart)]);
         const elapsed = performance.now() - startedAt;
-        await wait(Math.max(0, Math.max(MIN_TOTAL - TRANSITION, Math.min(latestStart, elapsed)) - elapsed));
-        document.documentElement.classList.remove('is-preloading');
-        preloader.classList.add('is-transitioning');
-        await animateParticles();
-        cancelAnimationFrame(globeFrame);
-        preloader.classList.add('is-complete');
+        const transitionAt = Math.max(MIN_TOTAL - TRANSITION, Math.min(latestStart, elapsed));
+        await wait(Math.max(0, transitionAt - elapsed));
+        animateTransition();
       })();
     })();
 
