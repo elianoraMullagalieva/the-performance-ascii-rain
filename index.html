@@ -234,12 +234,16 @@
             });
           }
           if (t < 1) requestAnimationFrame(tick); else {
-            context.clearRect(0, 0, innerWidth, innerHeight);
             cancelAnimationFrame(frame);
-            preloader.classList.add('is-complete');
+            compass.style.opacity = '1';
             hero.classList.remove('is-assembly');
             hero.classList.add('is-revealing');
             requestAnimationFrame(() => hero.classList.add('is-revealed'));
+            // The last drawn rings stay visible while the actual SVG compass
+            // settles underneath them. This prevents a blank frame between
+            // the particle layer and the finished illustration.
+            requestAnimationFrame(() => preloader.classList.add('is-complete'));
+            setTimeout(() => context.clearRect(0, 0, innerWidth, innerHeight), 380);
             resolve();
           }
         };
