@@ -6,7 +6,8 @@
   <title>The Performance — Институт культуры влияния</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Anticva&family=Manrope:wght@300;400;500;600&family=Onest:wght@300&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Anticva&family=Cormorant+Garamond:wght@400&family=Manrope:wght@300;400;500;600&family=Onest:wght@300&display=swap" rel="stylesheet">
+  <script>document.documentElement.classList.add('is-preloading');</script>
   <style>
     :root { --paper:#f5f1ef; --ink:#161514; --accent:#D12F3F; }
     * { box-sizing:border-box; }
@@ -34,9 +35,16 @@
     @keyframes needle-drift { from { transform:rotate(-13deg); } to { transform:rotate(13deg); } }
     @media (prefers-reduced-motion:reduce) { .compass__needle { animation:none; transition:none; } }
     @media (hover:hover) and (pointer:fine) { body.has-cursor-mark a,body.has-cursor-mark button { cursor:none; }.cursor-mark { position:fixed; z-index:20; top:0; left:0; width:8px; height:8px; background:var(--accent); pointer-events:none; opacity:0; transform:translate3d(var(--cursor-x,-20px),var(--cursor-y,-20px),0) translate(-50%,-50%) scale(.35); transition:opacity .16s ease,transform .18s cubic-bezier(.16,1,.3,1); will-change:transform,opacity; }.cursor-mark.is-active { opacity:1; transform:translate3d(var(--cursor-x,-20px),var(--cursor-y,-20px),0) translate(-50%,-50%) scale(1); }.menu-toggle:hover i { background:var(--accent); }.menu-toggle i { transition:background .24s cubic-bezier(.16,1,.3,1); } }
+    .preloader { position:fixed; z-index:30; inset:0; overflow:hidden; background:var(--paper); opacity:1; visibility:visible; transition:background-color .42s ease,opacity .36s ease,visibility .36s step-end; }.preloader.is-transitioning { background-color:transparent; }.preloader.is-transitioning .preloader__globe,.preloader.is-transitioning .preloader__label { opacity:0; transition:opacity .38s cubic-bezier(.16,1,.3,1) .12s; }.preloader.is-complete { opacity:0; visibility:hidden; pointer-events:none; }.preloader__globe,.preloader__particles { position:absolute; inset:0; width:100%; height:100%; }.preloader__particles { pointer-events:none; }.preloader__label { position:absolute; left:50%; bottom:clamp(28px,8vh,84px); color:var(--ink); font:300 clamp(12px,1vw,16px)/1 Onest,sans-serif; letter-spacing:.08em; text-transform:uppercase; transform:translateX(-50%); }.is-preloading .hero > * { opacity:0; }.hero > * { transition:opacity .46s cubic-bezier(.16,1,.3,1); }
+    @media (prefers-reduced-motion:reduce) { .preloader__particles { display:none; } }
   </style>
 </head>
 <body>
+  <section class="preloader" aria-label="Загрузка">
+    <canvas class="preloader__globe" id="preloader-globe" aria-hidden="true"></canvas>
+    <canvas class="preloader__particles" id="preloader-particles" aria-hidden="true"></canvas>
+    <p class="preloader__label">The Performance</p>
+  </section>
   <main class="hero">
     <button class="menu-toggle" type="button" aria-label="Открыть меню" aria-expanded="false"><i></i><i></i><i></i></button>
     <a class="brand" href="#" aria-label="The Performance — на главную"><img class="brand__mark" src="figma-logo-mark.svg" alt=""><div class="brand__name">The Performance</div><div class="brand__sub">Институт культуры влияния</div></a>
@@ -50,6 +58,124 @@
   </main>
   <i class="cursor-mark" aria-hidden="true"></i>
   <script>
+    (() => {
+      const MIN_TOTAL = 1600;
+      const MAX_TOTAL = 3500;
+      const TRANSITION = 860;
+      const preloader = document.querySelector('.preloader');
+      const globeCanvas = document.querySelector('#preloader-globe');
+      const particlesCanvas = document.querySelector('#preloader-particles');
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+      const startedAt = performance.now();
+      let globeFrame;
+
+      const sizeCanvas = (canvas) => {
+        const ratio = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = Math.round(innerWidth * ratio);
+        canvas.height = Math.round(innerHeight * ratio);
+        const context = canvas.getContext('2d');
+        context.setTransform(ratio, 0, 0, ratio, 0, 0);
+        return context;
+      };
+      let globeContext = sizeCanvas(globeCanvas);
+
+      const drawGlobe = (now) => {
+        const w = innerWidth;
+        const h = innerHeight;
+        const cx = w / 2;
+        const cy = h / 2 - Math.min(h * .03, 28);
+        const radius = Math.min(w, h) * .22;
+        globeContext.clearRect(0, 0, w, h);
+        globeContext.save();
+        globeContext.translate(cx, cy);
+        globeContext.strokeStyle = 'rgba(43,43,41,.58)';
+        globeContext.lineWidth = 1;
+        globeContext.beginPath();
+        globeContext.ellipse(0, 0, radius, radius, 0, 0, Math.PI * 2);
+        globeContext.stroke();
+        for (let i = -3; i <= 3; i += 1) {
+          const tilt = i * .18 + Math.sin(now * .00018) * .035;
+          globeContext.beginPath();
+          globeContext.ellipse(0, 0, radius * Math.cos(tilt), radius, 0, 0, Math.PI * 2);
+          globeContext.globalAlpha = .35;
+          globeContext.stroke();
+        }
+        for (let i = -3; i <= 3; i += 1) {
+          const y = i * radius * .23;
+          const rx = Math.sqrt(Math.max(0, radius * radius - y * y));
+          globeContext.globalAlpha = .38;
+          globeContext.beginPath();
+          globeContext.ellipse(0, y, rx, radius * .115, 0, 0, Math.PI * 2);
+          globeContext.stroke();
+        }
+        globeContext.globalAlpha = .9;
+        globeContext.fillStyle = '#2B2B29';
+        globeContext.textAlign = 'center';
+        globeContext.textBaseline = 'middle';
+        globeContext.font = `400 ${Math.round(radius * .14)}px "Cormorant Garamond", serif`;
+        [-.47, 0, .47].forEach((row, index) => globeContext.fillText('PERFORMANCE', Math.sin(now * .00022 + index) * radius * .11, row * radius));
+        globeContext.font = `300 ${Math.max(10, Math.round(radius * .052))}px Onest, sans-serif`;
+        globeContext.globalAlpha = .56;
+        [-.34, .13, .6].forEach((row) => globeContext.fillText('ИНСТИТУТ КУЛЬТУРЫ ВЛИЯНИЯ', 0, row * radius));
+        globeContext.restore();
+        globeFrame = requestAnimationFrame(drawGlobe);
+      };
+      drawGlobe(performance.now());
+      addEventListener('resize', () => { globeContext = sizeCanvas(globeCanvas); }, { passive:true });
+
+      const animateParticles = () => new Promise((resolve) => {
+        if (reduceMotion) { resolve(); return; }
+        const context = sizeCanvas(particlesCanvas);
+        const rect = document.querySelector('.compass').getBoundingClientRect();
+        const sourceX = innerWidth / 2;
+        const sourceY = innerHeight / 2 - Math.min(innerHeight * .03, 28);
+        const destinationX = rect.left + rect.width / 2;
+        const destinationY = rect.top + rect.height / 2;
+        const particles = Array.from({ length: 170 }, (_, index) => {
+          const angle = (index / 170) * Math.PI * 2 + Math.random() * .13;
+          const startRadius = Math.min(innerWidth, innerHeight) * (.08 + Math.random() * .16);
+          const endRadius = rect.width * (.12 + Math.random() * .42);
+          return { angle, startRadius, endRadius, drift:(Math.random() - .5) * 56, red:index % 29 === 0 };
+        });
+        const started = performance.now();
+        const frame = (now) => {
+          const t = Math.min(1, (now - started) / TRANSITION);
+          const eased = t * t * (3 - 2 * t);
+          context.clearRect(0, 0, innerWidth, innerHeight);
+          particles.forEach((particle) => {
+            const sx = sourceX + Math.cos(particle.angle) * particle.startRadius;
+            const sy = sourceY + Math.sin(particle.angle) * particle.startRadius;
+            const tx = destinationX + Math.cos(particle.angle) * particle.endRadius;
+            const ty = destinationY + Math.sin(particle.angle) * particle.endRadius;
+            const x = sx + (tx - sx) * eased + Math.sin(t * Math.PI) * particle.drift;
+            const y = sy + (ty - sy) * eased - Math.sin(t * Math.PI) * 24;
+            context.fillStyle = particle.red ? '#D12F3F' : 'rgba(43,43,41,.7)';
+            context.globalAlpha = Math.sin(t * Math.PI) * .78;
+            context.fillRect(x, y, particle.red ? 2 : 1.2, particle.red ? 2 : 1.2);
+          });
+          if (t < 1) requestAnimationFrame(frame); else { context.clearRect(0, 0, innerWidth, innerHeight); resolve(); }
+        };
+        requestAnimationFrame(frame);
+      });
+
+      const criticalAssets = Promise.all([
+        document.fonts.ready,
+        ...[...document.querySelectorAll('.compass img')].map((image) => image.decode?.().catch(() => undefined) || Promise.resolve())
+      ]);
+      (async () => {
+        const latestStart = MAX_TOTAL - TRANSITION;
+        await Promise.race([criticalAssets, wait(latestStart)]);
+        const elapsed = performance.now() - startedAt;
+        await wait(Math.max(0, Math.max(MIN_TOTAL - TRANSITION, Math.min(latestStart, elapsed)) - elapsed));
+        document.documentElement.classList.remove('is-preloading');
+        preloader.classList.add('is-transitioning');
+        await animateParticles();
+        cancelAnimationFrame(globeFrame);
+        preloader.classList.add('is-complete');
+      })();
+    })();
+
     (() => {
       const hero = document.querySelector('.hero');
       const needle = document.querySelector('.compass__needle');
