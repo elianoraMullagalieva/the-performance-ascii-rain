@@ -304,7 +304,7 @@
           // This is a stencil dissolve, never a global alpha fade: individual
           // glyph cells disappear as their matching particles are released.
           material.uniforms.dissolve.value = clamp01((e - .020) / .27);
-          compass.style.opacity = String(clamp01((e - .87) / .114));
+          compass.style.opacity = String(clamp01((e - .87) / .103));
           compassNeedle.style.opacity = String(clamp01((e - .90) / .08));
           if (!contentRevealStarted && e >= .32) {
             contentRevealStarted = true;
@@ -323,7 +323,7 @@
               if (released <= .001) return;
               const sourcePoint = projectGlobePoint(particle.u, particle.v, projector);
               const spread = ease(clamp01((e - .085 - particle.releaseJitter) / .20));
-              const assembly = ease(clamp01((e - .31 - particle.buildDelay) / .225));
+          const assembly = ease(clamp01((e - .31 - particle.buildDelay) / .225));
               const driftX = Math.cos((particle.u + e * .28) * 17) * particle.bend * (1 - assembly);
               const driftY = Math.sin((particle.v - e * .22) * 19) * particle.bend * .55 * (1 - assembly);
               const fieldX = mix(sourcePoint.x, particle.fieldX + driftX, spread);
