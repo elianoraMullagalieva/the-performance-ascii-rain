@@ -981,9 +981,17 @@
         copy.append(name, note);
         front.appendChild(copy);
 
+        // Обратная сторона — то же фото, приглушённое: карточка читается
+        // как один объект, а не как две разные с изнанки.
         const back = document.createElement('div');
         back.className = 'ring__face ring__face--back';
-        back.style.background = `rgb(${tone},${tone},${tone + 2})`;
+        back.style.background = '#171717';
+        const backPhoto = document.createElement('img');
+        backPhoto.className = 'ring__photo';
+        backPhoto.src = card.image;
+        backPhoto.alt = '';
+        backPhoto.loading = 'lazy';
+        back.appendChild(backPhoto);
         item.append(front, back);
         ring.appendChild(item);
       }
