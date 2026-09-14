@@ -46,9 +46,9 @@
       --ring-h:min(50svh, 40vw);
       /* Карточка шире и ниже прежнего: пропорция 1.0 — ширина ещё +20%. */
       --card-h:calc(var(--ring-h) - 40px);
-      --card-w:calc(var(--card-h) / 1.28);
+      --card-w:calc(var(--card-h) / 1.08);
       /* Сцена уже кольца, чтобы крайние карточки уходили за края. */
-      --stage-w:calc(100vw - var(--edge-x) * 2);
+      --stage-w:calc(100vw - var(--edge-x));
     }
 
     .hero { position:sticky; top:0; z-index:1; height:100svh; overflow:hidden; }
@@ -1136,7 +1136,7 @@
 
       const angle = 360 / COUNT;
       // Зазор между карточками на 5% шире прежнего.
-      const factor = (1 + SPACING * 0.15) * 1.06;
+      const factor = (1 + SPACING * 0.15) * 1.10;
       const degPerSec = SPEED * 6;
 
       // Пересчёт размеров от живой высоты сцены: на старте она ещё нулевая,
@@ -1144,7 +1144,7 @@
       const resize = () => {
         const stageH = stage.getBoundingClientRect().height || innerHeight * .79;
         CARD_H = Math.round(stageH - 40);
-        CARD_W = Math.round(CARD_H / 1.28);
+        CARD_W = Math.round(CARD_H / 1.08);
         // Кольцо разворачиваем по ширине сцены, а не по ширине карточки:
         // крайние карточки должны доходить до краёв — до линии логотипа
         // и кнопки. factor остаётся как поправка на плотность.
