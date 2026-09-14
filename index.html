@@ -57,9 +57,10 @@
        нельзя: на трекпаде шаг втрое мельче. */
     /* Трек наезжает на герой: шторка начинает подниматься, пока первый
        экран ещё виден, а не после 100svh прокрутки вхолостую. */
-    /* Фраз стало четыре, поэтому трек длиннее: иначе на каждую приходится
-       на четверть меньше прокрутки и их снова не успеваешь прочитать. */
-    .veil-track { position:relative; height:300svh; margin-top:-72svh; }
+    /* Темп задаётся только длиной трека — сглаживания прокрутки нет.
+       460svh на четыре фразы плюс шторку: примерно экран прокрутки на
+       каждую фразу, этого хватает, чтобы прочитать. */
+    .veil-track { position:relative; height:460svh; margin-top:-72svh; }
     .veil {
       position:sticky; top:0; z-index:2;
       display:grid; place-items:center;
@@ -128,8 +129,8 @@
        стовысотной секции — иначе она «выезжает снизу» отдельным блоком. */
     .circle-section {
       position:relative; z-index:2;
-      display:grid; align-content:center;
-      padding:0 0 clamp(40px,7svh,90px);
+      display:grid; align-content:start;
+      padding:0 0 clamp(30px,4svh,60px);
       background:var(--void);
     }
     /* Карусель лежит в тёмном контейнере с полями по краям — как в макете,
@@ -137,9 +138,13 @@
     .ring-stage {
       display:flex; align-items:center; justify-content:center;
       /* Сцена уже кольца: при пяти карточках диаметр ~2x ширины карточки,
-         поэтому узкая сцена нужна, чтобы крайние уходили за края. */
-      width:min(789px, 74vw); margin-inline:auto;
-      height:clamp(420px,72svh,700px);
+         поэтому узкая сцена нужна, чтобы крайние уходили за края.
+         Без потолка — на больших мониторах всё должно расти пропорционально. */
+      width:max(320px, 55vw); margin-inline:auto;
+      /* Высота от самой карточки, а не от окна: иначе на большом мониторе
+         вокруг кольца появляется пустое поле в пол-экрана. */
+      height:calc(max(320px, 55vw) * .55 * 1.446 + 40px);
+      max-height:86svh;
       overflow:hidden;
       perspective:2200px;
       cursor:grab; touch-action:pan-y;
@@ -235,7 +240,7 @@
        скролл доводит четвёртую, первая уходит за край. */
     .pcard {
       position:relative; flex:none;
-      width:clamp(230px,26.627vw,384px);
+      width:max(230px, 26.627vw);
       aspect-ratio:370 / 632;
       border-radius:clamp(18px,2.083vw,30px);
       overflow:hidden; background:#171717;
@@ -407,7 +412,7 @@
     <h2 class="philosophy__title">Философия</h2>
     <div class="philosophy__rail">
       <article class="pcard pcard--red pcard--brand">
-        <img class="pcard__media" src="cards/photo-4.png" alt="">
+        <img class="pcard__media" src="cards/photo-2.png" alt="">
         <div class="pcard__brand">
           <img src="cards/logo-big.svg" alt="">
           <p class="pcard__brand-name">The Performance</p>
@@ -417,7 +422,7 @@
       </article>
 
       <article class="pcard pcard--green">
-        <img class="pcard__media" src="cards/card-green.png" alt="">
+        <img class="pcard__media" src="cards/photo-3.png" alt="">
         <div class="pcard__badges">
           <span class="pcard__badge">01</span><span class="pcard__badge">принцип</span>
         </div>
@@ -439,7 +444,7 @@
       </article>
 
       <article class="pcard pcard--dark">
-        <img class="pcard__media" src="cards/card-dark.png" alt="">
+        <img class="pcard__media" src="cards/photo-4.png" alt="">
         <div class="pcard__badges">
           <span class="pcard__badge">03</span><span class="pcard__badge">принцип</span>
         </div>
@@ -831,9 +836,11 @@
       // (~2 движения трекпада), всё остальное отдано фразам, чтобы каждую
       // успевали прочитать. Одним числом их регулировать нельзя — короткий
       // трек ускоряет шторку и заодно съедает время на чтение.
-      const VEIL_END = 0.07;
-      const CHROME_IN = 0.09; // обвязка перекрашивается ПОСЛЕ шторки
-      const PHRASES_FROM = 0.12; // и только потом начинаются фразы
+      // Трек длинный (460svh), поэтому доля шторки мала: 0.022 — это ~2
+      // движения трекпада, как и просили. Фразы получают весь остаток.
+      const VEIL_END = 0.022;
+      const CHROME_IN = 0.03; // обвязка перекрашивается ПОСЛЕ шторки
+      const PHRASES_FROM = 0.05; // и только потом начинаются фразы
 
       const clamp01 = v => Math.min(1, Math.max(0, v));
       const ease = v => v * v * (3 - 2 * v);
@@ -863,46 +870,14 @@
       holder.style.display = 'grid';
       holder.style.placeItems = 'center';
 
-      // Прогресс не берётся из прокрутки напрямую: резкий свайп трекпада
-      // иначе проматывает всю анимацию за кадр, а микроскролл не даёт
-      // ничего заметного. Показываемый прогресс догоняет запрошенный с
-      // ограничением скорости — одно движение разворачивается плавно.
-      let requested = 0;
-      let displayed = 0;
-      let smoothFrame = 0;
-      let prevFrameTime = 0;
-      // 0.09 доли в секунду: фраза не может пройти быстрее ~2.8 с, то есть
-      // её успевают прочитать даже при резком свайпе, а одно движение
-      // трекпада разворачивается за ~330 мс и потому заметно.
-      // Доля оставшегося пути, покрываемая за секунду. 0.985 — примерно
-      // 0.3 с на то, чтобы догнать цель с любого расстояния.
-      const CATCH_RATE = 0.985;
-
-      const advance = (now) => {
-        const elapsed = prevFrameTime ? Math.min(48, now - prevFrameTime) : 16;
-        prevFrameTime = now;
-        const delta = requested - displayed;
-        // Чисто пропорциональная догонка: за секунду покрывается доля пути,
-        // а не фиксированное расстояние. Иначе большая дельта (резкий скролл
-        // и особенно обратный) отрабатывается с той же малой скоростью и
-        // читается как залипание. Нижней границы скорости здесь быть не должно.
-        const k = 1 - Math.pow(1 - CATCH_RATE, elapsed / 1000);
-        displayed += delta * k;
-        if (Math.abs(requested - displayed) < .0004) displayed = requested;
-        paint(displayed);
-        if (Math.abs(requested - displayed) > .0001) {
-          smoothFrame = requestAnimationFrame(advance);
-        } else {
-          smoothFrame = 0;
-          prevFrameTime = 0;
-        }
-      };
-
+      // Никакого сглаживания: картинка рисуется прямо от позиции прокрутки.
+      // Догоняющий прогресс всегда отстаёт от пальца, и это отставание и
+      // читается как лаг — особенно на обратном скролле. Темп чтения фраз
+      // задаётся длиной трека, а не торможением анимации.
       const render = () => {
         const rect = track.getBoundingClientRect();
         const travel = rect.height - innerHeight;
-        requested = travel > 0 ? clamp01(-rect.top / travel) : 0;
-        if (!smoothFrame) { prevFrameTime = 0; smoothFrame = requestAnimationFrame(advance); }
+        paint(travel > 0 ? clamp01(-rect.top / travel) : 0);
       };
 
       const paint = (progress) => {
@@ -976,7 +951,7 @@
       const stageW = stage.getBoundingClientRect().width || innerWidth;
       // Ширина — как была (~39% сцены). Высота по макету 441:485:
       // карточка 306x443, то есть отношение 1.446 вместо прежних 0.91.
-      const CARD_W = Math.round(Math.min(520, Math.max(250, stageW * .55)));
+      const CARD_W = Math.round(Math.max(250, stageW * .55));
       const CARD_H = Math.round(CARD_W * 1.446);
       const SPACING = 3;    // параметр кольца из Originkit: factor = 1 + spacing*0.15
       const SPEED = 2.5;    // ~15 град/с: карточка сменяется за ~3 с
@@ -984,12 +959,13 @@
       // Пять карточек «Среда единомышленников». Подписи чередуются сверху и
       // снизу — как в макете, где у одной карточки текст вверху, у другой внизу.
       // Фото из папки «фото сайт», размер 370x551 — ровно карточка из макета.
+      // Присланные фото карусели (307x443 — размер карточки из макета).
       const CARDS = [
-        { image:'cards/photo-1.png', name:'Предприниматели', note:'Которым важно доносить идеи', place:'bottom' },
-        { image:'cards/photo-2.png', name:'Преподаватели',   note:'Которым важно доносить идеи', place:'top' },
-        { image:'cards/photo-3.png', name:'Руководители',    note:'Которым важно вести за собой', place:'bottom' },
-        { image:'cards/photo-4.png', name:'Исследователи',   note:'Которым важно быть понятыми', place:'top' },
-        { image:'cards/photo-2.png', name:'Авторы',          note:'Которым важно звучать точно', place:'bottom' }
+        { image:'cards/ring-2.png', name:'Предприниматели', note:'Которым важно доносить идеи', place:'bottom' },
+        { image:'cards/ring-1.png', name:'Преподаватели',   note:'Которым важно доносить идеи', place:'top' },
+        { image:'cards/ring-2.png', name:'Руководители',    note:'Которым важно вести за собой', place:'bottom' },
+        { image:'cards/ring-1.png', name:'Исследователи',   note:'Которым важно быть понятыми', place:'top' },
+        { image:'cards/ring-2.png', name:'Авторы',          note:'Которым важно звучать точно', place:'bottom' }
       ];
       const SENSITIVITY = 5;
 
