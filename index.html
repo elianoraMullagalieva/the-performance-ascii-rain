@@ -37,9 +37,15 @@
        и подстраивались под высоту экрана (а не жили числами вразнобой). */
     :root {
       --edge-y:clamp(18px,2.6svh,30px); --edge-x:clamp(14px,1.7vw,30px);
-      /* Ширина сцены карусели одной переменной: от неё же считается высота,
-         иначе calc с max() внутри не разрешается и сцена схлопывается. */
-      --stage-w:max(320px, 55vw);
+      /* Сцена карусели считается ОТ ВЫСОТЫ ЭКРАНА, а не от ширины: заголовок
+         и кольцо должны влезать в один экран с воздухом сверху и снизу.
+         79svh — это экран минус место под заголовок и нижние отступы. */
+      --ring-h:min(79svh, 62vw);
+      /* Карточка шире и ниже прежнего: пропорция 1.2 вместо 1.446. */
+      --card-h:calc(var(--ring-h) - 40px);
+      --card-w:calc(var(--card-h) / 1.2);
+      /* Сцена уже кольца, чтобы крайние карточки уходили за края. */
+      --stage-w:calc(var(--card-w) * 1.82);
     }
 
     .hero { position:sticky; top:0; z-index:1; height:100svh; overflow:hidden; }
@@ -81,7 +87,22 @@
       transition:clip-path .62s cubic-bezier(.22,1,.36,1);
       will-change:clip-path;
     }
-    .veil__phrases { grid-area:1/1; width:min(88vw,1100px); padding:0 20px; }
+    .veil__phrases { grid-area:1/1; width:min(88vw,1100px); padding:0 20px; z-index:2; }
+    /* Заголовок сцены уезжает вверх по мере выхода карусели: --title-lift
+       идёт от 0 до 1 на последней строке. */
+    .veil__line--title {
+      transform:translateY(calc(var(--title-lift,0) * -26svh));
+      transition:transform .1s linear;
+    }
+    /* Сцена карусели лежит в той же шторке: сдвиг снизу и доворот
+       привязаны к прогрессу последней цитаты. */
+    .veil .ring-stage {
+      grid-area:1/1; align-self:end;
+      margin-bottom:calc(var(--ring-in,0) * 4svh - 4svh);
+      opacity:var(--ring-in,0);
+      transform:translateY(calc((1 - var(--ring-in,0)) * 46svh)) rotate(calc((1 - var(--ring-in,0)) * -7deg));
+      pointer-events:var(--ring-pe,none);
+    }
     .veil__line {
       margin:0;
       font-family:Manrope,Arial,sans-serif;
@@ -136,14 +157,6 @@
 
     /* ───────── Среда единомышленников ─────────
        Обычная прокрутка без шторок: блок просто идёт следом. */
-    /* Не самостоятельный экран: карусель идёт сразу за шторкой, без своей
-       стовысотной секции — иначе она «выезжает снизу» отдельным блоком. */
-    .circle-section {
-      position:relative; z-index:2;
-      display:grid; align-content:start;
-      padding:0 0 clamp(30px,4svh,60px);
-      background:var(--void);
-    }
     /* Карусель лежит в тёмном контейнере с полями по краям — как в макете,
        а не во всю ширину экрана. */
     .ring-stage {
@@ -152,16 +165,13 @@
          поэтому узкая сцена нужна, чтобы крайние уходили за края.
          Без потолка — на больших мониторах всё растёт пропорционально. */
       width:var(--stage-w); margin-inline:auto;
-      /* Высота считается от самой карточки (0.55 ширины сцены, пропорция
-         1.446), а не от окна: иначе вокруг кольца зияет пустое поле. */
-      height:min(86svh, calc(var(--stage-w) * 0.55 * 1.446 + 40px));
+      height:var(--ring-h);
       overflow:hidden;
       perspective:2200px;
       cursor:grab; touch-action:pan-y;
       user-select:none;
       opacity:0; transition:opacity .6s cubic-bezier(.16,1,.3,1) .18s;
     }
-    .circle-section.is-in .ring-stage { opacity:1; }
     .ring-stage.is-dragging { cursor:grabbing; }
     .ring-tilt { transform:rotateX(-5deg); transform-style:preserve-3d; }
     .ring { position:relative; transform-style:preserve-3d; will-change:transform; }
@@ -183,13 +193,14 @@
     }
     .ring__copy--top { top:10.6%; }
     .ring__copy--bottom { bottom:8.5%; }
+    /* Карточка стала шире — подписи тоже крупнее. */
     .ring__name {
-      margin:0; font-size:clamp(1rem,.7rem + .85vw,1.44rem);
+      margin:0; font-size:clamp(1.15rem,.72rem + 1.15vw,1.85rem);
       font-weight:400; line-height:1.15; letter-spacing:-.01em;
     }
     .ring__note {
-      margin:0; font-size:clamp(.75rem,.6rem + .42vw,1rem);
-      font-weight:400; line-height:1.2; opacity:.92;
+      margin:0; font-size:clamp(.85rem,.62rem + .6vw,1.2rem);
+      font-weight:400; line-height:1.25; opacity:.92;
     }
     /* Затемнение только под самой подписью, а не по всей карточке:
        сплошной градиент сверху и снизу пачкал фото. */
@@ -401,21 +412,21 @@
         <p class="veil__line" data-line>Мысль рождается в&nbsp;слове</p>
         <p class="veil__line" data-line>Слово формирует влияние</p>
         <p class="veil__line" data-line>Влияние формирует реальность</p>
-        <!-- Четвёртой строкой, на том же месте и тем же шрифтом. -->
-        <p class="veil__line" data-line>Среда единомышленников</p>
+        <!-- Четвёртая строка — заголовок сцены: проявляется так же, как
+             цитаты, но поднимается вверх, освобождая место карусели. -->
+        <p class="veil__line veil__line--title" data-line data-title>Среда единомышленников</p>
+      </div>
+      <!-- Карусель живёт в той же неподвижной шторке: выезжает снизу с
+           доворотом на последней цитате, отдельной прокрутки не нужно. -->
+      <div class="ring-stage" id="ring-stage">
+        <div class="ring-tilt">
+          <div class="ring" id="ring"></div>
+        </div>
       </div>
     </section>
   </div>
 
   <!-- Среда единомышленников: заголовок и 3D-карусель. -->
-  <!-- Заголовок живёт в шторке четвёртой фразой, здесь только карусель. -->
-  <section class="circle-section" aria-label="Среда единомышленников">
-    <div class="ring-stage" id="ring-stage">
-      <div class="ring-tilt">
-        <div class="ring" id="ring"></div>
-      </div>
-    </div>
-  </section>
 
   <!-- Философия: лента из четырёх карточек, четвёртая уходит за край. -->
   <section class="philosophy" aria-label="Философия">
@@ -937,6 +948,19 @@
             letter.style.filter = blur > .05 ? `blur(${blur.toFixed(2)}px)` : 'none';
             letter.style.opacity = visible.toFixed(3);
           });
+
+          // Последняя строка ведёт сцену: пока заголовок проявляется, кольцо
+          // выезжает снизу с доворотом, а сам заголовок уходит вверх — всё на
+          // одном неподвижном экране, без дополнительной прокрутки.
+          if (isTitle) {
+            const lift = ease(clamp01((local - arrived * .45) / .55));
+            if (veil._lift !== lift) {
+              veil._lift = lift;
+              veil.style.setProperty('--title-lift', lift.toFixed(4));
+              veil.style.setProperty('--ring-in', lift.toFixed(4));
+              veil.style.setProperty('--ring-pe', lift > .9 ? 'auto' : 'none');
+            }
+          }
         });
       };
 
@@ -964,10 +988,12 @@
       const stageW = stage.getBoundingClientRect().width || innerWidth;
       // Ширина — как была (~39% сцены). Высота по макету 441:485:
       // карточка 306x443, то есть отношение 1.446 вместо прежних 0.91.
-      // Без нижнего порога: на узком экране порог 250px переставал
-      // сходиться с высотой сцены, и карточка не влезала.
-      const CARD_W = Math.round(stageW * .55);
-      const CARD_H = Math.round(CARD_W * 1.446);
+      // Размеры берём из тех же CSS-переменных, что задают сцену: карточка
+      // считается от высоты экрана, поэтому кольцо всегда влезает целиком.
+      const css = getComputedStyle(document.documentElement);
+      const px = name => parseFloat(css.getPropertyValue(name)) || 0;
+      const CARD_W = Math.round(px('--card-w') || stageW * .55);
+      const CARD_H = Math.round(px('--card-h') || CARD_W * 1.2);
       const SPACING = 3;    // параметр кольца из Originkit: factor = 1 + spacing*0.15
       const SPEED = 2.5;    // ~15 град/с: карточка сменяется за ~3 с
 
@@ -1082,11 +1108,6 @@
         else if (!entry.isIntersecting && frame) { cancelAnimationFrame(frame); frame = 0; }
       }, { rootMargin:'100px' }).observe(stage);
 
-      // Заголовок и кольцо выходят из блюра, когда блок подходит к экрану.
-      const section = document.querySelector('.circle-section');
-      new IntersectionObserver(([entry]) => {
-        section.classList.toggle('is-in', entry.isIntersecting);
-      }, { rootMargin:'-12% 0px -30% 0px' }).observe(section);
     })();
 
     (() => {
