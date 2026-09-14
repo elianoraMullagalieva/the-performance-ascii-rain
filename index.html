@@ -754,9 +754,7 @@
         const target = { x:rect.left + rect.width / 2, y:rect.top + rect.height / 2 };
         const originWorld = new THREE.Vector3();
         const targetWorld = toWorld(target.x, target.y);
-        // A denser, still fine-grained field makes the dissolve legible before
-        // the vector contour takes over, without turning it into a heavy cloud.
-        const particleCount = innerWidth < 768 ? 3050 : 5600;
+        const particleCount = innerWidth < 768 ? 2600 : 4800;
         const sourcePoints = sampleGlobeTypography(particleCount);
         const targetPoints = sampleCompassBase(particleCount);
         const particles = sourcePoints.map((sourcePoint, index) => {
@@ -781,8 +779,7 @@
             releaseJitter:Math.random() * .055,
             buildDelay:radius / 300 * .07 + Math.random() * .09,
             bend:(Math.random() - .5) * rect.width * .045,
-            size:.40 + Math.random() * .31,
-            ink:.94 + Math.random() * .18
+            size:.40 + Math.random() * .31
           };
         });
         const projector = new THREE.Vector3();
@@ -831,7 +828,7 @@
               // Keep the particles fine, but give a small portion more ink so
               // the eye reads an actual material breakup rather than a fade.
               // Частица гаснет по своей кривой, с опережением вектора.
-              const alpha = Math.min(.93, (.70 + assembly * .21) * released * particle.ink);
+              const alpha = (.64 + assembly * .25) * released;
               context.globalAlpha = alpha;
               context.fillStyle = INK;
               context.fillRect(x - particle.size * .5, y - particle.size * .5, particle.size, particle.size);
