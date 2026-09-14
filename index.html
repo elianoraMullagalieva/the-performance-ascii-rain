@@ -9,9 +9,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400&family=Manrope:wght@300;400;500;600&family=Onest:wght@300&display=swap" rel="stylesheet">
   <script>document.documentElement.classList.add('is-preloading');</script>
   <link rel="preload" href="three.min.js" as="script">
-  <!-- defer: 670 КБ не должны блокировать построение DOM и первую отрисовку.
-       Прелоадер всё равно стартует после загрузки шрифтов. -->
-  <script src="three.min.js" defer></script>
+  <!-- Без defer: инлайновый скрипт ниже создаёт WebGLRenderer прямо во время
+       разбора страницы, поэтому THREE обязан быть уже определён. Отложить
+       загрузку можно только вместе с переносом инициализации в DOMContentLoaded. -->
+  <script src="three.min.js"></script>
   <style>
     @font-face { font-family:"Anticva"; src:url("fonts/Anticva-Regular.otf") format("opentype"); font-style:normal; font-weight:400; font-display:block; }
     :root {
