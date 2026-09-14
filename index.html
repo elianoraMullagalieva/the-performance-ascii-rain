@@ -182,12 +182,15 @@
       margin:0; font-size:clamp(.75rem,.6rem + .42vw,1rem);
       font-weight:400; line-height:1.2; opacity:.92;
     }
-    /* Подпись читается и на светлом фото. */
-    .ring__face--front::after {
-      content:""; position:absolute; inset:0; pointer-events:none;
-      background:linear-gradient(180deg, rgba(10,10,10,.55) 0%, rgba(10,10,10,0) 34%,
-                                  rgba(10,10,10,0) 60%, rgba(10,10,10,.6) 100%);
+    /* Затемнение только под самой подписью, а не по всей карточке:
+       сплошной градиент сверху и снизу пачкал фото. */
+    .ring__copy::before {
+      content:""; position:absolute; z-index:-1;
+      left:-14%; right:-14%; top:-42%; bottom:-42%;
+      background:radial-gradient(ellipse at center, rgba(10,10,10,.62), rgba(10,10,10,0) 72%);
+      pointer-events:none;
     }
+    .ring__copy { isolation:isolate; }
 
     @media (prefers-reduced-motion:reduce) {
       .ring-stage { height:auto; overflow-x:auto; perspective:none; }
@@ -233,9 +236,12 @@
       width:calc(clamp(20px,3.681vw,53px) - clamp(8px,1.042vw,15px));
     }
     /* Карточка 370x632, радиус 30 */
+    /* Ширина 26.627% — ровно три карточки целиком плюс половина четвёртой
+       в видимой зоне (экран минус левое поле), как просили: последний
+       скролл доводит четвёртую, первая уходит за край. */
     .pcard {
       position:relative; flex:none;
-      width:clamp(230px,25.694vw,370px);
+      width:clamp(230px,26.627vw,384px);
       aspect-ratio:370 / 632;
       border-radius:clamp(18px,2.083vw,30px);
       overflow:hidden; background:#171717;
@@ -407,7 +413,7 @@
     <h2 class="philosophy__title">Философия</h2>
     <div class="philosophy__rail">
       <article class="pcard pcard--red pcard--brand">
-        <img class="pcard__media" src="cards/card-red.png" alt="">
+        <img class="pcard__media" src="cards/photo-4.png" alt="">
         <div class="pcard__brand">
           <img src="cards/logo-big.svg" alt="">
           <p class="pcard__brand-name">The Performance</p>
@@ -428,7 +434,7 @@
       </article>
 
       <article class="pcard pcard--light">
-        <img class="pcard__media" src="cards/card-light.png" alt="">
+        <img class="pcard__media" src="cards/photo-1.png" alt="">
         <div class="pcard__badges">
           <span class="pcard__badge">02</span><span class="pcard__badge">принцип</span>
         </div>
@@ -854,18 +860,21 @@
       // 0.09 доли в секунду: фраза не может пройти быстрее ~2.8 с, то есть
       // её успевают прочитать даже при резком свайпе, а одно движение
       // трекпада разворачивается за ~330 мс и потому заметно.
-      const CATCH_UP = 0.09;
+      // Доля оставшегося пути, покрываемая за секунду. 0.985 — примерно
+      // 0.3 с на то, чтобы догнать цель с любого расстояния.
+      const CATCH_RATE = 0.985;
 
       const advance = (now) => {
         const elapsed = prevFrameTime ? Math.min(48, now - prevFrameTime) : 16;
         prevFrameTime = now;
         const delta = requested - displayed;
-        // Догонка пропорциональна расстоянию, а не фиксирована: при резком
-        // скролле (особенно обратном) большая дельта иначе отрабатывается
-        // постоянной скоростью и читается как залипание на несколько секунд.
-        const ease = 1 - Math.pow(0.0005, elapsed / 1000);
-        const step = Math.max(elapsed / 1000 * CATCH_UP, Math.abs(delta) * ease);
-        displayed += Math.sign(delta) * Math.min(Math.abs(delta), step);
+        // Чисто пропорциональная догонка: за секунду покрывается доля пути,
+        // а не фиксированное расстояние. Иначе большая дельта (резкий скролл
+        // и особенно обратный) отрабатывается с той же малой скоростью и
+        // читается как залипание. Нижней границы скорости здесь быть не должно.
+        const k = 1 - Math.pow(1 - CATCH_RATE, elapsed / 1000);
+        displayed += delta * k;
+        if (Math.abs(requested - displayed) < .0004) displayed = requested;
         paint(displayed);
         if (Math.abs(requested - displayed) > .0001) {
           smoothFrame = requestAnimationFrame(advance);
