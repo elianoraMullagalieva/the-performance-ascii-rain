@@ -148,6 +148,9 @@
     .chrome--dark .chrome__cta { border-color:var(--ink); color:var(--ink); }
     .chrome--dark .chrome__cta img { filter:none; }
     .chrome--dark .chrome__meta { color:var(--ink); }
+    /* На «Философии» карточки доходят до низа экрана — нижние подписи
+       выглядывали бы из-под них. Шапка сверху остаётся. */
+    .philosophy .chrome__meta { display:none; }
     .chrome.is-on { pointer-events:auto; }
     .chrome__brand { position:absolute; top:var(--edge-y); left:5.9vw; width:140px; }
     .chrome__brand img { display:block; width:100%; height:auto; filter:brightness(0) invert(1); }
@@ -266,6 +269,12 @@
       /* Карточки стали ниже — заголовок опускаем в освободившийся воздух.
          Боковой padding убран: при text-align:center он сдвигал строку
          вбок, поэтому слово стояло не по центру экрана. */
+      /* Секция — grid, и её колонка равна ширине ленты (шире экрана).
+         Заголовок надо держать по ширине ЭКРАНА, иначе text-align:center
+         центрирует его по ленте и слово уезжает вправо на половину выноса. */
+      justify-self:start;
+      width:100vw; max-width:100vw;
+      position:sticky; left:0;
       margin:clamp(20px,3.4svh,46px) 0 clamp(34px,4.4vw,62px);
       padding:0;
       text-align:center;
@@ -345,7 +354,9 @@
     }
     .pcard__name {
       margin:0; max-width:32ch;
-      font-size:clamp(1.05rem,.72rem + .92vw,1.5rem);
+      /* Заголовок карточки на 12% крупнее: все три члена clamp подняты
+         одинаково, чтобы шкала сохранилась на любой ширине. */
+      font-size:clamp(1.176rem,.806rem + 1.03vw,1.68rem);
       font-weight:400; line-height:1.12; letter-spacing:-.01em;
       text-wrap:balance;
     }
