@@ -54,7 +54,9 @@
        нельзя: на трекпаде шаг втрое мельче. */
     /* Трек наезжает на герой: шторка начинает подниматься, пока первый
        экран ещё виден, а не после 100svh прокрутки вхолостую. */
-    .veil-track { position:relative; height:230svh; margin-top:-72svh; }
+    /* Фраз стало четыре, поэтому трек длиннее: иначе на каждую приходится
+       на четверть меньше прокрутки и их снова не успеваешь прочитать. */
+    .veil-track { position:relative; height:300svh; margin-top:-72svh; }
     .veil {
       position:sticky; top:0; z-index:2;
       display:grid; place-items:center;
@@ -116,10 +118,12 @@
 
     /* ───────── Среда единомышленников ─────────
        Обычная прокрутка без шторок: блок просто идёт следом. */
+    /* Не самостоятельный экран: карусель идёт сразу за шторкой, без своей
+       стовысотной секции — иначе она «выезжает снизу» отдельным блоком. */
     .circle-section {
       position:relative; z-index:2;
-      display:grid; align-content:center; gap:clamp(22px,3svh,38px);
-      min-height:100svh; padding:clamp(40px,6svh,70px) 0 clamp(30px,4svh,50px);
+      display:grid; align-content:center;
+      padding:0 0 clamp(40px,7svh,90px);
       background:var(--void);
     }
     .circle-section__title {
@@ -382,13 +386,15 @@
         <p class="veil__line" data-line>Мысль рождается в&nbsp;слове</p>
         <p class="veil__line" data-line>Слово формирует влияние</p>
         <p class="veil__line" data-line>Влияние формирует реальность</p>
+        <!-- Четвёртой строкой, на том же месте и тем же шрифтом. -->
+        <p class="veil__line" data-line>Среда единомышленников</p>
       </div>
     </section>
   </div>
 
   <!-- Среда единомышленников: заголовок и 3D-карусель. -->
+  <!-- Заголовок живёт в шторке четвёртой фразой, здесь только карусель. -->
   <section class="circle-section" aria-label="Среда единомышленников">
-    <h2 class="circle-section__title">Среда<br>единомышленников</h2>
     <div class="ring-stage" id="ring-stage">
       <div class="ring-tilt">
         <div class="ring" id="ring"></div>
@@ -853,8 +859,12 @@
       const advance = (now) => {
         const elapsed = prevFrameTime ? Math.min(48, now - prevFrameTime) : 16;
         prevFrameTime = now;
-        const step = elapsed / 1000 * CATCH_UP;
         const delta = requested - displayed;
+        // Догонка пропорциональна расстоянию, а не фиксирована: при резком
+        // скролле (особенно обратном) большая дельта иначе отрабатывается
+        // постоянной скоростью и читается как залипание на несколько секунд.
+        const ease = 1 - Math.pow(0.0005, elapsed / 1000);
+        const step = Math.max(elapsed / 1000 * CATCH_UP, Math.abs(delta) * ease);
         displayed += Math.sign(delta) * Math.min(Math.abs(delta), step);
         paint(displayed);
         if (Math.abs(requested - displayed) > .0001) {
@@ -890,13 +900,17 @@
         const slot = span / lines.length;
         const arrived = WAVE + RAMP;
 
+        const lastIndex = lines.length - 1;
         lines.forEach((item, index) => {
           const local = (progress - PHRASES_FROM - index * slot) / slot;
           const n = Math.max(1, item.letters.length - 1);
+          // Последняя строка — заголовок раздела: она проявляется и остаётся,
+          // а не растворяется, как фразы перед ней.
+          const isTitle = index === lastIndex;
           item.letters.forEach((letter, letterIndex) => {
             const offset = (letterIndex / n) * WAVE;
             const appear = ease(clamp01((local - offset) / RAMP));
-            const vanish = ease(clamp01((local - arrived - HOLD - offset) / RAMP));
+            const vanish = isTitle ? 0 : ease(clamp01((local - arrived - HOLD - offset) / RAMP));
             const visible = appear * (1 - vanish);
             const blur = (1 - visible) * BLUR;
             letter.style.filter = blur > .05 ? `blur(${blur.toFixed(2)}px)` : 'none';
@@ -936,12 +950,13 @@
 
       // Пять карточек «Среда единомышленников». Подписи чередуются сверху и
       // снизу — как в макете, где у одной карточки текст вверху, у другой внизу.
+      // Фото из папки «фото сайт», размер 370x551 — ровно карточка из макета.
       const CARDS = [
-        { image:'cards/card-red.png',   name:'Предприниматели', note:'Которым важно доносить идеи', place:'bottom' },
-        { image:'cards/card-dark.png',  name:'Преподаватели',   note:'Которым важно доносить идеи.', place:'top' },
-        { image:'cards/card-green.png', name:'Руководители',    note:'Которым важно вести за собой', place:'bottom' },
-        { image:'cards/card-light.png', name:'Исследователи',   note:'Которым важно быть понятыми', place:'top' },
-        { image:'cards/card-alt.png',   name:'Авторы',          note:'Которым важно звучать точно', place:'bottom' }
+        { image:'cards/photo-1.png', name:'Предприниматели', note:'Которым важно доносить идеи', place:'bottom' },
+        { image:'cards/photo-2.png', name:'Преподаватели',   note:'Которым важно доносить идеи', place:'top' },
+        { image:'cards/photo-3.png', name:'Руководители',    note:'Которым важно вести за собой', place:'bottom' },
+        { image:'cards/photo-4.png', name:'Исследователи',   note:'Которым важно быть понятыми', place:'top' },
+        { image:'cards/photo-2.png', name:'Авторы',          note:'Которым важно звучать точно', place:'bottom' }
       ];
       const SENSITIVITY = 5;
 
