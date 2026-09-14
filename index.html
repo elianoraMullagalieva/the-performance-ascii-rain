@@ -62,7 +62,7 @@
 .menu a,.menu b { position:relative; display:inline-block; width:max-content; color:inherit; text-decoration:none; cursor:pointer; transition:color .24s cubic-bezier(.16,1,.3,1),transform .24s cubic-bezier(.16,1,.3,1); }.menu a:before,.menu b:before { content:""; position:absolute; top:50%; left:-10px; width:4px; height:4px; background:var(--accent); opacity:0; transform:translateY(-50%) scale(.3); transition:opacity .18s ease,transform .24s cubic-bezier(.16,1,.3,1); }.menu a:hover,.menu b:hover { color:var(--accent); transform:translateX(4px); }.menu a:hover:before,.menu b:hover:before { opacity:1; transform:translateY(-50%) scale(1); }
     .cta { position:absolute; top:calc(var(--edge-y) - 5px); right:var(--edge-x); display:flex; align-items:center; justify-content:space-between; width:224px; height:50px; padding:0 17px; border:1px solid var(--ink); color:var(--ink); background:transparent; cursor:pointer; transition:border-color .24s cubic-bezier(.16,1,.3,1),color .24s cubic-bezier(.16,1,.3,1),background .24s cubic-bezier(.16,1,.3,1),transform .24s cubic-bezier(.16,1,.3,1); }.cta:hover { border-color:var(--accent); color:var(--bg-light); background:var(--accent); transform:translateY(-1px); }.cta:active { transform:translateY(0) scale(.98); }.cta:hover .cta__arrow { filter:brightness(0) invert(1); }.cta__label--mobile,.menu-toggle,.mobile-mantra { display:none; }.cta__arrow { width:12px; height:12px; object-fit:contain; transition:filter .24s cubic-bezier(.16,1,.3,1); }
     .copy { position:absolute; top:22.3%; left:0; width:100%; text-align:center; }.eyebrow { margin:0 0 14px; letter-spacing:.32px; }.title { margin:0; display:flex; flex-direction:column; align-items:center; font-family:Anticva,serif; font-size:clamp(49px,4.85vw,70px); font-weight:400; line-height:.98; letter-spacing:-2.8px; text-transform:uppercase; }.title__line,.title__word { display:block; white-space:nowrap; }.title__line--primary { position:relative; }.title > .title__line + .title__line { margin-top:10px; }.side-note { position:absolute; top:50%; width:max-content; font-family:Onest,Manrope,sans-serif; font-size:clamp(11px,.86vw,12px); font-weight:300; text-align:left; line-height:1.35; letter-spacing:.03em; transform:translateY(-50%); }.side-note span,.meta span { display:block; }.side-note--left { right:calc(100% + clamp(18px,1.857vw,32px)); }.side-note--right { left:calc(100% + clamp(18px,1.857vw,32px)); }
-    .compass { position:absolute; top:50.4%; left:50%; width:clamp(300px,32vw,460px); aspect-ratio:1; transform:translateX(-50%); }.compass__base,.compass__needle,.compass__patina { position:absolute; inset:0; width:100%; height:100%; }.compass__needle { z-index:2; transform-origin:50% 50%; transition:opacity .239s cubic-bezier(.16,1,.3,1); will-change:transform,opacity; }.compass.is-arriving .compass__needle { animation:needle-arrival .615s cubic-bezier(.22,1,.36,1) both; }.compass__patina { z-index:3; opacity:.34; mix-blend-mode:multiply; pointer-events:none; }
+    .compass { position:absolute; top:50.4%; left:50%; width:clamp(300px,32vw,460px); aspect-ratio:1; transform:translateX(-50%); }.compass__base,.compass__needle { position:absolute; inset:0; width:100%; height:100%; }.compass__needle { z-index:2; transform-origin:50% 50%; transition:opacity .239s cubic-bezier(.16,1,.3,1); will-change:transform,opacity; }.compass.is-arriving .compass__needle { animation:needle-arrival .615s cubic-bezier(.22,1,.36,1) both; }
     .meta { position:absolute; bottom:calc(var(--edge-y) + env(safe-area-inset-bottom,0px)); line-height:1.45; letter-spacing:.06em; }.meta--left { left:var(--edge-x); }.meta--right { right:var(--edge-x); text-align:right; }.cross { position:absolute; top:58.2%; font-family:Anticva,serif; font-size:32px; font-weight:300; opacity:.55; }.cross--left { left:11px; }.cross--right { right:11px; }
     /* ───────── Шторка и блок фраз ─────────
        Всё считается от позиции прокрутки, а не от событий «докрутил докуда-то»:
@@ -464,7 +464,7 @@
     <button class="cta" type="button"><span class="cta__label cta__label--desktop">Запросить участие</span><span class="cta__label cta__label--mobile">Участие</span><img class="cta__arrow" src="figma-arrow.svg" alt="" aria-hidden="true"></button>
     <section class="copy" aria-labelledby="hero-title"><p class="eyebrow">The Performance&nbsp;&nbsp;—&nbsp;&nbsp;Est. 2016</p><h1 class="title" id="hero-title"><span class="title__line title__line--primary"><span class="side-note side-note--left"><span>Видеть</span><span>иначе</span></span><span class="title__word">Институт</span><span class="side-note side-note--right"><span>Говорить</span><span>убедительно</span></span></span><span class="title__line title__line--secondary">Культуры <br class="mobile-only">влияния</span></h1></section>
     <div class="mobile-mantra" aria-hidden="true"><span class="mobile-mantra__dots"><img src="figma-dot-large.svg" alt=""><img src="figma-dot-medium.svg" alt=""><img src="figma-dot-small.svg" alt=""></span><span>видеть иначе</span></div>
-    <div class="compass" aria-label="Интерактивный компас"><img class="compass__base" src="compass-base.svg" alt=""><img class="compass__needle" src="compass-needle.svg" alt=""><img class="compass__patina" src="compass-patina-v1.png" alt=""></div>
+    <div class="compass" aria-label="Интерактивный компас"><img class="compass__base" src="compass-base.svg" alt=""><img class="compass__needle" src="compass-needle.svg" alt=""></div>
     <i class="cross cross--left" aria-hidden="true">＋</i><i class="cross cross--right" aria-hidden="true">＋</i>
     <p class="meta meta--left"><span>＋&nbsp; Листайте и&nbsp;исследуйте</span><span>&nbsp;&nbsp;&nbsp;&nbsp;пространство института</span></p><p class="meta meta--right"><span>Москва&nbsp; /&nbsp; Online</span><span>Приём заявок открыт</span></p>
   </main>
@@ -734,12 +734,13 @@
       // grid guard prevents a pile of fat dots on dark, thicker SVG strokes.
       const sampleCompassBase = count => {
         const base = compass.querySelector('.compass__base');
-        const patina = compass.querySelector('.compass__patina');
         const map = document.createElement('canvas');
         map.width = map.height = 600;
         const mapContext = map.getContext('2d', { willReadFrequently:true });
+        // Только чистый вектор. Патина — это фактически второй компас со
+        // смещёнными кольцами: подмешанная в цели, она собирала частицы в
+        // два несовпадающих рисунка, и это читалось как раздвоение.
         mapContext.drawImage(base, 0, 0, 600, 600);
-        mapContext.drawImage(patina, 0, 0, 600, 600);
         const points = [];
         const grid = new Set();
         try {
