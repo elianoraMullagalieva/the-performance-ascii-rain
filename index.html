@@ -641,10 +641,42 @@
       holder.style.display = 'grid';
       holder.style.placeItems = 'center';
 
+      // Прогресс не берётся из прокрутки напрямую: резкий свайп трекпада
+      // иначе проматывает всю анимацию за кадр, а микроскролл не даёт
+      // ничего заметного. Показываемый прогресс догоняет запрошенный с
+      // ограничением скорости — одно движение разворачивается плавно.
+      let requested = 0;
+      let displayed = 0;
+      let smoothFrame = 0;
+      let prevFrameTime = 0;
+      // 0.09 доли в секунду: фраза не может пройти быстрее ~2.8 с, то есть
+      // её успевают прочитать даже при резком свайпе, а одно движение
+      // трекпада разворачивается за ~330 мс и потому заметно.
+      const CATCH_UP = 0.09;
+
+      const advance = (now) => {
+        const elapsed = prevFrameTime ? Math.min(48, now - prevFrameTime) : 16;
+        prevFrameTime = now;
+        const step = elapsed / 1000 * CATCH_UP;
+        const delta = requested - displayed;
+        displayed += Math.sign(delta) * Math.min(Math.abs(delta), step);
+        paint(displayed);
+        if (Math.abs(requested - displayed) > .0001) {
+          smoothFrame = requestAnimationFrame(advance);
+        } else {
+          smoothFrame = 0;
+          prevFrameTime = 0;
+        }
+      };
+
       const render = () => {
         const rect = track.getBoundingClientRect();
         const travel = rect.height - innerHeight;
-        const progress = travel > 0 ? clamp01(-rect.top / travel) : 0;
+        requested = travel > 0 ? clamp01(-rect.top / travel) : 0;
+        if (!smoothFrame) { prevFrameTime = 0; smoothFrame = requestAnimationFrame(advance); }
+      };
+
+      const paint = (progress) => {
 
         veil.style.setProperty('--veil', ease(clamp01(progress / VEIL_END)).toFixed(4));
 
