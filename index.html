@@ -43,7 +43,7 @@
       /* Карусель на 30% мельче прежнего. На узких экранах в min() побеждает
          доля ширины, поэтому она выше: иначе карточка ужимается сильнее,
          чем на 30%, и становится совсем мелкой. */
-      --ring-h:min(55svh, 62vw);
+      --ring-h:min(48svh, 55vw);
       /* Карточка шире и ниже прежнего: пропорция 1.2 вместо 1.446. */
       --card-h:calc(var(--ring-h) - 40px);
       --card-w:calc(var(--card-h) / 1.2);
@@ -129,6 +129,16 @@
     /* Обвязка первого экрана перекрашивается в светлый, когда шторка встала.
        Сами элементы не двигаются — меняется только цвет (как в макете). */
     .chrome { position:fixed; z-index:3; inset:0; pointer-events:none; opacity:0; }
+    /* Обвязка секций: появляется, когда блок занял экран. На светлой
+       «Философии» — тёмная, на «Среде» — светлая. */
+    .chrome--section { position:absolute; opacity:0; transition:opacity .5s cubic-bezier(.16,1,.3,1); }
+    .philosophy-track .philosophy .chrome--section,
+    .circle-section .chrome--section { position:fixed; }
+    .chrome--section.is-in { opacity:1; }
+    .chrome--dark .chrome__brand img { filter:none; }
+    .chrome--dark .chrome__cta { border-color:var(--ink); color:var(--ink); }
+    .chrome--dark .chrome__cta img { filter:none; }
+    .chrome--dark .chrome__meta { color:var(--ink); }
     .chrome.is-on { pointer-events:auto; }
     .chrome__brand { position:absolute; top:var(--edge-y); left:5.9vw; width:140px; }
     .chrome__brand img { display:block; width:100%; height:auto; filter:brightness(0) invert(1); }
@@ -244,10 +254,11 @@
     }
     /* Заголовок: x=58 (4.028%), Anticva 72px, line-height 80/72 */
     .philosophy__title {
-      margin:0 0 clamp(40px,5.2vw,76px);
-      padding-left:clamp(20px,4.028vw,58px);
+      margin:0 0 clamp(34px,4.4vw,62px);
+      padding:0 clamp(20px,4.028vw,58px);
+      text-align:center;
       font-family:Anticva,Georgia,serif;
-      font-size:clamp(2.7rem,1.2rem + 4.3vw,5.4rem);
+      font-size:clamp(2.3rem,1.1rem + 3.4vw,4.3rem);
       font-weight:400; line-height:1.111; letter-spacing:.01em;
       text-transform:uppercase; color:#171717;
     }
@@ -314,18 +325,18 @@
        рядом с короткими смотрелись неряшливо. */
     .pcard__copy {
       position:absolute; z-index:2; left:clamp(14px,2.222vw,32px);
-      right:clamp(14px,2.222vw,32px); bottom:clamp(22px,4.4vw,62px);
+      right:clamp(14px,2.222vw,32px); bottom:clamp(34px,6.6vw,92px);
       display:flex; flex-direction:column; gap:7px;
       font-family:Manrope,Arial,sans-serif;
     }
     .pcard__name {
-      margin:0; max-width:20ch;
+      margin:0; max-width:32ch;
       font-size:clamp(1.05rem,.72rem + .92vw,1.5rem);
       font-weight:400; line-height:1.12; letter-spacing:-.01em;
       text-wrap:balance;
     }
     .pcard__note {
-      margin:0; max-width:27ch;
+      margin:0; max-width:34ch;
       font-size:clamp(.8rem,.66rem + .39vw,1rem);
       font-weight:400; line-height:1.34; letter-spacing:.01em;
       text-wrap:pretty;
@@ -448,6 +459,12 @@
        Страница идёт дальше только когда доехала последняя карточка. -->
   <div class="philosophy-track" id="philosophy-track">
   <section class="philosophy" aria-label="Философия">
+    <div class="chrome chrome--section chrome--dark" aria-hidden="true">
+      <span class="chrome__brand"><img src="HERO/10%20%E2%80%94%20EYE/%D0%9B%D0%9E%D0%93%D0%9E%D0%9B%D0%9E%D0%93%D0%9E.svg" alt=""></span>
+      <span class="chrome__cta"><span>Запросить участие</span><img src="figma-arrow.svg" alt=""></span>
+      <p class="chrome__meta chrome__meta--left"><span>＋&nbsp; Листайте и&nbsp;исследуйте</span><span>&nbsp;&nbsp;&nbsp;&nbsp;пространство института</span></p>
+      <p class="chrome__meta chrome__meta--right"><span>Москва&nbsp; /&nbsp; Online</span><span>Приём заявок открыт</span></p>
+    </div>
     <h2 class="philosophy__title">Философия</h2>
     <div class="philosophy__rail">
       <article class="pcard pcard--red pcard--brand">
@@ -498,6 +515,12 @@
 
   <!-- Среда единомышленников: карусель идёт после «Философии». -->
   <section class="circle-section" aria-label="Среда единомышленников">
+    <div class="chrome chrome--section chrome--light" aria-hidden="true">
+      <span class="chrome__brand"><img src="HERO/10%20%E2%80%94%20EYE/%D0%9B%D0%9E%D0%93%D0%9E%D0%9B%D0%9E%D0%93%D0%9E.svg" alt=""></span>
+      <span class="chrome__cta"><span>Запросить участие</span><img src="figma-arrow.svg" alt=""></span>
+      <p class="chrome__meta chrome__meta--left"><span>＋&nbsp; Листайте и&nbsp;исследуйте</span><span>&nbsp;&nbsp;&nbsp;&nbsp;пространство института</span></p>
+      <p class="chrome__meta chrome__meta--right"><span>Москва&nbsp; /&nbsp; Online</span><span>Приём заявок открыт</span></p>
+    </div>
     <!-- Заголовок и карусель — один блок, на одном экране. -->
     <h2 class="circle-title">Среда единомышленников</h2>
     <div class="ring-stage" id="ring-stage">
@@ -519,7 +542,7 @@
   <script>
     (() => {
       const HOLD_GLOBE = 1710;
-      const TRANSITION = 5350;
+      const TRANSITION = 6325;
       const BG = 0xFBFBFB;
       const INK = '#2B2B29';
       const preloader = document.querySelector('.preloader');
@@ -745,13 +768,10 @@
           // Облако держится у будущего контура: точка разлетается недалеко
           // от собственного места на компасе, а не в общее широкое поле.
           // Иначе перед сборкой видно россыпь далеко за контуром.
-          const ownRadius = radius / 600 * rect.width;
-          // Облако не выходит за контур компаса: точка разлетается почти
-          // на своё же место, с небольшим запасом, и жёстко ограничена
-          // радиусом самого компаса. Иначе частицы висят далеко за контуром.
-          const maxRadius = rect.width * .47;
-          const fieldRadius = Math.min(maxRadius, ownRadius * (1.02 + Math.random() * .14));
-          const fieldAngle = angle + (Math.random() - .5) * .40;
+          // Разлёт как в версии, которая нравилась: широкое общее поле,
+          // большой угловой разброс — движение читается размашисто.
+          const fieldRadius = Math.min(rect.width * .40, Math.max(radius / 600 * rect.width, rect.width * (.07 + Math.random() * .34)));
+          const fieldAngle = angle + (Math.random() - .5) * 1.45;
           return {
             ...sourcePoint,
             targetX:target.x + dx / 600 * rect.width,
@@ -760,7 +780,7 @@
             fieldY:target.y + Math.sin(fieldAngle) * fieldRadius,
             releaseJitter:Math.random() * .055,
             buildDelay:radius / 300 * .07 + Math.random() * .09,
-            bend:(Math.random() - .5) * rect.width * .026,
+            bend:(Math.random() - .5) * rect.width * .045,
             size:.40 + Math.random() * .31,
             ink:.94 + Math.random() * .18
           };
@@ -783,12 +803,7 @@
           // This is a stencil dissolve, never a global alpha fade: individual
           // glyph cells disappear as their matching particles are released.
           material.uniforms.dissolve.value = clamp01(e / .257);
-          // Мягкая передача: частицы начинают подзатухать раньше и дольше,
-          // вектор проступает позже. В зоне нахлёста оба слоя приглушены —
-          // вместо двух наложенных компасов получается провал в дымку,
-          // из которой проявляется контур.
-          const particlesFade = ease(clamp01((e - .60) / .26));
-          const contourIn = ease(clamp01((e - .70) / .22));
+          const contourIn = ease(clamp01((e - .695) / .16));
           // Begin the permanent vector contour the moment the last particles
           // reach their mapped SVG positions. This overlaps the two layers,
           // rather than leaving a static particle-only hold before the compass.
@@ -805,8 +820,8 @@
               const released = ease(clamp01((material.uniforms.dissolve.value - particle.dissolve - particle.releaseJitter) / .171));
               if (released <= .001) return;
               const sourcePoint = projectGlobePoint(particle.u, particle.v, projector);
-              const spread = ease(clamp01((e - .05 - particle.releaseJitter) / .160));
-          const assembly = ease(clamp01((e - .28 - particle.buildDelay) / .205));
+              const spread = ease(clamp01((e - .05 - particle.releaseJitter) / .190));
+          const assembly = ease(clamp01((e - .31 - particle.buildDelay) / .225));
               const driftX = Math.cos((particle.u + e * .28) * 17) * particle.bend * (1 - assembly);
               const driftY = Math.sin((particle.v - e * .22) * 19) * particle.bend * .55 * (1 - assembly);
               const fieldX = mix(sourcePoint.x, particle.fieldX + driftX, spread);
@@ -816,7 +831,7 @@
               // Keep the particles fine, but give a small portion more ink so
               // the eye reads an actual material breakup rather than a fade.
               // Частица гаснет по своей кривой, с опережением вектора.
-              const alpha = Math.min(.93, (.70 + assembly * .21) * released * particle.ink * (1 - particlesFade));
+              const alpha = Math.min(.93, (.70 + assembly * .21) * released * particle.ink);
               context.globalAlpha = alpha;
               context.fillStyle = INK;
               context.fillRect(x - particle.size * .5, y - particle.size * .5, particle.size, particle.size);
@@ -844,16 +859,19 @@
                 window.dispatchEvent(new Event('compass:interaction-ready'));
               }, 650);
             }
-            // Прелоадер отыграл — возвращаем видеопамять. Без этого рендерер,
-            // бэкбуфер во весь экран и текстура 4096x2048 висят всю сессию.
+            // Видеопамять возвращаем ПОСЛЕ того, как прелоадер полностью
+            // исчез: раньше канвас стирался мгновенно, а белый слой гас ещё
+            // секунду — экран успевал «побелеть» поверх собранного компаса.
             removeEventListener('pointermove', trackPointer);
             removeEventListener('resize', fitCamera);
-            material.uniforms.map.value?.dispose();
-            material.dispose();
-            globe.geometry.dispose();
-            renderer.dispose();
-            renderer.forceContextLoss?.();
-            globeCanvas.width = globeCanvas.height = 0;
+            setTimeout(() => {
+              material.uniforms.map.value?.dispose();
+              material.dispose();
+              globe.geometry.dispose();
+              renderer.dispose();
+              renderer.forceContextLoss?.();
+              globeCanvas.width = globeCanvas.height = 0;
+            }, 1200);
             resolve();
           }
         };
@@ -940,8 +958,14 @@
 
         // Обвязка приходит после шторки и уходит вместе с последней фразой:
         // к концу блока мелкие подписи растворяются, а не обрываются.
+        // Шторка следующего блока начинает подниматься ещё на исчезновении
+        // последней фразы: иначе между ними пустое ожидание.
+        const handoff = ease(clamp01((progress - .74) / .22));
+        veil.style.setProperty('--handoff', handoff.toFixed(4));
+
         const chromeIn = ease(clamp01((progress - CHROME_IN) / 0.10));
-        const chromeOut = ease(clamp01((progress - .88) / .10));
+        // Уводим обвязку тем же движением, что поднимает следующий блок.
+        const chromeOut = Math.max(handoff, ease(clamp01((progress - .88) / .10)));
         const chromeVisible = chromeIn * (1 - chromeOut);
         chrome.style.opacity = chromeVisible.toFixed(3);
         chrome.classList.toggle('is-on', chromeVisible > .5);
@@ -984,6 +1008,19 @@
       addEventListener('resize', request, { passive:true });
       document.fonts.ready.then(render);
       render();
+    })();
+
+    // Шапка секции появляется, когда блок занял экран, и гаснет при уходе.
+    (() => {
+      const shells = [...document.querySelectorAll('.chrome--section')];
+      if (!shells.length) return;
+      shells.forEach(shell => {
+        const host = shell.closest('.philosophy, .circle-section');
+        if (!host) return;
+        new IntersectionObserver(([entry]) => {
+          shell.classList.toggle('is-in', entry.isIntersecting);
+        }, { rootMargin:'-25% 0px -25% 0px' }).observe(host);
+      });
     })();
 
     // ───────── «Философия»: блок прилипает, лента едет вбок ─────────
