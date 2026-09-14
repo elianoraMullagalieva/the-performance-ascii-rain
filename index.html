@@ -43,12 +43,12 @@
       /* Карусель на 30% мельче прежнего. На узких экранах в min() побеждает
          доля ширины, поэтому она выше: иначе карточка ужимается сильнее,
          чем на 30%, и становится совсем мелкой. */
-      --ring-h:min(54svh, 62vw);
+      --ring-h:min(60svh, 70vw);
       /* Карточка шире и ниже прежнего: пропорция 1.0 — ширина ещё +20%. */
       --card-h:calc(var(--ring-h) - 40px);
       --card-w:calc(var(--card-h) / 1.28);
       /* Сцена уже кольца, чтобы крайние карточки уходили за края. */
-      --stage-w:calc(var(--card-w) * 1.82);
+      --stage-w:calc(var(--card-w) * 2.05);
     }
 
     .hero { position:sticky; top:0; z-index:1; height:100svh; overflow:hidden; }
@@ -214,7 +214,8 @@
       box-shadow:0 18px 48px rgba(0,0,0,.55);
     }
     .ring__face--back { transform:rotateY(180deg); filter:brightness(.35); }
-    .ring__photo { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+    .ring__photo { position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
+      filter:saturate(.86) brightness(.62); }
     /* Подпись поверх фото: чередуется сверху и снизу, как в макете. */
     .ring__copy {
       position:absolute; z-index:2; left:11.1%; right:11.1%;
@@ -234,7 +235,7 @@
       /* Подзаголовок ложится в две строки: имя роли остаётся в одну. */
       margin:0; max-width:16ch;
       font-size:clamp(.85rem,.62rem + .6vw,1.2rem);
-      font-weight:400; line-height:1.28; letter-spacing:.01em;
+      font-weight:300; line-height:1.28; letter-spacing:.02em;
       opacity:.92; text-wrap:pretty;
     }
     /* Затемнение только под самой подписью, а не по всей карточке:
@@ -345,7 +346,7 @@
        рядом с короткими смотрелись неряшливо. */
     .pcard__copy {
       position:absolute; z-index:2; left:clamp(14px,2.222vw,32px);
-      right:clamp(14px,2.222vw,32px); bottom:clamp(34px,6.6vw,92px);
+      right:clamp(14px,2.222vw,32px); top:70%;
       display:flex; flex-direction:column; gap:7px;
       font-family:Manrope,Arial,sans-serif;
     }
@@ -353,14 +354,14 @@
       margin:0; max-width:32ch;
       /* Заголовок карточки на 12% крупнее: все три члена clamp подняты
          одинаково, чтобы шкала сохранилась на любой ширине. */
-      font-size:clamp(1.176rem,.806rem + 1.03vw,1.68rem);
+      font-size:clamp(1.188rem,.814rem + 1.04vw,1.697rem);
       font-weight:400; line-height:1.12; letter-spacing:-.01em;
       text-wrap:balance;
     }
     .pcard__note {
       margin:0; max-width:34ch;
       font-size:clamp(.8rem,.66rem + .39vw,1rem);
-      font-weight:400; line-height:1.34; letter-spacing:.01em;
+      font-weight:300; line-height:1.34; letter-spacing:.02em;
       text-wrap:pretty;
     }
     .pcard--light .pcard__copy { color:#282828; }
@@ -388,7 +389,7 @@
       max-width:26ch;
       font-family:Manrope,Arial,sans-serif;
       font-size:clamp(.8rem,.66rem + .39vw,1rem);
-      font-weight:400; line-height:1.19; letter-spacing:.01em;
+      font-weight:300; line-height:1.19; letter-spacing:.02em;
       text-wrap:pretty;
     }
     .pcard__brand-tag {
@@ -1135,7 +1136,7 @@
 
       const angle = 360 / COUNT;
       // Зазор между карточками на 5% шире прежнего.
-      const factor = (1 + SPACING * 0.15) * 1.05;
+      const factor = (1 + SPACING * 0.15) * 1.16;
       const degPerSec = SPEED * 6;
 
       // Пересчёт размеров от живой высоты сцены: на старте она ещё нулевая,
@@ -1165,7 +1166,7 @@
         front.style.background = tone;
         const photo = document.createElement('img');
         photo.className = 'ring__photo';
-        photo.src = 'cards/placeholder.jpg';
+        photo.src = 'cards/ring-photo.jpg';
         photo.alt = '';
         front.appendChild(photo);
 
@@ -1187,7 +1188,7 @@
         back.style.background = tone;
         const backPhoto = document.createElement('img');
         backPhoto.className = 'ring__photo';
-        backPhoto.src = 'cards/placeholder.jpg';
+        backPhoto.src = 'cards/ring-photo.jpg';
         backPhoto.alt = '';
         back.appendChild(backPhoto);
         item.append(front, back);
