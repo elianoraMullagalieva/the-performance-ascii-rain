@@ -475,10 +475,12 @@
           // от собственного места на компасе, а не в общее широкое поле.
           // Иначе перед сборкой видно россыпь далеко за контуром.
           const ownRadius = radius / 600 * rect.width;
-          // Потолок пропорциональный, а не плоский: с плоским все внешние
-          // точки схлопываются в одну окружность и теряют разброс.
-          const fieldRadius = ownRadius * (1.05 + Math.random() * .26) + rect.width * .014;
-          const fieldAngle = angle + (Math.random() - .5) * .62;
+          // Облако не выходит за контур компаса: точка разлетается почти
+          // на своё же место, с небольшим запасом, и жёстко ограничена
+          // радиусом самого компаса. Иначе частицы висят далеко за контуром.
+          const maxRadius = rect.width * .47;
+          const fieldRadius = Math.min(maxRadius, ownRadius * (1.02 + Math.random() * .14));
+          const fieldAngle = angle + (Math.random() - .5) * .40;
           return {
             ...sourcePoint,
             targetX:target.x + dx / 600 * rect.width,
