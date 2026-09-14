@@ -43,10 +43,10 @@
       /* Карусель на 30% мельче прежнего. На узких экранах в min() побеждает
          доля ширины, поэтому она выше: иначе карточка ужимается сильнее,
          чем на 30%, и становится совсем мелкой. */
-      --ring-h:min(48svh, 55vw);
-      /* Карточка шире и ниже прежнего: пропорция 1.2 вместо 1.446. */
+      --ring-h:min(54svh, 62vw);
+      /* Карточка шире и ниже прежнего: пропорция 1.0 — ширина ещё +20%. */
       --card-h:calc(var(--ring-h) - 40px);
-      --card-w:calc(var(--card-h) / 1.2);
+      --card-w:calc(var(--card-h) / 1.0);
       /* Сцена уже кольца, чтобы крайние карточки уходили за края. */
       --stage-w:calc(var(--card-w) * 1.82);
     }
@@ -93,14 +93,23 @@
     .veil__phrases { grid-area:1/1; width:min(88vw,1100px); padding:0 20px; z-index:2; }
     /* Блок «Философия» прилипает, пока лента едет по горизонтали:
        трек даёт прокрутку, секция внутри стоит на месте. */
-    .philosophy-track { position:relative; }
-    .philosophy-track .philosophy { position:sticky; top:0; min-height:100svh; display:grid; align-content:center; }
+    /* Трек наезжает на блок фраз: светлая «Философия» начинает подниматься,
+       пока последняя фраза ещё растворяется, а не после пустого чёрного
+       экрана. Наезд равен доле прокрутки, отданной на подъём. */
+    .philosophy-track { position:relative; z-index:3; margin-top:-88svh; }
+    .philosophy-track .philosophy {
+      position:sticky; top:0; min-height:100svh; display:grid; align-content:center;
+      /* Тот же приём, что у тёмной шторки: блок открывается снизу вверх.
+         --handoff считается в блоке фраз и растёт на уходе последней. */
+      clip-path:inset(calc((1 - var(--handoff,0)) * 100%) 0 0 0);
+    }
     /* Карусель — снова отдельная секция, после «Философии». */
     /* Заголовок и карусель — одна группа: в один экран, с общим воздухом. */
     .circle-section {
       position:relative; z-index:2;
       display:grid; align-content:center; justify-items:center;
-      gap:clamp(18px,3svh,42px);
+      /* Зазор больше — кольцо опускается ниже под заголовок. */
+      gap:clamp(28px,5svh,64px);
       min-height:100svh; padding:clamp(24px,4svh,56px) 0;
       background:var(--void);
     }
@@ -254,8 +263,11 @@
     }
     /* Заголовок: x=58 (4.028%), Anticva 72px, line-height 80/72 */
     .philosophy__title {
-      margin:0 0 clamp(34px,4.4vw,62px);
-      padding:0 clamp(20px,4.028vw,58px);
+      /* Карточки стали ниже — заголовок опускаем в освободившийся воздух.
+         Боковой padding убран: при text-align:center он сдвигал строку
+         вбок, поэтому слово стояло не по центру экрана. */
+      margin:clamp(20px,3.4svh,46px) 0 clamp(34px,4.4vw,62px);
+      padding:0;
       text-align:center;
       font-family:Anticva,Georgia,serif;
       font-size:clamp(2.3rem,1.1rem + 3.4vw,4.3rem);
@@ -288,8 +300,10 @@
     .pcard {
       position:relative; flex:none;
       width:max(230px, 26.627vw);
-      max-height:74svh;
-      aspect-ratio:370 / 632;
+      max-height:66svh;
+      /* Карточка ниже макетной: 370/632 давала слишком высокую плашку,
+         при ширине по 26.627vw высота упиралась в экран. */
+      aspect-ratio:370 / 548;
       border-radius:clamp(18px,2.083vw,30px);
       overflow:hidden; background:#171717;
       scroll-snap-align:start;
@@ -522,7 +536,7 @@
       <p class="chrome__meta chrome__meta--right"><span>Москва&nbsp; /&nbsp; Online</span><span>Приём заявок открыт</span></p>
     </div>
     <!-- Заголовок и карусель — один блок, на одном экране. -->
-    <h2 class="circle-title">Среда единомышленников</h2>
+    <h2 class="circle-title">Среда<br>единомышленников</h2>
     <div class="ring-stage" id="ring-stage">
       <div class="ring-tilt">
         <div class="ring" id="ring"></div>
@@ -800,12 +814,12 @@
           // This is a stencil dissolve, never a global alpha fade: individual
           // glyph cells disappear as their matching particles are released.
           material.uniforms.dissolve.value = clamp01(e / .257);
-          const contourIn = ease(clamp01((e - .695) / .16));
+          const contourIn = clamp01((e - .87) / .103);
           // Begin the permanent vector contour the moment the last particles
           // reach their mapped SVG positions. This overlaps the two layers,
           // rather than leaving a static particle-only hold before the compass.
           compass.style.opacity = String(contourIn);
-          compassNeedle.style.opacity = String(ease(clamp01((e - .84) / .12)));
+          compassNeedle.style.opacity = String(clamp01((e - .90) / .08));
           if (!contentRevealStarted && e >= .32) {
             contentRevealStarted = true;
             hero.classList.add('is-revealing');
@@ -957,8 +971,11 @@
         // к концу блока мелкие подписи растворяются, а не обрываются.
         // Шторка следующего блока начинает подниматься ещё на исчезновении
         // последней фразы: иначе между ними пустое ожидание.
-        const handoff = ease(clamp01((progress - .74) / .22));
+        const handoff = ease(clamp01((progress - .62) / .30));
         veil.style.setProperty('--handoff', handoff.toFixed(4));
+        // Подъём светлого блока живёт на :root — его читает «Философия»,
+        // которая лежит в другом поддереве и до veil не достаёт.
+        document.documentElement.style.setProperty('--handoff', handoff.toFixed(4));
 
         const chromeIn = ease(clamp01((progress - CHROME_IN) / 0.10));
         // Уводим обвязку тем же движением, что поднимает следующий блок.
@@ -1043,14 +1060,22 @@
         overflow = Math.max(0, Math.round(right - innerWidth + 24));
         // Прокрутка на фиксации: вынос плюс запас, чтобы последняя карточка
         // доезжала спокойным движением, а не мгновенно.
-        track.style.height = `calc(100svh + ${Math.round(overflow * 1.9 + innerHeight * .25)}px)`;
+        // Трек длиннее на долю холостого хода, иначе мёртвая зона в начале
+        // съела бы ход ленты и последняя карточка перестала бы доезжать.
+        const scroll = (overflow * 1.9 + innerHeight * .25) / (1 - LEAD_IN);
+        track.style.height = `calc(100svh + ${Math.round(scroll)}px)`;
       };
+
+      // Первое движение после фиксации блок стоит: сначала человек видит,
+      // что попал на «Философию», и только вторым скроллом лента едет вбок.
+      const LEAD_IN = 0.22;
 
       const paint = () => {
         const rect = track.getBoundingClientRect();
         const travel = track.offsetHeight - innerHeight;
         const progress = travel > 0 ? clamp01(-rect.top / travel) : 0;
-        rail.style.setProperty('--rail-x', (progress * overflow).toFixed(1));
+        const moved = clamp01((progress - LEAD_IN) / (1 - LEAD_IN));
+        rail.style.setProperty('--rail-x', (moved * overflow).toFixed(1));
       };
 
       let ticking = false;
@@ -1101,7 +1126,8 @@
       const SENSITIVITY = 5;
 
       const angle = 360 / COUNT;
-      const factor = 1 + SPACING * 0.15;
+      // Зазор между карточками на 5% шире прежнего.
+      const factor = (1 + SPACING * 0.15) * 1.05;
       const degPerSec = SPEED * 6;
 
       // Пересчёт размеров от живой высоты сцены: на старте она ещё нулевая,
@@ -1109,7 +1135,7 @@
       const resize = () => {
         const stageH = stage.getBoundingClientRect().height || innerHeight * .79;
         CARD_H = Math.round(stageH - 40);
-        CARD_W = Math.round(CARD_H / 1.2);
+        CARD_W = Math.round(CARD_H / 1.0);
         radius = (CARD_W * factor) / (2 * Math.tan(Math.PI / COUNT));
         ring.style.width = `${CARD_W}px`;
         ring.style.height = `${CARD_H}px`;
