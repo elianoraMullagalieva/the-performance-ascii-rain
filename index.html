@@ -316,12 +316,13 @@
     .pcard__media { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
     /* Цветокоррекция из макета: шейдер Figma заменён CSS-фильтром —
        рантайм требует WebGPU и экспериментальных флагов браузера. */
-    .pcard--red   .pcard__media { filter:saturate(.79) contrast(1.16) brightness(.92) hue-rotate(-4deg); }
-    .pcard--light .pcard__media { filter:saturate(1.04) brightness(1.02); }
-    /* Фото остаётся цветным: saturate(0) выжимал из него весь бордовый,
-       и карточка читалась как пустая тёмная плашка. */
-    .pcard--dark  .pcard__media { filter:saturate(.92) brightness(.78); }
-    .pcard--dark::after {
+    /* Фотография одна на всех карточках, поэтому и коррекция общая:
+       разные фильтры давали четыре разных оттенка одного снимка. */
+    .pcard--red   .pcard__media,
+    .pcard--green .pcard__media,
+    .pcard--light .pcard__media,
+    .pcard--dark  .pcard__media { filter:saturate(.92) brightness(.72); }
+        .pcard--dark::after {
       content:""; position:absolute; inset:0;
       background:linear-gradient(180deg, rgba(120,20,14,.42), rgba(23,23,23,.85));
     }
