@@ -166,7 +166,6 @@
       perspective:2200px;
       cursor:grab; touch-action:pan-y;
       user-select:none;
-      opacity:0; transition:opacity .6s cubic-bezier(.16,1,.3,1) .18s;
     }
     .ring-stage.is-dragging { cursor:grabbing; }
     .ring-tilt { transform:rotateX(-5deg); transform-style:preserve-3d; }
@@ -994,9 +993,12 @@
         // Реальный вынос ленты за правый край экрана.
         const last = rail.lastElementChild;
         if (!last) return;
-        const railLeft = rail.getBoundingClientRect().left;
-        const railEnd = last.getBoundingClientRect().right - railLeft + parseFloat(getComputedStyle(rail).columnGap || 0);
-        overflow = Math.max(0, Math.round(railEnd - innerWidth + railLeft));
+        // Вынос = сколько правый край последней карточки выступает за экран
+        // в НЕсдвинутом состоянии. Текущий сдвиг надо прибавить обратно,
+        // иначе замер зависит от того, где лента стоит в момент измерения.
+        const shift = parseFloat(rail.style.getPropertyValue('--rail-x')) || 0;
+        const right = last.getBoundingClientRect().right + shift;
+        overflow = Math.max(0, Math.round(right - innerWidth + 24));
         // Прокрутка на фиксации: вынос плюс запас, чтобы последняя карточка
         // доезжала спокойным движением, а не мгновенно.
         track.style.height = `calc(100svh + ${Math.round(overflow * 1.9 + innerHeight * .25)}px)`;
@@ -1037,11 +1039,11 @@
       // Размеры берём из фактической геометрии сцены, а не из строки
       // кастомного свойства: getPropertyValue на :root возвращает исходный
       // calc(...) текстом, и parseFloat дал бы NaN.
-      const stageH = stage.getBoundingClientRect().height || innerHeight * .79;
-      const CARD_H = Math.round(stageH - 40);
-      const CARD_W = Math.round(CARD_H / 1.2);
       const SPACING = 3;    // параметр кольца из Originkit: factor = 1 + spacing*0.15
       const SPEED = 2.5;    // ~15 град/с: карточка сменяется за ~3 с
+      // Размеры пересчитываются, а не берутся один раз: на старте сцена ещё
+      // не имеет реальной высоты, и кольцо получалось нулевым.
+      let CARD_W = 0, CARD_H = 0, radius = 0;
 
       // Пять карточек «Среда единомышленников». Подписи чередуются сверху и
       // снизу — как в макете, где у одной карточки текст вверху, у другой внизу.
@@ -1058,19 +1060,28 @@
 
       const angle = 360 / COUNT;
       const factor = 1 + SPACING * 0.15;
-      const radius = (CARD_W * factor) / (2 * Math.tan(Math.PI / COUNT));
       const degPerSec = SPEED * 6;
 
-      ring.style.width = `${CARD_W}px`;
-      ring.style.height = `${CARD_H}px`;
+      // Пересчёт размеров от живой высоты сцены: на старте она ещё нулевая,
+      // поэтому одноразовый расчёт давал кольцо 0x0.
+      const resize = () => {
+        const stageH = stage.getBoundingClientRect().height || innerHeight * .79;
+        CARD_H = Math.round(stageH - 40);
+        CARD_W = Math.round(CARD_H / 1.2);
+        radius = (CARD_W * factor) / (2 * Math.tan(Math.PI / COUNT));
+        ring.style.width = `${CARD_W}px`;
+        ring.style.height = `${CARD_H}px`;
+        [...ring.children].forEach((item, i) => {
+          item.style.transform = `rotateY(${i * angle}deg) translateZ(${radius}px)`;
+        });
+        if (typeof apply === 'function') apply();
+      };
 
       // Пять карточек с фото и подписями; подпись чередуется верх/низ.
       for (let i = 0; i < COUNT; i++) {
         const card = CARDS[i % CARDS.length];
         const item = document.createElement('div');
         item.className = 'ring__item';
-        item.style.transform = `rotateY(${i * angle}deg) translateZ(${radius}px)`;
-
         const front = document.createElement('div');
         front.className = 'ring__face ring__face--front';
         front.style.background = '#171717';
@@ -1114,7 +1125,11 @@
       const drag = { active:false, x:0 };
 
       const apply = () => { ring.style.transform = `translateZ(${-radius}px) rotateY(${rotY}deg)`; };
-      apply();
+      // Только здесь: карточки уже созданы, apply объявлен. Пересчитываем
+      // при ресайзе и после загрузки шрифтов, когда сцена получает высоту.
+      resize();
+      addEventListener('resize', resize, { passive:true });
+      document.fonts.ready.then(resize);
 
       const draw = (now) => {
         const dt = last ? Math.min((now - last) / 1000, .1) : 0;
