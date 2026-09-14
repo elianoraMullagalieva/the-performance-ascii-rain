@@ -138,10 +138,9 @@
        а не во всю ширину экрана. */
     .ring-stage {
       display:flex; align-items:center; justify-content:center;
-      width:min(1272px, 88vw); margin-inline:auto;
+      width:min(1272px, 92vw); margin-inline:auto;
       height:clamp(340px,58svh,620px);
       overflow:hidden;
-      background:#0a0a0a;
       perspective:2200px;
       cursor:grab; touch-action:pan-y;
       user-select:none;
@@ -516,10 +515,13 @@
           // This is a stencil dissolve, never a global alpha fade: individual
           // glyph cells disappear as their matching particles are released.
           material.uniforms.dissolve.value = clamp01(e / .257);
+          // Частицы гаснут ровно в том темпе, в каком проявляется вектор:
+          // иначе оба слоя видны одновременно и читаются как два компаса.
+          const contourIn = ease(clamp01((e - .695) / .16));
           // Begin the permanent vector contour the moment the last particles
           // reach their mapped SVG positions. This overlaps the two layers,
           // rather than leaving a static particle-only hold before the compass.
-          compass.style.opacity = String(ease(clamp01((e - .695) / .16)));
+          compass.style.opacity = String(contourIn);
           compassNeedle.style.opacity = String(ease(clamp01((e - .84) / .12)));
           if (!contentRevealStarted && e >= .32) {
             contentRevealStarted = true;
@@ -542,7 +544,9 @@
               const y = mix(fieldY, particle.targetY, assembly);
               // Keep the particles fine, but give a small portion more ink so
               // the eye reads an actual material breakup rather than a fade.
-              const alpha = Math.min(.93, (.70 + assembly * .21) * released * particle.ink);
+              // (1 - contourIn) гасит частицу ровно настолько, насколько уже
+              // проявился вектор — два слоя никогда не видны вместе.
+              const alpha = Math.min(.93, (.70 + assembly * .21) * released * particle.ink * (1 - contourIn));
               context.globalAlpha = alpha;
               context.fillStyle = INK;
               context.fillRect(x - particle.size * .5, y - particle.size * .5, particle.size, particle.size);
@@ -693,10 +697,12 @@
       // Карточка вписана в контейнер: кольцо шире него, крайние карточки
       // уходят в темноту по краям — как в макете.
       const stageW = stage.getBoundingClientRect().width || innerWidth;
-      const CARD_W = Math.round(Math.min(400, Math.max(240, stageW * .30)));
-      const CARD_H = Math.round(CARD_W * 1.32);
+      // Замеры по референсу: карточка ~39% ширины сцены, почти квадратная,
+      // в кадре одновременно читаются пять штук.
+      const CARD_W = Math.round(Math.min(520, Math.max(250, stageW * .39)));
+      const CARD_H = Math.round(CARD_W * .91);
       const SPACING = 3;
-      const SPEED = 0.85;   // медленнее: спокойное вращение
+      const SPEED = 2.5;    // ~15 град/с: карточка сменяется за ~3 с
       const SENSITIVITY = 5;
 
       const angle = 360 / COUNT;
