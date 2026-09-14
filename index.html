@@ -46,7 +46,7 @@
       --ring-h:min(54svh, 62vw);
       /* Карточка шире и ниже прежнего: пропорция 1.0 — ширина ещё +20%. */
       --card-h:calc(var(--ring-h) - 40px);
-      --card-w:calc(var(--card-h) / 1.0);
+      --card-w:calc(var(--card-h) / 1.28);
       /* Сцена уже кольца, чтобы крайние карточки уходили за края. */
       --stage-w:calc(var(--card-w) * 1.82);
     }
@@ -214,6 +214,7 @@
       box-shadow:0 18px 48px rgba(0,0,0,.55);
     }
     .ring__face--back { transform:rotateY(180deg); filter:brightness(.35); }
+    .ring__photo { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
     /* Подпись поверх фото: чередуется сверху и снизу, как в макете. */
     .ring__copy {
       position:absolute; z-index:2; left:11.1%; right:11.1%;
@@ -238,13 +239,9 @@
     }
     /* Затемнение только под самой подписью, а не по всей карточке:
        сплошной градиент сверху и снизу пачкал фото. */
-    .ring__copy::before {
-      content:""; position:absolute; z-index:-1;
-      left:-14%; right:-14%; top:-42%; bottom:-42%;
-      background:radial-gradient(ellipse at center, rgba(10,10,10,.62), rgba(10,10,10,0) 72%);
-      pointer-events:none;
-    }
-    .ring__copy { isolation:isolate; }
+    /* Подпись лежит прямо на фото: радиальная подложка читалась как
+       грязное чёрное пятно под текстом. */
+    .ring__copy { isolation:isolate; text-shadow:0 1px 12px rgba(0,0,0,.55); }
 
     @media (prefers-reduced-motion:reduce) {
       .ring-stage { height:auto; overflow-x:auto; perspective:none; }
@@ -494,7 +491,7 @@
     <h2 class="philosophy__title">Философия</h2>
     <div class="philosophy__rail">
       <article class="pcard pcard--red pcard--brand">
-        <img class="pcard__media" src="cards/photo-2.png" alt="">
+        <img class="pcard__media" src="cards/placeholder.jpg" alt="">
         <div class="pcard__brand">
           <img src="cards/logo-big.svg" alt="">
           <p class="pcard__brand-name">The Performance</p>
@@ -504,7 +501,7 @@
       </article>
 
       <article class="pcard pcard--green">
-        <img class="pcard__media" src="cards/photo-3.png" alt="">
+        <img class="pcard__media" src="cards/placeholder.jpg" alt="">
         <div class="pcard__badges">
           <span class="pcard__badge">01</span><span class="pcard__badge">принцип</span>
         </div>
@@ -515,7 +512,7 @@
       </article>
 
       <article class="pcard pcard--light">
-        <img class="pcard__media" src="cards/photo-1.png" alt="">
+        <img class="pcard__media" src="cards/placeholder.jpg" alt="">
         <div class="pcard__badges">
           <span class="pcard__badge">02</span><span class="pcard__badge">принцип</span>
         </div>
@@ -526,7 +523,7 @@
       </article>
 
       <article class="pcard pcard--dark">
-        <img class="pcard__media" src="cards/photo-4.png" alt="">
+        <img class="pcard__media" src="cards/placeholder.jpg" alt="">
         <div class="pcard__badges">
           <span class="pcard__badge">03</span><span class="pcard__badge">принцип</span>
         </div>
@@ -1147,7 +1144,7 @@
       const resize = () => {
         const stageH = stage.getBoundingClientRect().height || innerHeight * .79;
         CARD_H = Math.round(stageH - 40);
-        CARD_W = Math.round(CARD_H / 1.0);
+        CARD_W = Math.round(CARD_H / 1.28);
         radius = (CARD_W * factor) / (2 * Math.tan(Math.PI / COUNT));
         ring.style.width = `${CARD_W}px`;
         ring.style.height = `${CARD_H}px`;
@@ -1162,12 +1159,16 @@
         const card = CARDS[i % CARDS.length];
         const item = document.createElement('div');
         item.className = 'ring__item';
-        // Пока вместо фотографий — однотонные плашки, чёрная и бордовая
-        // через одну: фактура не спорит с подписью, пока нет финальных фото.
+        // Пока во всех карточках одна и та же фотография-заглушка.
         const tone = i % 2 === 0 ? '#171717' : '#3A0F14';
         const front = document.createElement('div');
         front.className = 'ring__face ring__face--front';
         front.style.background = tone;
+        const photo = document.createElement('img');
+        photo.className = 'ring__photo';
+        photo.src = 'cards/placeholder.jpg';
+        photo.alt = '';
+        front.appendChild(photo);
 
         const copy = document.createElement('div');
         copy.className = `ring__copy ring__copy--${card.place}`;
@@ -1185,6 +1186,11 @@
         const back = document.createElement('div');
         back.className = 'ring__face ring__face--back';
         back.style.background = tone;
+        const backPhoto = document.createElement('img');
+        backPhoto.className = 'ring__photo';
+        backPhoto.src = 'cards/placeholder.jpg';
+        backPhoto.alt = '';
+        back.appendChild(backPhoto);
         item.append(front, back);
         ring.appendChild(item);
       }
