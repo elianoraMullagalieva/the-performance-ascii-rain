@@ -9,7 +9,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400&family=Manrope:wght@300;400;500;600&family=Onest:wght@300&display=swap" rel="stylesheet">
   <script>document.documentElement.classList.add('is-preloading');</script>
   <link rel="preload" href="three.min.js" as="script">
-  <script src="three.min.js"></script>
+  <!-- defer: 670 КБ не должны блокировать построение DOM и первую отрисовку.
+       Прелоадер всё равно стартует после загрузки шрифтов. -->
+  <script src="three.min.js" defer></script>
   <style>
     @font-face { font-family:"Anticva"; src:url("fonts/Anticva-Regular.otf") format("opentype"); font-style:normal; font-weight:400; font-display:block; }
     :root {
@@ -75,7 +77,10 @@
       text-align:center; text-wrap:balance;
       color:var(--light);
     }
-    .veil__line .l { display:inline-block; will-change:filter,opacity; }
+    /* will-change ставится только на время работы буквы: постоянный слой на
+       каждую из 89 букв держится ради 26 анимирующих в пике. */
+    .veil__line .l { display:inline-block; }
+    .veil__line .l.is-moving { will-change:filter,opacity; }
     .veil__line .w { display:inline-block; white-space:nowrap; }
 
     /* Обвязка первого экрана перекрашивается в светлый, когда шторка встала.
@@ -126,18 +131,6 @@
       padding:0 0 clamp(40px,7svh,90px);
       background:var(--void);
     }
-    .circle-section__title {
-      margin:0; padding:0 var(--edge-x);
-      font-family:Anticva,Georgia,serif;
-      font-size:clamp(1.9rem,.6rem + 4.6vw,4.4rem);
-      font-weight:400; line-height:1.02; letter-spacing:-.02em;
-      text-align:center; text-transform:uppercase; text-wrap:balance;
-      color:var(--light);
-      /* Заголовок выходит из блюра — тем же приёмом, что и фразы. */
-      opacity:0; filter:blur(18px);
-      transition:opacity .5s cubic-bezier(.16,1,.3,1), filter .6s cubic-bezier(.16,1,.3,1);
-    }
-    .circle-section.is-in .circle-section__title { opacity:1; filter:blur(0); }
     /* Карусель лежит в тёмном контейнере с полями по краям — как в макете,
        а не во всю ширину экрана. */
     .ring-stage {
@@ -542,10 +535,14 @@
       };
       material.uniforms.map.value = createTexture();
       fitCamera();
-      addEventListener('pointermove', event => {
+      // Именованные обработчики: безымянные стрелки потом не снять, а они
+      // держат замыканием весь граф three.js и дёргают setSize на каждый
+      // resize уже невидимого канваса.
+      const trackPointer = event => {
         pointerX = (event.clientX / innerWidth - .5) * 2;
         pointerY = (event.clientY / innerHeight - .5) * 2;
-      }, { passive:true });
+      };
+      addEventListener('pointermove', trackPointer, { passive:true });
       addEventListener('resize', fitCamera, { passive:true });
 
       const render = (now) => {
@@ -558,7 +555,13 @@
         frame = requestAnimationFrame(render);
       };
       render(performance.now());
-      const textureReady = Promise.all([document.fonts.load('400 80px "Cormorant Garamond"'), document.fonts.load('300 24px "Onest"')]).then(() => { material.uniforms.map.value = createTexture(); });
+      // Первая текстура 4096x2048 освобождается перед подменой, иначе она
+      // остаётся в видеопамяти рядом со второй.
+      const textureReady = Promise.all([document.fonts.load('400 80px "Cormorant Garamond"'), document.fonts.load('300 24px "Onest"')]).then(() => {
+        const previous = material.uniforms.map.value;
+        material.uniforms.map.value = createTexture();
+        previous?.dispose();
+      });
       const criticalAssets = Promise.all([textureReady, document.fonts.ready, ...[...document.querySelectorAll('.compass img')].map(image => image.decode?.().catch(() => undefined) || Promise.resolve())]);
 
       const sizeParticles = () => {
@@ -784,6 +787,16 @@
                 window.dispatchEvent(new Event('compass:interaction-ready'));
               }, 650);
             }
+            // Прелоадер отыграл — возвращаем видеопамять. Без этого рендерер,
+            // бэкбуфер во весь экран и текстура 4096x2048 висят всю сессию.
+            removeEventListener('pointermove', trackPointer);
+            removeEventListener('resize', fitCamera);
+            material.uniforms.map.value?.dispose();
+            material.dispose();
+            globe.geometry.dispose();
+            renderer.dispose();
+            renderer.forceContextLoss?.();
+            globeCanvas.width = globeCanvas.height = 0;
             resolve();
           }
         };
@@ -921,7 +934,17 @@
             const appear = ease(clamp01((local - offset) / RAMP));
             const vanish = isTitle ? 0 : ease(clamp01((local - arrived - HOLD - offset) / RAMP));
             const visible = appear * (1 - vanish);
+            // Пишем стиль только когда значение реально изменилось: иначе на
+            // каждом кадре уходит 178 записей в CSSOM, большинство — те же
+            // самые значения уже отыгравших строк.
+            if (letter._v === visible) return;
+            letter._v = visible;
             const blur = (1 - visible) * BLUR;
+            const moving = visible > .001 && visible < .999;
+            if (letter._m !== moving) {
+              letter._m = moving;
+              letter.classList.toggle('is-moving', moving);
+            }
             letter.style.filter = blur > .05 ? `blur(${blur.toFixed(2)}px)` : 'none';
             letter.style.opacity = visible.toFixed(3);
           });
@@ -1116,20 +1139,29 @@
         needle.style.transform = `rotate(${current.toFixed(3)}deg)`;
         frame = requestAnimationFrame(render);
       };
+      // Центр иглы кэшируется: чтение getBoundingClientRect в обработчике
+      // движения мыши — принудительный layout на каждое событие.
+      let needleCenter = null;
+      const measureNeedle = () => {
+        const rect = needle.getBoundingClientRect();
+        needleCenter = { x:rect.left + rect.width / 2, y:rect.top + rect.height / 2 };
+      };
+      addEventListener('resize', () => { needleCenter = null; }, { passive:true });
+      addEventListener('scroll', () => { needleCenter = null; }, { passive:true });
+
       const followPointer = (event) => {
         if (!interactionReady) return;
-        const rect = needle.getBoundingClientRect();
-        const x = event.clientX - (rect.left + rect.width / 2);
-        const y = event.clientY - (rect.top + rect.height / 2);
+        if (!needleCenter) measureNeedle();
+        const x = event.clientX - needleCenter.x;
+        const y = event.clientY - needleCenter.y;
         const pointerAngle = Math.atan2(y, x) * 180 / Math.PI;
         // The arrow's resting direction is north-east (-45°). Normalize before
         // clamping so a cursor on the left of the compass correctly turns it left.
         target = clamp(normalizeAngle(pointerAngle + 45), -68, 68);
       };
+      // Только pointermove: mousemove дублировал его в десктопных браузерах,
+      // и обработчик срабатывал дважды на каждое движение мыши.
       hero.addEventListener('pointermove', followPointer, { passive:true });
-      // `mousemove` keeps the interaction reliable for trackpads and browsers
-      // that do not expose pointer events to a page.
-      hero.addEventListener('mousemove', followPointer, { passive:true });
       hero.addEventListener('pointerleave', () => { if (interactionReady) target = 0; });
       window.addEventListener('compass:interaction-ready', () => {
         interactionReady = true;
