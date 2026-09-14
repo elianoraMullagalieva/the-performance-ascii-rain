@@ -43,12 +43,12 @@
       /* Карусель на 30% мельче прежнего. На узких экранах в min() побеждает
          доля ширины, поэтому она выше: иначе карточка ужимается сильнее,
          чем на 30%, и становится совсем мелкой. */
-      --ring-h:min(60svh, 70vw);
+      --ring-h:min(42svh, 46vw);
       /* Карточка шире и ниже прежнего: пропорция 1.0 — ширина ещё +20%. */
       --card-h:calc(var(--ring-h) - 40px);
       --card-w:calc(var(--card-h) / 1.28);
       /* Сцена уже кольца, чтобы крайние карточки уходили за края. */
-      --stage-w:calc(var(--card-w) * 2.05);
+      --stage-w:min(96vw, calc(var(--card-w) * 5.2));
     }
 
     .hero { position:sticky; top:0; z-index:1; height:100svh; overflow:hidden; }
@@ -198,12 +198,12 @@
       width:var(--stage-w); margin-inline:auto;
       height:var(--ring-h);
       overflow:hidden;
-      perspective:2200px;
+      perspective:3000px;
       cursor:grab; touch-action:pan-y;
       user-select:none;
     }
     .ring-stage.is-dragging { cursor:grabbing; }
-    .ring-tilt { transform:rotateX(-5deg); transform-style:preserve-3d; }
+    .ring-tilt { transform:rotateX(-7deg); transform-style:preserve-3d; }
     .ring { position:relative; transform-style:preserve-3d; will-change:transform; }
     .ring__item { position:absolute; inset:0; transform-style:preserve-3d; }
     .ring__face {
@@ -1105,7 +1105,7 @@
       if (!stage || !ring) return;
 
       // Заглушки под будущие карточки — дизайн придёт позже.
-      const COUNT = 5;
+      const COUNT = 10;
       // Шире экрана: карточки крупнее, кольцо перекрывает всю ширину.
       // Карточка вписана в контейнер: кольцо шире него, крайние карточки
       // уходят в темноту по краям — как в макете.
@@ -1116,7 +1116,7 @@
       // кастомного свойства: getPropertyValue на :root возвращает исходный
       // calc(...) текстом, и parseFloat дал бы NaN.
       const SPACING = 3;    // параметр кольца из Originkit: factor = 1 + spacing*0.15
-      const SPEED = 2.5;    // ~15 град/с: карточка сменяется за ~3 с
+      const SPEED = 2;    // ~15 град/с: карточка сменяется за ~3 с
       // Размеры пересчитываются, а не берутся один раз: на старте сцена ещё
       // не имеет реальной высоты, и кольцо получалось нулевым.
       let CARD_W = 0, CARD_H = 0, radius = 0;
@@ -1136,7 +1136,7 @@
 
       const angle = 360 / COUNT;
       // Зазор между карточками на 5% шире прежнего.
-      const factor = (1 + SPACING * 0.15) * 1.16;
+      const factor = (1 + SPACING * 0.15) * 0.62;
       const degPerSec = SPEED * 6;
 
       // Пересчёт размеров от живой высоты сцены: на старте она ещё нулевая,
