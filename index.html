@@ -955,7 +955,9 @@
       const stageW = stage.getBoundingClientRect().width || innerWidth;
       // Ширина — как была (~39% сцены). Высота по макету 441:485:
       // карточка 306x443, то есть отношение 1.446 вместо прежних 0.91.
-      const CARD_W = Math.round(Math.max(250, stageW * .55));
+      // Без нижнего порога: на узком экране порог 250px переставал
+      // сходиться с высотой сцены, и карточка не влезала.
+      const CARD_W = Math.round(stageW * .55);
       const CARD_H = Math.round(CARD_W * 1.446);
       const SPACING = 3;    // параметр кольца из Originkit: factor = 1 + spacing*0.15
       const SPEED = 2.5;    // ~15 град/с: карточка сменяется за ~3 с
