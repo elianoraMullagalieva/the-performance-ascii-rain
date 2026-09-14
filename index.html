@@ -12,24 +12,161 @@
   <script src="three.min.js"></script>
   <style>
     @font-face { font-family:"Anticva"; src:url("fonts/Anticva-Regular.otf") format("opentype"); font-style:normal; font-weight:400; font-display:block; }
-    :root { --paper:#f5f1ef; --ink:#161514; --accent:#D12F3F; }
+    :root {
+      --bg-light:#FBFBFB; --ink:#161514; --accent:#D12F3F;
+      /* Шторка и СВЕТЛЫЙ — оттенки из макета 441:332. */
+      --void:#111111; --light:#EFEAE4;
+      /* Правило 02: clamp с обязательной rem-частью.
+         Опорные точки фразы: 30px@375 / 68px@1440 / потолок 92px. */
+      --fz-phrase:clamp(1.875rem, 1.0169rem + 3.662vw, 5.75rem);
+    }
+    /* Правило 04: ступени по высоте — крупная фраза обязана помещаться. */
+    @media (min-width:901px) and (max-height:820px) { :root { --fz-phrase:clamp(1.8rem,.9rem + 3vw,4.2rem); } }
+    @media (min-width:901px) and (max-height:700px) { :root { --fz-phrase:clamp(1.65rem,.85rem + 2.6vw,3.6rem); } }
+    @media (min-width:901px) and (max-height:620px) { :root { --fz-phrase:clamp(1.5rem,.8rem + 2.2vw,3rem); } }
+    @media (max-width:600px) and (max-height:760px) { :root { --fz-phrase:clamp(1.55rem,1rem + 3vw,2.3rem); } }
     * { box-sizing:border-box; }
     .mobile-only { display:none; }
-    html,body { min-width:320px; min-height:100%; margin:0; -webkit-text-size-adjust:100%; text-size-adjust:100%; }
-    body { overflow:hidden; background:var(--paper); color:var(--ink); font-family:Manrope,Arial,sans-serif; }
-    .hero { position:relative; min-height:100svh; overflow:hidden; }
-    .brand { position:absolute; top:26px; left:5.9vw; display:block; width:140px; color:inherit; text-decoration:none; }
+    html,body { min-width:320px; min-height:100%; margin:0; max-width:100%; overflow-x:clip; -webkit-text-size-adjust:100%; text-size-adjust:100%; }
+    body { background:var(--bg-light); color:var(--ink); font-family:Manrope,Arial,sans-serif; }
+
+    /* Поля рамки — одной переменной, чтобы верх и низ дышали одинаково
+       и подстраивались под высоту экрана (а не жили числами вразнобой). */
+    :root { --edge-y:clamp(18px,2.6svh,30px); --edge-x:clamp(14px,1.7vw,30px); }
+
+    .hero { position:sticky; top:0; z-index:1; height:100svh; overflow:hidden; }
+    .brand { position:absolute; top:var(--edge-y); left:5.9vw; display:block; width:140px; color:inherit; text-decoration:none; }
     .brand__art { display:block; width:100%; height:auto; }
-    .menu { position:absolute; top:26px; left:50%; display:grid; grid-template-columns:repeat(4,130px); gap:38px; transform:translateX(-50%); }
+    .menu { position:absolute; top:var(--edge-y); left:50%; display:grid; grid-template-columns:repeat(4,130px); gap:38px; transform:translateX(-50%); }
     .menu__group { display:grid; gap:8px; align-content:start; }
     .menu b,.menu a,.cta,.eyebrow,.side-note,.meta { font-size:clamp(11px,1vw,13px); font-weight:500; line-height:1.32; letter-spacing:.08px; text-transform:uppercase; }
     .menu b,.menu a { font-size:clamp(10px,.92vw,12px); font-weight:400; letter-spacing:.01em; }.menu a { position:relative; color:inherit; text-decoration:none; transition:color .24s cubic-bezier(.16,1,.3,1),transform .24s cubic-bezier(.16,1,.3,1); }.menu a:before { content:""; position:absolute; top:50%; left:-10px; width:4px; height:4px; background:var(--accent); opacity:0; transform:translateY(-50%) scale(.3); transition:opacity .18s ease,transform .24s cubic-bezier(.16,1,.3,1); }.menu a:hover { color:var(--accent); transform:translateX(4px); }.menu a:hover:before { opacity:1; transform:translateY(-50%) scale(1); }
-    .cta { position:absolute; top:21px; right:30px; display:flex; align-items:center; justify-content:space-between; width:224px; height:50px; padding:0 17px; border:1px solid var(--ink); color:var(--ink); background:transparent; cursor:pointer; transition:border-color .24s cubic-bezier(.16,1,.3,1),color .24s cubic-bezier(.16,1,.3,1),background .24s cubic-bezier(.16,1,.3,1),transform .24s cubic-bezier(.16,1,.3,1); }.cta:hover { border-color:var(--accent); color:var(--paper); background:var(--accent); transform:translateY(-1px); }.cta:active { transform:translateY(0) scale(.98); }.cta:hover .cta__arrow { filter:brightness(0) invert(1); }.cta__label--mobile,.menu-toggle,.mobile-mantra { display:none; }.cta__arrow { width:12px; height:12px; object-fit:contain; transition:filter .24s cubic-bezier(.16,1,.3,1); }
+    .cta { position:absolute; top:calc(var(--edge-y) - 5px); right:var(--edge-x); display:flex; align-items:center; justify-content:space-between; width:224px; height:50px; padding:0 17px; border:1px solid var(--ink); color:var(--ink); background:transparent; cursor:pointer; transition:border-color .24s cubic-bezier(.16,1,.3,1),color .24s cubic-bezier(.16,1,.3,1),background .24s cubic-bezier(.16,1,.3,1),transform .24s cubic-bezier(.16,1,.3,1); }.cta:hover { border-color:var(--accent); color:var(--bg-light); background:var(--accent); transform:translateY(-1px); }.cta:active { transform:translateY(0) scale(.98); }.cta:hover .cta__arrow { filter:brightness(0) invert(1); }.cta__label--mobile,.menu-toggle,.mobile-mantra { display:none; }.cta__arrow { width:12px; height:12px; object-fit:contain; transition:filter .24s cubic-bezier(.16,1,.3,1); }
     .copy { position:absolute; top:22.3%; left:0; width:100%; text-align:center; }.eyebrow { margin:0 0 14px; letter-spacing:.32px; }.title { margin:0; display:flex; flex-direction:column; align-items:center; font-family:Anticva,serif; font-size:clamp(49px,4.85vw,70px); font-weight:400; line-height:.98; letter-spacing:-2.8px; text-transform:uppercase; }.title__line,.title__word { display:block; white-space:nowrap; }.title__line--primary { position:relative; }.title > .title__line + .title__line { margin-top:10px; }.side-note { position:absolute; top:50%; width:max-content; font-family:Onest,Manrope,sans-serif; font-size:clamp(11px,.86vw,12px); font-weight:300; text-align:left; line-height:1.35; letter-spacing:.03em; transform:translateY(-50%); }.side-note span,.meta span { display:block; }.side-note--left { right:calc(100% + clamp(18px,1.857vw,32px)); }.side-note--right { left:calc(100% + clamp(18px,1.857vw,32px)); }
     .compass { position:absolute; top:50.4%; left:50%; width:clamp(300px,32vw,460px); aspect-ratio:1; transform:translateX(-50%); }.compass__base,.compass__needle,.compass__patina { position:absolute; inset:0; width:100%; height:100%; }.compass__needle { z-index:2; transform-origin:50% 50%; transition:opacity .239s cubic-bezier(.16,1,.3,1); will-change:transform,opacity; }.compass.is-arriving .compass__needle { animation:needle-arrival .615s cubic-bezier(.22,1,.36,1) both; }.compass__patina { z-index:3; opacity:.34; mix-blend-mode:multiply; pointer-events:none; }
-    .meta { position:absolute; bottom:38px; line-height:1.45; letter-spacing:.08px; }.meta--left { left:24px; }.meta--right { right:30px; text-align:right; }.cross { position:absolute; top:58.2%; font-family:Anticva,serif; font-size:32px; font-weight:300; opacity:.55; }.cross--left { left:11px; }.cross--right { right:11px; }
+    .meta { position:absolute; bottom:calc(var(--edge-y) + env(safe-area-inset-bottom,0px)); line-height:1.45; letter-spacing:.08px; }.meta--left { left:var(--edge-x); }.meta--right { right:var(--edge-x); text-align:right; }.cross { position:absolute; top:58.2%; font-family:Anticva,serif; font-size:32px; font-weight:300; opacity:.55; }.cross--left { left:11px; }.cross--right { right:11px; }
+    /* ───────── Шторка и блок фраз ─────────
+       Всё считается от позиции прокрутки, а не от событий «докрутил докуда-то»:
+       такая схема симметрично отрабатывает скролл вверх, потому что нет
+       состояний, которые можно проскочить и залипнуть. */
+    /* Трек короткий: на шторку приходится ~76px прокрутки — это два
+       обычных движения трекпада, а не пять. Считать в «щелчках колеса»
+       нельзя: на трекпаде шаг втрое мельче. */
+    .veil-track { position:relative; height:130svh; }
+    .veil {
+      position:sticky; top:0; z-index:2;
+      display:grid; place-items:center;
+      height:100svh; overflow:hidden;
+      background:var(--void);
+      /* Подъём шторки снизу вверх. --veil: 0 — опущена, 1 — закрыла экран. */
+      clip-path:inset(calc((1 - var(--veil,0)) * 100%) 0 0 0);
+      will-change:clip-path;
+    }
+    .veil__phrases { grid-area:1/1; width:min(88vw,1100px); padding:0 20px; }
+    .veil__line {
+      margin:0;
+      font-family:Manrope,Arial,sans-serif;
+      font-size:var(--fz-phrase);
+      font-weight:200; line-height:1.1; letter-spacing:-.02em;
+      text-align:center; text-wrap:balance;
+      color:var(--light);
+    }
+    .veil__line .l { display:inline-block; will-change:filter,opacity; }
+    .veil__line .w { display:inline-block; white-space:nowrap; }
+
+    /* Обвязка первого экрана перекрашивается в светлый, когда шторка встала.
+       Сами элементы не двигаются — меняется только цвет (как в макете). */
+    .chrome { position:fixed; z-index:3; inset:0; pointer-events:none; opacity:0; }
+    .chrome.is-on { pointer-events:auto; }
+    .chrome__brand { position:absolute; top:var(--edge-y); left:5.9vw; width:140px; }
+    .chrome__brand img { display:block; width:100%; height:auto; filter:brightness(0) invert(1); }
+    .chrome__cta {
+      position:absolute; top:calc(var(--edge-y) - 5px); right:var(--edge-x);
+      display:flex; align-items:center; justify-content:space-between;
+      width:224px; height:50px; padding:0 17px;
+      border:1px solid var(--light); background:transparent; color:var(--light);
+      font-size:clamp(11px,1vw,13px); font-weight:500; letter-spacing:.08px; text-transform:uppercase;
+      cursor:pointer;
+    }
+    .chrome__cta img { width:12px; height:12px; filter:brightness(0) invert(1); }
+    .chrome__meta {
+      position:absolute; bottom:calc(var(--edge-y) + env(safe-area-inset-bottom,0px));
+      color:var(--light); font-size:clamp(11px,1vw,13px); font-weight:500;
+      line-height:1.45; letter-spacing:.08px; text-transform:uppercase;
+    }
+    .chrome__meta span { display:block; }
+    .chrome__meta--left { left:var(--edge-x); }
+    .chrome__meta--right { right:var(--edge-x); text-align:right; }
+
+    @media (max-width:960px) { .chrome__cta { width:auto; height:34px; padding:0 12px; font-size:9px; gap:10px; } }
+    @media (max-width:780px) {
+      .chrome__brand { left:50%; width:119px; transform:translateX(-50%); }
+      .chrome__cta { top:var(--edge-y); right:var(--edge-x); height:28px; font-size:7px; }
+      .chrome__cta img { width:5px; height:5px; }
+      .chrome__meta { font-size:8px; }
+    }
+
+    @media (prefers-reduced-motion:reduce) {
+      .veil-track { height:auto; }
+      .veil { position:static; height:auto; padding:14svh 0; clip-path:none; }
+      .veil__line .l { filter:none !important; opacity:1 !important; }
+    }
+
+    /* ───────── Среда единомышленников ─────────
+       Обычная прокрутка без шторок: блок просто идёт следом. */
+    .circle-section {
+      position:relative; z-index:2;
+      display:grid; align-content:center; gap:clamp(22px,3svh,38px);
+      min-height:100svh; padding:clamp(40px,6svh,70px) 0 clamp(30px,4svh,50px);
+      background:var(--void);
+    }
+    .circle-section__title {
+      margin:0; padding:0 var(--edge-x);
+      font-family:Anticva,Georgia,serif;
+      font-size:clamp(1.9rem,.6rem + 4.6vw,4.4rem);
+      font-weight:400; line-height:1.02; letter-spacing:-.02em;
+      text-align:center; text-transform:uppercase; text-wrap:balance;
+      color:var(--light);
+      /* Заголовок выходит из блюра — тем же приёмом, что и фразы. */
+      opacity:0; filter:blur(18px);
+      transition:opacity .5s cubic-bezier(.16,1,.3,1), filter .6s cubic-bezier(.16,1,.3,1);
+    }
+    .circle-section.is-in .circle-section__title { opacity:1; filter:blur(0); }
+    /* Карусель: кольцо карточек вращается по оси Y. Во всю ширину экрана. */
+    .ring-stage {
+      display:flex; align-items:center; justify-content:center;
+      width:100vw; margin-left:calc(50% - 50vw);
+      height:clamp(340px,56svh,620px);
+      overflow:hidden;
+      perspective:3000px;
+      cursor:grab; touch-action:pan-y;
+      user-select:none;
+      opacity:0; transition:opacity .6s cubic-bezier(.16,1,.3,1) .18s;
+    }
+    .circle-section.is-in .ring-stage { opacity:1; }
+    .ring-stage.is-dragging { cursor:grabbing; }
+    .ring-tilt { transform:rotateX(-5deg); transform-style:preserve-3d; }
+    .ring { position:relative; transform-style:preserve-3d; will-change:transform; }
+    .ring__item { position:absolute; inset:0; transform-style:preserve-3d; }
+    .ring__face {
+      position:absolute; inset:0;
+      border-radius:6px; overflow:hidden;
+      backface-visibility:hidden;
+      background-size:cover; background-position:center;
+      box-shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+    .ring__face--back { transform:rotateY(180deg); filter:brightness(.35); }
+
+    @media (prefers-reduced-motion:reduce) {
+      .ring-stage { height:auto; overflow-x:auto; perspective:none; }
+      .ring-tilt { transform:none; }
+      .ring { display:flex; gap:16px; width:max-content; transform:none !important; }
+      .ring__item { position:static; width:220px; height:300px; flex:none; }
+      .ring__face--back { display:none; }
+    }
+
     @media (max-width:1120px) { .menu { grid-template-columns:repeat(4,108px); gap:20px; } }
-    @media (max-width:960px) { .menu { display:none; }.copy { top:19%; }.menu-toggle { position:absolute; z-index:4; top:32px; left:30px; display:flex; flex-direction:column; gap:6px; width:27px; padding:0; border:0; background:transparent; cursor:pointer; }.menu-toggle i { display:block; width:27px; height:1px; background:var(--ink); }.menu-toggle i:nth-child(2) { width:16px; }.hero.menu-open .menu { position:absolute; z-index:3; top:84px; left:20px; display:grid; grid-template-columns:repeat(2,minmax(120px,1fr)); width:calc(100% - 40px); gap:24px; padding:18px; background:rgba(245,241,239,.96); border:1px solid rgba(22,21,20,.25); transform:none; } }
+    @media (max-width:960px) { .menu { display:none; }.copy { top:19%; }.menu-toggle { position:absolute; z-index:4; top:32px; left:30px; display:flex; flex-direction:column; gap:6px; width:27px; padding:0; border:0; background:transparent; cursor:pointer; }.menu-toggle i { display:block; width:27px; height:1px; background:var(--ink); }.menu-toggle i:nth-child(2) { width:16px; }.hero.menu-open .menu { position:absolute; z-index:3; top:84px; left:20px; display:grid; grid-template-columns:repeat(2,minmax(120px,1fr)); width:calc(100% - 40px); gap:24px; padding:18px; background:rgba(251,251,251,.96); border:1px solid rgba(22,21,20,.25); transform:none; } }
     @media (max-width:780px) { .brand { top:24px; left:50%; width:119px; transform:translateX(-50%); }.brand__mark { width:22px; height:27px; margin-bottom:6px; }.brand__name { font-size:10.73px; letter-spacing:.429px; }.brand__sub { margin-top:3px; font-size:5.11px; font-weight:300; letter-spacing:-.15px; }.menu-toggle { top:42px; left:20px; }.cta { top:36px; right:20px; width:71px; height:28px; padding:0 12px; font-size:7px; }.cta__label--desktop { display:none; }.cta__label--mobile { display:block; }.cta__arrow { width:5px; height:5px; }.copy { top:clamp(156px,22.75svh,192px); }.eyebrow { margin-bottom:14px; font-size:10px; letter-spacing:.4px; }.title { width:calc(100% - 40px); margin:0 auto; font-size:42px; line-height:1.05; letter-spacing:-1.26px; font-synthesis:none; }.title > .title__line + .title__line { margin-top:0; }.title__line--primary { position:static; }.title br.mobile-only { display:block; }.side-note { top:35.3svh; width:70px; font-size:9px; line-height:1.2; letter-spacing:.04em; transform:none; }.hero.is-revealing.is-revealed .side-note { transform:none; }.side-note--left { left:20px; right:auto; }.side-note--right { left:auto; right:18px; }.mobile-mantra { position:absolute; z-index:2; top:clamp(370px,47.6svh,402px); left:50%; display:flex; flex-direction:column; align-items:center; transform:translateX(-50%); color:#474540; font-family:Onest,Manrope,sans-serif; font-size:18px; font-weight:300; line-height:1; white-space:nowrap; }.mobile-mantra__dots { display:flex; flex-direction:column; align-items:center; gap:3px; height:19px; margin-bottom:12px; }.mobile-mantra__dots img { display:block; object-fit:contain; }.mobile-mantra__dots img:nth-child(1) { width:5px; height:5px; }.mobile-mantra__dots img:nth-child(2) { width:3px; height:3px; }.mobile-mantra__dots img:nth-child(3) { width:1.5px; height:1.5px; }.compass { top:clamp(400px,58svh,490px); width:min(64vw,248px); }.meta { bottom:clamp(20px,3.1svh,26px); font-size:8px; line-height:1.5; letter-spacing:.24px; }.meta--left { left:20px; }.meta--right { right:20px; }.cross { display:none; } }
     @media (max-width:360px) { .brand { width:110px; }.menu-toggle { left:14px; }.cta { right:12px; width:64px; padding:0 10px; }.title { width:calc(100% - 28px); font-size:clamp(36px,12.56vw,42px); }.side-note--left { left:14px; }.side-note--right { right:12px; }.meta--left { left:12px; }.meta--right { right:12px; } }
     @media (hover:none), (pointer:coarse) { .compass.is-idle .compass__needle { animation:needle-drift 7.2s cubic-bezier(.45,0,.55,1) infinite alternate; } }
@@ -37,7 +174,7 @@
     @keyframes needle-arrival { 0% { transform:rotate(-4deg); } 56% { transform:rotate(2.2deg); } 78% { transform:rotate(-1deg); } 100% { transform:rotate(0deg); } }
     @media (prefers-reduced-motion:reduce) { .compass__needle { animation:none; transition:none; } }
     @media (hover:hover) and (pointer:fine) { body.has-cursor-mark a:not(.brand),body.has-cursor-mark button { cursor:none; }body.has-cursor-mark .brand { cursor:pointer; }.cursor-mark { position:fixed; z-index:20; top:0; left:0; width:8px; height:8px; background:var(--accent); pointer-events:none; opacity:0; transform:translate3d(var(--cursor-x,-20px),var(--cursor-y,-20px),0) translate(-50%,-50%) scale(.35); transition:opacity .16s ease,transform .18s cubic-bezier(.16,1,.3,1); will-change:transform,opacity; }.cursor-mark.is-active { opacity:1; transform:translate3d(var(--cursor-x,-20px),var(--cursor-y,-20px),0) translate(-50%,-50%) scale(1); }.menu-toggle:hover i { background:var(--accent); }.menu-toggle i { transition:background .24s cubic-bezier(.16,1,.3,1); } }
-    .preloader { position:fixed; z-index:30; inset:0; overflow:hidden; background:var(--paper); opacity:1; visibility:visible; transition:background-color .42s ease,opacity .62s cubic-bezier(.16,1,.3,1),visibility .62s step-end; }.preloader.is-transitioning { background-color:transparent; }.preloader.is-complete { opacity:0; visibility:hidden; pointer-events:none; }.preloader__globe,.preloader__particles { position:absolute; inset:0; display:block; width:100%; height:100%; }.preloader__particles { pointer-events:none; }.loader-counter { position:absolute; left:50%; bottom:clamp(32px,8.9vh,96px); color:#2B2B29; font:300 clamp(22px,1.56vw,30px)/1 Onest,sans-serif; letter-spacing:-.03em; transform:translateX(-50%); transition:opacity .26s ease; user-select:none; }.preloader.is-transitioning .loader-counter { opacity:0; }.is-preloading .hero > * { opacity:0; }.hero > * { transition:opacity .46s cubic-bezier(.16,1,.3,1),transform .46s cubic-bezier(.16,1,.3,1); }.hero.is-assembly > * { opacity:0; }.hero.is-assembly .compass { transition:none; }.hero.is-revealing .copy { opacity:1; }.hero.is-revealing .brand,.hero.is-revealing .menu,.hero.is-revealing .cta,.hero.is-revealing .meta,.hero.is-revealing .cross { opacity:0; }.hero.is-revealing .eyebrow,.hero.is-revealing .title__word,.hero.is-revealing .title__line--secondary,.hero.is-revealing .side-note { opacity:0; transform:translateY(8px); }.hero.is-revealing.is-revealed .brand,.hero.is-revealing.is-revealed .menu,.hero.is-revealing.is-revealed .cta { opacity:1; transition-delay:.08s; }.hero.is-revealing.is-revealed .eyebrow { opacity:1; transform:none; transition:opacity .34s ease .04s,transform .46s cubic-bezier(.16,1,.3,1) .04s; }.hero.is-revealing.is-revealed .title__word { opacity:1; transform:none; transition:opacity .38s ease .14s,transform .52s cubic-bezier(.16,1,.3,1) .14s; }.hero.is-revealing.is-revealed .title__line--secondary { opacity:1; transform:none; transition:opacity .38s ease .24s,transform .52s cubic-bezier(.16,1,.3,1) .24s; }.hero.is-revealing.is-revealed .side-note { opacity:1; transform:translateY(-50%); transition:opacity .34s ease .34s,transform .46s cubic-bezier(.16,1,.3,1) .34s; }.hero.is-revealing.is-revealed .meta,.hero.is-revealing.is-revealed .cross { opacity:1; transition-delay:.22s; }
+    .preloader { position:fixed; z-index:30; inset:0; overflow:hidden; background:var(--bg-light); opacity:1; visibility:visible; transition:background-color .42s ease,opacity .62s cubic-bezier(.16,1,.3,1),visibility .62s step-end; }.preloader.is-transitioning { background-color:transparent; }.preloader.is-complete { opacity:0; visibility:hidden; pointer-events:none; }.preloader__globe,.preloader__particles { position:absolute; inset:0; display:block; width:100%; height:100%; }.preloader__particles { pointer-events:none; }.loader-counter { position:absolute; left:50%; bottom:clamp(32px,8.9vh,96px); color:#2B2B29; font:300 clamp(22px,1.56vw,30px)/1 Onest,sans-serif; letter-spacing:-.03em; transform:translateX(-50%); transition:opacity .26s ease; user-select:none; }.preloader.is-transitioning .loader-counter { opacity:0; }.is-preloading .hero > * { opacity:0; }.hero > * { transition:opacity .46s cubic-bezier(.16,1,.3,1),transform .46s cubic-bezier(.16,1,.3,1); }.hero.is-assembly > * { opacity:0; }.hero.is-assembly .compass { transition:none; }.hero.is-revealing .copy { opacity:1; }.hero.is-revealing .brand,.hero.is-revealing .menu,.hero.is-revealing .cta,.hero.is-revealing .meta,.hero.is-revealing .cross { opacity:0; }.hero.is-revealing .eyebrow,.hero.is-revealing .title__word,.hero.is-revealing .title__line--secondary,.hero.is-revealing .side-note { opacity:0; transform:translateY(8px); }.hero.is-revealing.is-revealed .brand,.hero.is-revealing.is-revealed .menu,.hero.is-revealing.is-revealed .cta { opacity:1; transition-delay:.08s; }.hero.is-revealing.is-revealed .eyebrow { opacity:1; transform:none; transition:opacity .34s ease .04s,transform .46s cubic-bezier(.16,1,.3,1) .04s; }.hero.is-revealing.is-revealed .title__word { opacity:1; transform:none; transition:opacity .38s ease .14s,transform .52s cubic-bezier(.16,1,.3,1) .14s; }.hero.is-revealing.is-revealed .title__line--secondary { opacity:1; transform:none; transition:opacity .38s ease .24s,transform .52s cubic-bezier(.16,1,.3,1) .24s; }.hero.is-revealing.is-revealed .side-note { opacity:1; transform:translateY(-50%); transition:opacity .34s ease .34s,transform .46s cubic-bezier(.16,1,.3,1) .34s; }.hero.is-revealing.is-revealed .meta,.hero.is-revealing.is-revealed .cross { opacity:1; transition-delay:.22s; }
     @media (prefers-reduced-motion:reduce) { .preloader__particles { display:none; } }
     /* Mobile frame: exact editorial proportions from the 390 px Figma layout. */
     .brand__art { image-rendering:auto; }
@@ -87,12 +224,42 @@
     <i class="cross cross--left" aria-hidden="true">＋</i><i class="cross cross--right" aria-hidden="true">＋</i>
     <p class="meta meta--left"><span>＋&nbsp; Листайте и исследуйте</span><span>&nbsp;&nbsp;&nbsp;&nbsp;пространство института</span></p><p class="meta meta--right"><span>Москва&nbsp; /&nbsp; Online</span><span>Приём заявок открыт</span></p>
   </main>
+
+  <!-- Шторка поднимается снизу, фиксируется, и в ней сменяются фразы. -->
+  <div class="veil-track" id="veil-track">
+    <section class="veil" id="veil" aria-label="Философия">
+      <div class="veil__phrases">
+        <p class="veil__line" data-line>Мысль рождается в&nbsp;слове</p>
+        <p class="veil__line" data-line>Слово формирует влияние</p>
+        <p class="veil__line" data-line>Влияние формирует реальность</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- Среда единомышленников: заголовок и 3D-карусель. -->
+  <section class="circle-section" aria-label="Среда единомышленников">
+    <h2 class="circle-section__title">Среда<br>единомышленников</h2>
+    <div class="ring-stage" id="ring-stage">
+      <div class="ring-tilt">
+        <div class="ring" id="ring"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Та же обвязка, что на первом экране: не двигается, только цвет. -->
+  <div class="chrome" id="chrome" aria-hidden="true">
+    <span class="chrome__brand"><img src="HERO/10%20%E2%80%94%20EYE/%D0%9B%D0%9E%D0%93%D0%9E%D0%9B%D0%9E%D0%93%D0%9E.svg" alt=""></span>
+    <span class="chrome__cta"><span>Запросить участие</span><img src="figma-arrow.svg" alt=""></span>
+    <p class="chrome__meta chrome__meta--left"><span>＋&nbsp; Листайте и исследуйте</span><span>&nbsp;&nbsp;&nbsp;&nbsp;пространство института</span></p>
+    <p class="chrome__meta chrome__meta--right"><span>Москва&nbsp; /&nbsp; Online</span><span>Приём заявок открыт</span></p>
+  </div>
+
   <i class="cursor-mark" aria-hidden="true"></i>
   <script>
     (() => {
       const HOLD_GLOBE = 1710;
-      const TRANSITION = 6325;
-      const BG = 0xF5F1EF;
+      const TRANSITION = 5350;
+      const BG = 0xFBFBFB;
       const INK = '#2B2B29';
       const preloader = document.querySelector('.preloader');
       const hero = document.querySelector('.hero');
@@ -304,8 +471,14 @@
           const dy = point.y - 300;
           const radius = Math.hypot(dx, dy);
           const angle = Math.atan2(dy, dx);
-          const fieldRadius = Math.min(rect.width * .40, Math.max(radius / 600 * rect.width, rect.width * (.07 + Math.random() * .34)));
-          const fieldAngle = angle + (Math.random() - .5) * 1.45;
+          // Облако держится у будущего контура: точка разлетается недалеко
+          // от собственного места на компасе, а не в общее широкое поле.
+          // Иначе перед сборкой видно россыпь далеко за контуром.
+          const ownRadius = radius / 600 * rect.width;
+          // Потолок пропорциональный, а не плоский: с плоским все внешние
+          // точки схлопываются в одну окружность и теряют разброс.
+          const fieldRadius = ownRadius * (1.05 + Math.random() * .26) + rect.width * .014;
+          const fieldAngle = angle + (Math.random() - .5) * .62;
           return {
             ...sourcePoint,
             targetX:target.x + dx / 600 * rect.width,
@@ -314,7 +487,7 @@
             fieldY:target.y + Math.sin(fieldAngle) * fieldRadius,
             releaseJitter:Math.random() * .055,
             buildDelay:radius / 300 * .07 + Math.random() * .09,
-            bend:(Math.random() - .5) * rect.width * .045,
+            bend:(Math.random() - .5) * rect.width * .026,
             size:.40 + Math.random() * .31,
             ink:.94 + Math.random() * .18
           };
@@ -353,8 +526,8 @@
               const released = ease(clamp01((material.uniforms.dissolve.value - particle.dissolve - particle.releaseJitter) / .171));
               if (released <= .001) return;
               const sourcePoint = projectGlobePoint(particle.u, particle.v, projector);
-              const spread = ease(clamp01((e - .05 - particle.releaseJitter) / .190));
-          const assembly = ease(clamp01((e - .31 - particle.buildDelay) / .225));
+              const spread = ease(clamp01((e - .05 - particle.releaseJitter) / .160));
+          const assembly = ease(clamp01((e - .28 - particle.buildDelay) / .205));
               const driftX = Math.cos((particle.u + e * .28) * 17) * particle.bend * (1 - assembly);
               const driftY = Math.sin((particle.v - e * .22) * 19) * particle.bend * .55 * (1 - assembly);
               const fieldX = mix(sourcePoint.x, particle.fieldX + driftX, spread);
@@ -402,6 +575,194 @@
         await wait(Math.max(0, HOLD_GLOBE - (performance.now() - startedAt)));
         animateTransition();
       })();
+    })();
+
+    // ───────── Шторка + фразы ─────────
+    // Единственный источник истины — позиция прокрутки. Никаких «сработало
+    // один раз» флагов: любое состояние вычисляется заново на каждом кадре,
+    // поэтому скролл вверх отматывает всё симметрично и ничего не залипает.
+    (() => {
+      const track = document.querySelector('#veil-track');
+      const veil = document.querySelector('#veil');
+      const chrome = document.querySelector('#chrome');
+      if (!track || !veil) return;
+
+      const BLUR = 26;    // расфокус буквы в момент рождения
+      const WAVE = 0.14;  // разбег между первой и последней буквой
+      const RAMP = 0.26;  // проявление одной буквы — мягче на ~18%
+      const HOLD = 0.18;  // пауза, когда фраза стоит резкой
+      // Доли всей прокрутки блока. Шторка поднимается примерно за два
+      // движения колеса — не рывком, но и без прокрутки вхолостую.
+      const VEIL_END = 0.14;
+      const CHROME_IN = 0.16; // обвязка перекрашивается ПОСЛЕ шторки
+      const PHRASES_FROM = 0.19; // и только потом начинаются фразы
+
+      const clamp01 = v => Math.min(1, Math.max(0, v));
+      const ease = v => v * v * (3 - 2 * v);
+
+      const lines = [...veil.querySelectorAll('[data-line]')].map(line => {
+        const words = line.textContent.trim().split(/ +/);
+        line.textContent = '';
+        const letters = [];
+        words.forEach((word, wordIndex) => {
+          const wordEl = document.createElement('span');
+          wordEl.className = 'w';
+          [...word].forEach(char => {
+            const letter = document.createElement('span');
+            letter.className = 'l';
+            letter.textContent = char;
+            wordEl.appendChild(letter);
+            letters.push(letter);
+          });
+          line.appendChild(wordEl);
+          if (wordIndex < words.length - 1) line.appendChild(document.createTextNode(' '));
+        });
+        line.style.gridArea = '1/1';
+        return { line, letters };
+      });
+      // Все фразы в одной точке: сменяются на месте, экран не двигается.
+      const holder = veil.querySelector('.veil__phrases');
+      holder.style.display = 'grid';
+      holder.style.placeItems = 'center';
+
+      const render = () => {
+        const rect = track.getBoundingClientRect();
+        const travel = rect.height - innerHeight;
+        const progress = travel > 0 ? clamp01(-rect.top / travel) : 0;
+
+        veil.style.setProperty('--veil', ease(clamp01(progress / VEIL_END)).toFixed(4));
+
+        // Обвязка приходит после шторки и уходит вместе с последней фразой:
+        // к концу блока мелкие подписи растворяются, а не обрываются.
+        const chromeIn = ease(clamp01((progress - CHROME_IN) / 0.10));
+        const chromeOut = ease(clamp01((progress - .88) / .10));
+        const chromeVisible = chromeIn * (1 - chromeOut);
+        chrome.style.opacity = chromeVisible.toFixed(3);
+        chrome.classList.toggle('is-on', chromeVisible > .5);
+
+        // Фразы занимают не весь остаток, а до .88: у последней остаётся
+        // запас на спокойное растворение внутри трека, без обрыва на краю.
+        const span = Math.max(.0001, .88 - PHRASES_FROM);
+        const slot = span / lines.length;
+        const arrived = WAVE + RAMP;
+
+        lines.forEach((item, index) => {
+          const local = (progress - PHRASES_FROM - index * slot) / slot;
+          const n = Math.max(1, item.letters.length - 1);
+          item.letters.forEach((letter, letterIndex) => {
+            const offset = (letterIndex / n) * WAVE;
+            const appear = ease(clamp01((local - offset) / RAMP));
+            const vanish = ease(clamp01((local - arrived - HOLD - offset) / RAMP));
+            const visible = appear * (1 - vanish);
+            const blur = (1 - visible) * BLUR;
+            letter.style.filter = blur > .05 ? `blur(${blur.toFixed(2)}px)` : 'none';
+            letter.style.opacity = visible.toFixed(3);
+          });
+        });
+      };
+
+      let ticking = false;
+      const request = () => { if (!ticking) { ticking = true; requestAnimationFrame(() => { ticking = false; render(); }); } };
+      addEventListener('scroll', request, { passive:true });
+      addEventListener('resize', request, { passive:true });
+      document.fonts.ready.then(render);
+      render();
+    })();
+
+    // ───────── 3D-карусель «Среда единомышленников» ─────────
+    // Перенос Round Carousel (Originkit) с React на ванильный JS:
+    // проект без сборщика, поэтому логика та же, но на чистом DOM.
+    (() => {
+      const stage = document.querySelector('#ring-stage');
+      const ring = document.querySelector('#ring');
+      if (!stage || !ring) return;
+
+      // Заглушки под будущие карточки — дизайн придёт позже.
+      const COUNT = 8;
+      // Шире экрана: карточки крупнее, кольцо перекрывает всю ширину.
+      // Кольцо заведомо шире экрана: крайние карточки уходят за края.
+      const CARD_W = Math.round(Math.min(520, Math.max(300, innerWidth * .32)));
+      const CARD_H = Math.round(CARD_W * 1.29);
+      const SPACING = 3;
+      const SPEED = 0.85;   // медленнее: спокойное вращение
+      const SENSITIVITY = 5;
+
+      const angle = 360 / COUNT;
+      const factor = 1 + SPACING * 0.15;
+      const radius = (CARD_W * factor) / (2 * Math.tan(Math.PI / COUNT));
+      const degPerSec = SPEED * 6;
+
+      ring.style.width = `${CARD_W}px`;
+      ring.style.height = `${CARD_H}px`;
+
+      // Плейсхолдеры разной светлоты, чтобы вращение читалось до вставки фото.
+      for (let i = 0; i < COUNT; i++) {
+        const item = document.createElement('div');
+        item.className = 'ring__item';
+        item.style.transform = `rotateY(${i * angle}deg) translateZ(${radius}px)`;
+        const tone = 26 + (i % 4) * 9;
+        const front = document.createElement('div');
+        front.className = 'ring__face';
+        front.style.background = `rgb(${tone},${tone},${tone + 2})`;
+        const back = document.createElement('div');
+        back.className = 'ring__face ring__face--back';
+        back.style.background = `rgb(${tone},${tone},${tone + 2})`;
+        item.append(front, back);
+        ring.appendChild(item);
+      }
+
+      const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduce) return;
+
+      let rotY = 0, velocity = 0, last = 0, frame = 0;
+      const drag = { active:false, x:0 };
+
+      const apply = () => { ring.style.transform = `translateZ(${-radius}px) rotateY(${rotY}deg)`; };
+      apply();
+
+      const draw = (now) => {
+        const dt = last ? Math.min((now - last) / 1000, .1) : 0;
+        last = now;
+        if (!drag.active) {
+          if (Math.abs(velocity) > .01) { rotY += velocity * dt; velocity *= .94; }
+          else rotY += degPerSec * dt;
+        }
+        apply();
+        frame = requestAnimationFrame(draw);
+      };
+      frame = requestAnimationFrame(draw);
+
+      stage.addEventListener('pointerdown', (event) => {
+        stage.setPointerCapture?.(event.pointerId);
+        drag.active = true; drag.x = event.clientX; velocity = 0;
+        stage.classList.add('is-dragging');
+      });
+      stage.addEventListener('pointermove', (event) => {
+        if (!drag.active) return;
+        const dx = event.clientX - drag.x;
+        drag.x = event.clientX;
+        const k = .3 * SENSITIVITY;
+        rotY += dx * k;
+        velocity = dx * k * 60;
+      });
+      const release = (event) => {
+        stage.releasePointerCapture?.(event.pointerId);
+        drag.active = false;
+        stage.classList.remove('is-dragging');
+      };
+      stage.addEventListener('pointerup', release);
+      stage.addEventListener('pointercancel', release);
+      // Карусель за экраном не крутится впустую (правило 08).
+      new IntersectionObserver(([entry]) => {
+        if (entry.isIntersecting && !frame) { last = 0; frame = requestAnimationFrame(draw); }
+        else if (!entry.isIntersecting && frame) { cancelAnimationFrame(frame); frame = 0; }
+      }, { rootMargin:'100px' }).observe(stage);
+
+      // Заголовок и кольцо выходят из блюра, когда блок подходит к экрану.
+      const section = document.querySelector('.circle-section');
+      new IntersectionObserver(([entry]) => {
+        section.classList.toggle('is-in', entry.isIntersecting);
+      }, { rootMargin:'-12% 0px -30% 0px' }).observe(section);
     })();
 
     (() => {
