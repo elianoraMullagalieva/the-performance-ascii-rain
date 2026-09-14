@@ -52,7 +52,9 @@
     /* Трек короткий: на шторку приходится ~76px прокрутки — это два
        обычных движения трекпада, а не пять. Считать в «щелчках колеса»
        нельзя: на трекпаде шаг втрое мельче. */
-    .veil-track { position:relative; height:230svh; }
+    /* Трек наезжает на герой: шторка начинает подниматься, пока первый
+       экран ещё виден, а не после 100svh прокрутки вхолостую. */
+    .veil-track { position:relative; height:230svh; margin-top:-72svh; }
     .veil {
       position:sticky; top:0; z-index:2;
       display:grid; place-items:center;
@@ -132,13 +134,15 @@
       transition:opacity .5s cubic-bezier(.16,1,.3,1), filter .6s cubic-bezier(.16,1,.3,1);
     }
     .circle-section.is-in .circle-section__title { opacity:1; filter:blur(0); }
-    /* Карусель: кольцо карточек вращается по оси Y. Во всю ширину экрана. */
+    /* Карусель лежит в тёмном контейнере с полями по краям — как в макете,
+       а не во всю ширину экрана. */
     .ring-stage {
       display:flex; align-items:center; justify-content:center;
-      width:100vw; margin-left:calc(50% - 50vw);
-      height:clamp(340px,56svh,620px);
+      width:min(1272px, 88vw); margin-inline:auto;
+      height:clamp(340px,58svh,620px);
       overflow:hidden;
-      perspective:3000px;
+      background:#0a0a0a;
+      perspective:2200px;
       cursor:grab; touch-action:pan-y;
       user-select:none;
       opacity:0; transition:opacity .6s cubic-bezier(.16,1,.3,1) .18s;
@@ -150,10 +154,10 @@
     .ring__item { position:absolute; inset:0; transform-style:preserve-3d; }
     .ring__face {
       position:absolute; inset:0;
-      border-radius:6px; overflow:hidden;
+      border-radius:14px; overflow:hidden;
       backface-visibility:hidden;
       background-size:cover; background-position:center;
-      box-shadow:0 10px 30px rgba(0,0,0,.35);
+      box-shadow:0 18px 48px rgba(0,0,0,.55);
     }
     .ring__face--back { transform:rotateY(180deg); filter:brightness(.35); }
 
@@ -686,9 +690,11 @@
       // Заглушки под будущие карточки — дизайн придёт позже.
       const COUNT = 8;
       // Шире экрана: карточки крупнее, кольцо перекрывает всю ширину.
-      // Кольцо заведомо шире экрана: крайние карточки уходят за края.
-      const CARD_W = Math.round(Math.min(520, Math.max(300, innerWidth * .32)));
-      const CARD_H = Math.round(CARD_W * 1.29);
+      // Карточка вписана в контейнер: кольцо шире него, крайние карточки
+      // уходят в темноту по краям — как в макете.
+      const stageW = stage.getBoundingClientRect().width || innerWidth;
+      const CARD_W = Math.round(Math.min(400, Math.max(240, stageW * .30)));
+      const CARD_H = Math.round(CARD_W * 1.32);
       const SPACING = 3;
       const SPEED = 0.85;   // медленнее: спокойное вращение
       const SENSITIVITY = 5;
