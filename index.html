@@ -35,7 +35,12 @@
 
     /* Поля рамки — одной переменной, чтобы верх и низ дышали одинаково
        и подстраивались под высоту экрана (а не жили числами вразнобой). */
-    :root { --edge-y:clamp(18px,2.6svh,30px); --edge-x:clamp(14px,1.7vw,30px); }
+    :root {
+      --edge-y:clamp(18px,2.6svh,30px); --edge-x:clamp(14px,1.7vw,30px);
+      /* Ширина сцены карусели одной переменной: от неё же считается высота,
+         иначе calc с max() внутри не разрешается и сцена схлопывается. */
+      --stage-w:max(320px, 55vw);
+    }
 
     .hero { position:sticky; top:0; z-index:1; height:100svh; overflow:hidden; }
     .brand { position:absolute; top:var(--edge-y); left:5.9vw; display:block; width:140px; color:inherit; text-decoration:none; }
@@ -139,12 +144,11 @@
       display:flex; align-items:center; justify-content:center;
       /* Сцена уже кольца: при пяти карточках диаметр ~2x ширины карточки,
          поэтому узкая сцена нужна, чтобы крайние уходили за края.
-         Без потолка — на больших мониторах всё должно расти пропорционально. */
-      width:max(320px, 55vw); margin-inline:auto;
-      /* Высота от самой карточки, а не от окна: иначе на большом мониторе
-         вокруг кольца появляется пустое поле в пол-экрана. */
-      height:calc(max(320px, 55vw) * .55 * 1.446 + 40px);
-      max-height:86svh;
+         Без потолка — на больших мониторах всё растёт пропорционально. */
+      width:var(--stage-w); margin-inline:auto;
+      /* Высота считается от самой карточки (0.55 ширины сцены, пропорция
+         1.446), а не от окна: иначе вокруг кольца зияет пустое поле. */
+      height:min(86svh, calc(var(--stage-w) * 0.55 * 1.446 + 40px));
       overflow:hidden;
       perspective:2200px;
       cursor:grab; touch-action:pan-y;
