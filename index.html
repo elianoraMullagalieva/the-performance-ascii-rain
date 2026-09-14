@@ -138,8 +138,10 @@
        а не во всю ширину экрана. */
     .ring-stage {
       display:flex; align-items:center; justify-content:center;
-      width:min(1272px, 92vw); margin-inline:auto;
-      height:clamp(340px,58svh,620px);
+      /* Сцена уже кольца: при пяти карточках диаметр ~2x ширины карточки,
+         поэтому узкая сцена нужна, чтобы крайние уходили за края. */
+      width:min(789px, 74vw); margin-inline:auto;
+      height:clamp(420px,72svh,700px);
       overflow:hidden;
       perspective:2200px;
       cursor:grab; touch-action:pan-y;
@@ -159,6 +161,29 @@
       box-shadow:0 18px 48px rgba(0,0,0,.55);
     }
     .ring__face--back { transform:rotateY(180deg); filter:brightness(.35); }
+    .ring__photo { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+    /* Подпись поверх фото: чередуется сверху и снизу, как в макете. */
+    .ring__copy {
+      position:absolute; z-index:2; left:11.1%; right:11.1%;
+      display:flex; flex-direction:column; gap:2px;
+      font-family:Manrope,Arial,sans-serif; color:#fff;
+    }
+    .ring__copy--top { top:10.6%; }
+    .ring__copy--bottom { bottom:8.5%; }
+    .ring__name {
+      margin:0; font-size:clamp(1rem,.7rem + .85vw,1.44rem);
+      font-weight:400; line-height:1.15; letter-spacing:-.01em;
+    }
+    .ring__note {
+      margin:0; font-size:clamp(.75rem,.6rem + .42vw,1rem);
+      font-weight:400; line-height:1.2; opacity:.92;
+    }
+    /* Подпись читается и на светлом фото. */
+    .ring__face--front::after {
+      content:""; position:absolute; inset:0; pointer-events:none;
+      background:linear-gradient(180deg, rgba(10,10,10,.55) 0%, rgba(10,10,10,0) 34%,
+                                  rgba(10,10,10,0) 60%, rgba(10,10,10,.6) 100%);
+    }
 
     @media (prefers-reduced-motion:reduce) {
       .ring-stage { height:auto; overflow-x:auto; perspective:none; }
@@ -897,17 +922,27 @@
       if (!stage || !ring) return;
 
       // Заглушки под будущие карточки — дизайн придёт позже.
-      const COUNT = 8;
+      const COUNT = 5;
       // Шире экрана: карточки крупнее, кольцо перекрывает всю ширину.
       // Карточка вписана в контейнер: кольцо шире него, крайние карточки
       // уходят в темноту по краям — как в макете.
       const stageW = stage.getBoundingClientRect().width || innerWidth;
-      // Замеры по референсу: карточка ~39% ширины сцены, почти квадратная,
-      // в кадре одновременно читаются пять штук.
-      const CARD_W = Math.round(Math.min(520, Math.max(250, stageW * .39)));
-      const CARD_H = Math.round(CARD_W * .91);
-      const SPACING = 3;
+      // Ширина — как была (~39% сцены). Высота по макету 441:485:
+      // карточка 306x443, то есть отношение 1.446 вместо прежних 0.91.
+      const CARD_W = Math.round(Math.min(520, Math.max(250, stageW * .55)));
+      const CARD_H = Math.round(CARD_W * 1.446);
+      const SPACING = 3;    // параметр кольца из Originkit: factor = 1 + spacing*0.15
       const SPEED = 2.5;    // ~15 град/с: карточка сменяется за ~3 с
+
+      // Пять карточек «Среда единомышленников». Подписи чередуются сверху и
+      // снизу — как в макете, где у одной карточки текст вверху, у другой внизу.
+      const CARDS = [
+        { image:'cards/card-red.png',   name:'Предприниматели', note:'Которым важно доносить идеи', place:'bottom' },
+        { image:'cards/card-dark.png',  name:'Преподаватели',   note:'Которым важно доносить идеи.', place:'top' },
+        { image:'cards/card-green.png', name:'Руководители',    note:'Которым важно вести за собой', place:'bottom' },
+        { image:'cards/card-light.png', name:'Исследователи',   note:'Которым важно быть понятыми', place:'top' },
+        { image:'cards/card-alt.png',   name:'Авторы',          note:'Которым важно звучать точно', place:'bottom' }
+      ];
       const SENSITIVITY = 5;
 
       const angle = 360 / COUNT;
@@ -918,15 +953,34 @@
       ring.style.width = `${CARD_W}px`;
       ring.style.height = `${CARD_H}px`;
 
-      // Плейсхолдеры разной светлоты, чтобы вращение читалось до вставки фото.
+      // Пять карточек с фото и подписями; подпись чередуется верх/низ.
       for (let i = 0; i < COUNT; i++) {
+        const card = CARDS[i % CARDS.length];
         const item = document.createElement('div');
         item.className = 'ring__item';
         item.style.transform = `rotateY(${i * angle}deg) translateZ(${radius}px)`;
-        const tone = 26 + (i % 4) * 9;
+
         const front = document.createElement('div');
-        front.className = 'ring__face';
-        front.style.background = `rgb(${tone},${tone},${tone + 2})`;
+        front.className = 'ring__face ring__face--front';
+        front.style.background = '#171717';
+        const photo = document.createElement('img');
+        photo.className = 'ring__photo';
+        photo.src = card.image;
+        photo.alt = '';
+        photo.loading = 'lazy';
+        front.appendChild(photo);
+
+        const copy = document.createElement('div');
+        copy.className = `ring__copy ring__copy--${card.place}`;
+        const name = document.createElement('p');
+        name.className = 'ring__name';
+        name.textContent = card.name;
+        const note = document.createElement('p');
+        note.className = 'ring__note';
+        note.textContent = card.note;
+        copy.append(name, note);
+        front.appendChild(copy);
+
         const back = document.createElement('div');
         back.className = 'ring__face ring__face--back';
         back.style.background = `rgb(${tone},${tone},${tone + 2})`;
