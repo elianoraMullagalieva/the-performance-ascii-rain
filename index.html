@@ -93,11 +93,21 @@
     .philosophy-track { position:relative; }
     .philosophy-track .philosophy { position:sticky; top:0; min-height:100svh; display:grid; align-content:center; }
     /* Карусель — снова отдельная секция, после «Философии». */
+    /* Заголовок и карусель — одна группа: в один экран, с общим воздухом. */
     .circle-section {
       position:relative; z-index:2;
       display:grid; align-content:center; justify-items:center;
-      min-height:100svh; padding:clamp(30px,5svh,70px) 0;
+      gap:clamp(18px,3svh,42px);
+      min-height:100svh; padding:clamp(24px,4svh,56px) 0;
       background:var(--void);
+    }
+    .circle-title {
+      margin:0; padding:0 20px;
+      font-family:Manrope,Arial,sans-serif;
+      font-size:var(--fz-phrase);
+      font-weight:300; line-height:1.1; letter-spacing:-.02em;
+      text-align:center; text-wrap:balance;
+      color:var(--light);
     }
     .veil__line {
       margin:0;
@@ -427,9 +437,6 @@
         <p class="veil__line" data-line>Мысль рождается в&nbsp;слове</p>
         <p class="veil__line" data-line>Слово формирует влияние</p>
         <p class="veil__line" data-line>Влияние формирует реальность</p>
-        <!-- Четвёртая строка — заголовок сцены: проявляется так же, как
-             цитаты, но поднимается вверх, освобождая место карусели. -->
-        <p class="veil__line veil__line--title" data-line data-title>Среда единомышленников</p>
       </div>
     </section>
   </div>
@@ -488,6 +495,8 @@
 
   <!-- Среда единомышленников: карусель идёт после «Философии». -->
   <section class="circle-section" aria-label="Среда единомышленников">
+    <!-- Заголовок и карусель — один блок, на одном экране. -->
+    <h2 class="circle-title">Среда единомышленников</h2>
     <div class="ring-stage" id="ring-stage">
       <div class="ring-tilt">
         <div class="ring" id="ring"></div>
@@ -940,17 +949,13 @@
         const slot = span / lines.length;
         const arrived = WAVE + RAMP;
 
-        const lastIndex = lines.length - 1;
         lines.forEach((item, index) => {
           const local = (progress - PHRASES_FROM - index * slot) / slot;
           const n = Math.max(1, item.letters.length - 1);
-          // Последняя строка — заголовок раздела: она проявляется и остаётся,
-          // а не растворяется, как фразы перед ней.
-          const isTitle = index === lastIndex;
           item.letters.forEach((letter, letterIndex) => {
             const offset = (letterIndex / n) * WAVE;
             const appear = ease(clamp01((local - offset) / RAMP));
-            const vanish = isTitle ? 0 : ease(clamp01((local - arrived - HOLD - offset) / RAMP));
+            const vanish = ease(clamp01((local - arrived - HOLD - offset) / RAMP));
             const visible = appear * (1 - vanish);
             // Пишем стиль только когда значение реально изменилось: иначе на
             // каждом кадре уходит 178 записей в CSSOM, большинство — те же
