@@ -46,7 +46,7 @@
       --ring-h:min(50svh, 40vw);
       /* Карточка шире и ниже прежнего: пропорция 1.0 — ширина ещё +20%. */
       --card-h:calc(var(--ring-h) - 40px);
-      --card-w:calc(var(--card-h) / 0.86);
+      --card-w:calc(var(--card-h) / 1.35);
       /* Сцена уже кольца, чтобы крайние карточки уходили за края. */
       --stage-w:calc(100vw - var(--edge-x));
     }
@@ -227,7 +227,7 @@
     /* Карточка стала шире — подписи тоже крупнее. */
     .ring__name {
       margin:0; max-width:15ch;
-      font-size:clamp(1.15rem,.72rem + 1.15vw,1.85rem);
+      font-size:clamp(1.1rem,.69rem + 1.1vw,1.78rem);
       font-weight:400; line-height:1.08; letter-spacing:-.01em;
       text-wrap:balance;
     }
@@ -1116,7 +1116,7 @@
       // кастомного свойства: getPropertyValue на :root возвращает исходный
       // calc(...) текстом, и parseFloat дал бы NaN.
       const SPACING = 3;    // параметр кольца из Originkit: factor = 1 + spacing*0.15
-      const SPEED = 1.8;    // ~15 град/с: карточка сменяется за ~3 с
+      const SPEED = 2.6;    // ~15 град/с: карточка сменяется за ~3 с
       // Размеры пересчитываются, а не берутся один раз: на старте сцена ещё
       // не имеет реальной высоты, и кольцо получалось нулевым.
       let CARD_W = 0, CARD_H = 0, radius = 0;
@@ -1136,7 +1136,7 @@
 
       const angle = 360 / COUNT;
       // Зазор между карточками на 5% шире прежнего.
-      const factor = (1 + SPACING * 0.15) * 0.72;
+      const factor = (1 + SPACING * 0.15) * 0.46;
       const degPerSec = SPEED * 6;
 
       // Пересчёт размеров от живой высоты сцены: на старте она ещё нулевая,
@@ -1144,7 +1144,7 @@
       const resize = () => {
         const stageH = stage.getBoundingClientRect().height || innerHeight * .79;
         CARD_H = Math.round(stageH - 40);
-        CARD_W = Math.round(CARD_H / 0.86);
+        CARD_W = Math.round(CARD_H / 1.35);
         // Кольцо разворачиваем по ширине сцены, а не по ширине карточки:
         // крайние карточки должны доходить до краёв — до линии логотипа
         // и кнопки. factor остаётся как поправка на плотность.
