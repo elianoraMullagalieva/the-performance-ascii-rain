@@ -46,7 +46,7 @@
       --ring-h:min(50svh, 40vw);
       /* Карточка шире и ниже прежнего: пропорция 1.0 — ширина ещё +20%. */
       --card-h:calc(var(--ring-h) - 40px);
-      --card-w:calc(var(--card-h) / 1.35);
+      --card-w:calc(var(--card-h) / 1.8);
       /* Сцена уже кольца, чтобы крайние карточки уходили за края. */
       --stage-w:calc(100vw - var(--edge-x));
     }
@@ -189,6 +189,24 @@
       .veil { position:static; height:auto; padding:14svh 0; clip-path:none; }
       .veil__line .l { filter:none !important; opacity:1 !important; }
     }
+
+
+    /* ───────── Философия, вариант 2 ─────────
+       Подписи по центру и на одной высоте, бейджи сверху по центру. */
+    .philosophy--v2 .pcard__copy {
+      left:clamp(14px,2.4vw,34px); right:clamp(14px,2.4vw,34px);
+      top:72%; bottom:auto;
+      align-items:center; text-align:center; gap:clamp(8px,1vw,14px);
+    }
+    .philosophy--v2 .pcard__name { max-width:18ch; }
+    .philosophy--v2 .pcard__note { max-width:30ch; }
+    .philosophy--v2 .pcard__badges {
+      left:50%; right:auto; transform:translateX(-50%);
+      top:clamp(14px,1.9vw,28px);
+    }
+    .philosophy--v2 .pcard { aspect-ratio:370 / 600; }
+    .philosophy--v2 .pcard--brand { align-content:end; }
+    .philosophy--v2 .pcard__brand { padding-bottom:clamp(30px,4.6vw,64px); }
 
     /* ───────── Среда единомышленников ─────────
        Обычная прокрутка без шторок: блок просто идёт следом. */
@@ -512,6 +530,62 @@
           <p class="pcard__brand-note">Пространство на&nbsp;пересечении культуры, образования и&nbsp;лидерства.</p>
         </div>
         <span class="pcard__brand-tag">Перформанс</span>
+      </article>
+
+      <article class="pcard pcard--green">
+        <img class="pcard__media" src="cards/photo-3.png" alt="">
+        <div class="pcard__badges">
+          <span class="pcard__badge">01</span><span class="pcard__badge">принцип</span>
+        </div>
+        <div class="pcard__copy">
+          <h3 class="pcard__name">Мыслить через слово</h3>
+          <p class="pcard__note">Речь развивает интеллект, а&nbsp;не&nbsp;украшает его</p>
+        </div>
+      </article>
+
+      <article class="pcard pcard--light">
+        <img class="pcard__media" src="cards/photo-1.png" alt="">
+        <div class="pcard__badges">
+          <span class="pcard__badge">02</span><span class="pcard__badge">принцип</span>
+        </div>
+        <div class="pcard__copy">
+          <h3 class="pcard__name">Формировать влияние</h3>
+          <p class="pcard__note">Говорить так, чтобы менялась не&nbsp;тема разговора, а&nbsp;положение дел</p>
+        </div>
+      </article>
+
+      <article class="pcard pcard--dark">
+        <img class="pcard__media" src="cards/placeholder.jpg" alt="">
+        <div class="pcard__badges">
+          <span class="pcard__badge">03</span><span class="pcard__badge">принцип</span>
+        </div>
+        <div class="pcard__copy">
+          <h3 class="pcard__name">Соединять культуру и&nbsp;лидерство</h3>
+          <p class="pcard__note">Влияние без&nbsp;фундамента&nbsp;—<br>громкость</p>
+        </div>
+      </article>
+    </div>
+  </section>
+  </div>
+
+  <div class="philosophy-track" id="philosophy-track-v2">
+  <section class="philosophy philosophy--v2" aria-label="Философия — вариант 2">
+    <div class="chrome chrome--section chrome--dark" aria-hidden="true">
+      <span class="chrome__brand"><img src="HERO/10%20%E2%80%94%20EYE/%D0%9B%D0%9E%D0%93%D0%9E%D0%9B%D0%9E%D0%93%D0%9E.svg" alt=""></span>
+      <span class="chrome__cta"><span>Запросить участие</span><img src="figma-arrow.svg" alt=""></span>
+      <p class="chrome__meta chrome__meta--left"><span>＋&nbsp; Листайте и&nbsp;исследуйте</span><span>&nbsp;&nbsp;&nbsp;&nbsp;пространство института</span></p>
+      <p class="chrome__meta chrome__meta--right"><span>Москва&nbsp; /&nbsp; Online</span><span>Приём заявок открыт</span></p>
+    </div>
+    <h2 class="philosophy__title">Философия</h2>
+    <div class="philosophy__rail">
+      <article class="pcard pcard--red pcard--brand">
+        <img class="pcard__media" src="cards/photo-2.png" alt="">
+        <div class="pcard__brand">
+          <img src="cards/logo-big.svg" alt="">
+          <p class="pcard__brand-name">The Performance</p>
+          <p class="pcard__brand-note">Пространство на&nbsp;пересечении культуры, образования и&nbsp;лидерства.</p>
+        </div>
+        
       </article>
 
       <article class="pcard pcard--green">
@@ -1064,9 +1138,12 @@
     // Как в Кэмпе: доехали до блока — он фиксируется, следующая прокрутка
     // долистывает карточки, и только потом страница идёт дальше.
     (() => {
-      const track = document.querySelector('#philosophy-track');
-      const rail = track?.querySelector('.philosophy__rail');
-      if (!track || !rail) return;
+      const tracks = [...document.querySelectorAll('.philosophy-track')];
+      if (!tracks.length) return;
+      tracks.forEach(setupRail);
+      function setupRail(track) {
+      const rail = track.querySelector('.philosophy__rail');
+      if (!rail) return;
 
       const clamp01 = v => Math.min(1, Math.max(0, v));
       let overflow = 0;
@@ -1108,6 +1185,7 @@
       document.fonts.ready.then(() => { measure(); paint(); });
       measure();
       paint();
+      }
     })();
 
     // ───────── 3D-карусель «Среда единомышленников» ─────────
@@ -1150,7 +1228,7 @@
 
       const angle = 360 / COUNT;
       // Зазор между карточками на 5% шире прежнего.
-      const factor = (1 + SPACING * 0.15) * 0.46;
+      const factor = (1 + SPACING * 0.15) * 0.62;
       const degPerSec = SPEED * 6;
 
       // Пересчёт размеров от живой высоты сцены: на старте она ещё нулевая,
@@ -1158,7 +1236,7 @@
       const resize = () => {
         const stageH = stage.getBoundingClientRect().height || innerHeight * .79;
         CARD_H = Math.round(stageH - 40);
-        CARD_W = Math.round(CARD_H / 1.35);
+        CARD_W = Math.round(CARD_H / 1.8);
         // Кольцо разворачиваем по ширине сцены, а не по ширине карточки:
         // крайние карточки должны доходить до краёв — до линии логотипа
         // и кнопки. factor остаётся как поправка на плотность.
