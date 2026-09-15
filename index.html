@@ -1258,9 +1258,15 @@
 
       let ticking = false;
       const request = () => { if (!ticking) { ticking = true; requestAnimationFrame(() => { ticking = false; paint(); }); } };
-      addEventListener('scroll', request, { passive:true });
-      addEventListener('resize', () => { measure(); paint(); }, { passive:true });
-      document.fonts.ready.then(() => { measure(); paint(); });
+      // Слушатели вешаются один раз на трек: повторный вызов setupRail
+      // при смене брейкпоинта иначе плодил второй комплект, и они
+      // перетирали --rail-x значениями из устаревшего замыкания.
+      if (!track._railBound) {
+        track._railBound = true;
+        addEventListener('scroll', () => { if (!MOBILE_RAIL.matches) request(); }, { passive:true });
+        addEventListener('resize', () => { if (!MOBILE_RAIL.matches) { measure(); paint(); } }, { passive:true });
+        document.fonts.ready.then(() => { if (!MOBILE_RAIL.matches) { measure(); paint(); } });
+      }
       measure();
       paint();
       }
