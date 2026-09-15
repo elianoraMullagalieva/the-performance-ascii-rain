@@ -198,11 +198,11 @@
       /* Anticva прописными заметно шире Manrope: длинное слово
          «единомышленников» не влезало в узкий экран. */
       .circle-title { font-size:clamp(1.5rem,6.2vw,2.3rem); padding:0 16px; }
-      /* Шапка переключается мгновенно, без плавного проявления: именно
-         полусекундный переход читался как «меню появляется, только когда
-         остановишься». Видимостью по-прежнему управляет наблюдатель,
-         иначе все четыре шапки висят разом и накладываются на герое. */
-      .chrome--section { transition:none; position:fixed; }
+      /* На телефоне закреплённого меню после блока фраз нет: три слоя
+         position:fixed поверх всей страницы держали композитор занятым на
+         каждом кадре прокрутки. Шапка остаётся только на первом экране.
+         На десктопе секционные шапки работают по-прежнему. */
+      .chrome--section { display:none; }
       /* Бургер — ровно там же, где на первом экране. */
       .chrome__toggle {
         position:absolute; z-index:4; top:42px; left:20px;
@@ -1219,7 +1219,12 @@
         .filter(pair => pair.host);
       if (!pairs.length) return;
 
+      // На телефоне секционных шапок нет вовсе (display:none), поэтому и
+      // считать их выбор на каждом кадре прокрутки не нужно.
+      const NARROW_CHROME = matchMedia('(max-width:780px)');
+
       const pick = () => {
+        if (NARROW_CHROME.matches) return;
         const middle = innerHeight / 2;
         let winner = null, best = Infinity;
         pairs.forEach(({ host }) => {
@@ -1403,7 +1408,7 @@
           // карточками остался зазор, она должна быть шире самой карточки.
           // GAP берём с запасом: перспектива сближает спроецированные
           // центры сильнее, чем даёт плоский расчёт по хорде.
-          const GAP = 58;
+          const GAP = 29;
           radius = Math.round((CARD_W + GAP) / (2 * Math.sin(Math.PI / COUNT)));
         } else {
           radius = (stageW - CARD_W) / 2 * factorFor();
