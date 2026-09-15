@@ -176,12 +176,35 @@
     .chrome__meta--left { left:var(--edge-x); }
     .chrome__meta--right { right:var(--edge-x); text-align:right; }
 
+    /* Шапка секций повторяет мобильную шапку первого экрана:
+       бургер слева, логотип по центру, короткая кнопка справа.
+       Цвет наследуется от темы блока. */
+    .chrome__toggle { display:none; }
+    .chrome__cta-label--mobile { display:none; }
+    .chrome__cta { gap:10px; }
+    .cta { gap:12px; }
+
     @media (max-width:960px) { .chrome__cta { width:auto; height:34px; padding:0 12px; font-size:9px; gap:10px; } }
     @media (max-width:780px) {
       .chrome__brand { left:50%; width:119px; transform:translateX(-50%); }
-      .chrome__cta { top:var(--edge-y); right:var(--edge-x); height:28px; font-size:7px; }
+      .chrome__cta { top:42px; right:20px; width:71px; height:28px; padding:0 12px; font-size:7px; gap:6px; }
       .chrome__cta img { width:5px; height:5px; }
+      .chrome__cta-label--desktop { display:none; }
+      .chrome__cta-label--mobile { display:block; }
       .chrome__meta { font-size:8px; }
+      /* Бургер — ровно там же, где на первом экране. */
+      .chrome__toggle {
+        position:absolute; z-index:4; top:42px; left:20px;
+        display:flex; flex-direction:column; gap:6px; width:27px;
+      }
+      .chrome__toggle i { display:block; width:27px; height:1px; background:currentColor; }
+      .chrome__toggle i:nth-child(2) { width:16px; }
+      .chrome--dark .chrome__toggle { color:var(--ink); }
+      .chrome--light .chrome__toggle { color:var(--light); }
+    }
+    @media (max-width:360px) {
+      .chrome__toggle { left:14px; }
+      .chrome__cta { right:12px; width:64px; padding:0 10px; }
     }
 
     @media (prefers-reduced-motion:reduce) {
@@ -424,8 +447,20 @@
     }
 
     @media (max-width:780px) {
-      .philosophy__rail { scroll-snap-type:none; }
-      .pcard { width:74vw; }
+      /* Нативный горизонтальный скролл вместо пина. */
+      .philosophy-track { height:auto !important; margin-top:0; }
+      .philosophy-track .philosophy { position:static; min-height:auto; clip-path:none; }
+      .philosophy__rail {
+        transform:none !important;
+        overflow-x:auto; overflow-y:hidden;
+        scroll-snap-type:x mandatory;
+        -webkit-overflow-scrolling:touch;
+        scroll-padding-left:20px;
+        padding-bottom:4px;
+      }
+      .philosophy__rail::-webkit-scrollbar { display:none; }
+      .philosophy__rail { scrollbar-width:none; }
+      .pcard { width:74vw; scroll-snap-align:center; }
     }
 
     @media (max-width:1120px) { .menu { grid-template-columns:repeat(4,108px); gap:20px; } }
@@ -521,8 +556,8 @@
   <div class="philosophy-track" id="philosophy-track">
   <section class="philosophy" aria-label="Философия">
     <div class="chrome chrome--section chrome--dark" aria-hidden="true">
-      <span class="chrome__brand"><img src="HERO/10%20%E2%80%94%20EYE/%D0%9B%D0%9E%D0%93%D0%9E%D0%9B%D0%9E%D0%93%D0%9E.svg" alt=""></span>
-      <span class="chrome__cta"><span>Запросить участие</span><img src="figma-arrow.svg" alt=""></span>
+      <span class="chrome__toggle" aria-hidden="true"><i></i><i></i><i></i></span><span class="chrome__brand"><img src="HERO/10%20%E2%80%94%20EYE/%D0%9B%D0%9E%D0%93%D0%9E%D0%9B%D0%9E%D0%93%D0%9E.svg" alt=""></span>
+      <span class="chrome__cta"><span class="chrome__cta-label chrome__cta-label--desktop">Запросить участие</span><span class="chrome__cta-label chrome__cta-label--mobile">Участие</span><img src="figma-arrow.svg" alt=""></span>
       <p class="chrome__meta chrome__meta--left"><span>＋&nbsp; Листайте и&nbsp;исследуйте</span><span>&nbsp;&nbsp;&nbsp;&nbsp;пространство института</span></p>
       <p class="chrome__meta chrome__meta--right"><span>Москва&nbsp; /&nbsp; Online</span><span>Приём заявок открыт</span></p>
     </div>
@@ -577,8 +612,8 @@
   <div class="philosophy-track" id="philosophy-track-v2">
   <section class="philosophy philosophy--v2" aria-label="Философия — вариант 2">
     <div class="chrome chrome--section chrome--dark" aria-hidden="true">
-      <span class="chrome__brand"><img src="HERO/10%20%E2%80%94%20EYE/%D0%9B%D0%9E%D0%93%D0%9E%D0%9B%D0%9E%D0%93%D0%9E.svg" alt=""></span>
-      <span class="chrome__cta"><span>Запросить участие</span><img src="figma-arrow.svg" alt=""></span>
+      <span class="chrome__toggle" aria-hidden="true"><i></i><i></i><i></i></span><span class="chrome__brand"><img src="HERO/10%20%E2%80%94%20EYE/%D0%9B%D0%9E%D0%93%D0%9E%D0%9B%D0%9E%D0%93%D0%9E.svg" alt=""></span>
+      <span class="chrome__cta"><span class="chrome__cta-label chrome__cta-label--desktop">Запросить участие</span><span class="chrome__cta-label chrome__cta-label--mobile">Участие</span><img src="figma-arrow.svg" alt=""></span>
       <p class="chrome__meta chrome__meta--left"><span>＋&nbsp; Листайте и&nbsp;исследуйте</span><span>&nbsp;&nbsp;&nbsp;&nbsp;пространство института</span></p>
       <p class="chrome__meta chrome__meta--right"><span>Москва&nbsp; /&nbsp; Online</span><span>Приём заявок открыт</span></p>
     </div>
@@ -633,8 +668,8 @@
   <!-- Среда единомышленников: карусель идёт после «Философии». -->
   <section class="circle-section" aria-label="Среда единомышленников">
     <div class="chrome chrome--section chrome--light" aria-hidden="true">
-      <span class="chrome__brand"><img src="HERO/10%20%E2%80%94%20EYE/%D0%9B%D0%9E%D0%93%D0%9E%D0%9B%D0%9E%D0%93%D0%9E.svg" alt=""></span>
-      <span class="chrome__cta"><span>Запросить участие</span><img src="figma-arrow.svg" alt=""></span>
+      <span class="chrome__toggle" aria-hidden="true"><i></i><i></i><i></i></span><span class="chrome__brand"><img src="HERO/10%20%E2%80%94%20EYE/%D0%9B%D0%9E%D0%93%D0%9E%D0%9B%D0%9E%D0%93%D0%9E.svg" alt=""></span>
+      <span class="chrome__cta"><span class="chrome__cta-label chrome__cta-label--desktop">Запросить участие</span><span class="chrome__cta-label chrome__cta-label--mobile">Участие</span><img src="figma-arrow.svg" alt=""></span>
       <p class="chrome__meta chrome__meta--left"><span>＋&nbsp; Листайте и&nbsp;исследуйте</span><span>&nbsp;&nbsp;&nbsp;&nbsp;пространство института</span></p>
       <p class="chrome__meta chrome__meta--right"><span>Москва&nbsp; /&nbsp; Online</span><span>Приём заявок открыт</span></p>
     </div>
@@ -649,8 +684,8 @@
 
   <!-- Та же обвязка, что на первом экране: не двигается, только цвет. -->
   <div class="chrome" id="chrome" aria-hidden="true">
-    <span class="chrome__brand"><img src="HERO/10%20%E2%80%94%20EYE/%D0%9B%D0%9E%D0%93%D0%9E%D0%9B%D0%9E%D0%93%D0%9E.svg" alt=""></span>
-    <span class="chrome__cta"><span>Запросить участие</span><img src="figma-arrow.svg" alt=""></span>
+    <span class="chrome__toggle" aria-hidden="true"><i></i><i></i><i></i></span><span class="chrome__brand"><img src="HERO/10%20%E2%80%94%20EYE/%D0%9B%D0%9E%D0%93%D0%9E%D0%9B%D0%9E%D0%93%D0%9E.svg" alt=""></span>
+    <span class="chrome__cta"><span class="chrome__cta-label chrome__cta-label--desktop">Запросить участие</span><span class="chrome__cta-label chrome__cta-label--mobile">Участие</span><img src="figma-arrow.svg" alt=""></span>
     <p class="chrome__meta chrome__meta--left"><span>＋&nbsp; Листайте и&nbsp;исследуйте</span><span>&nbsp;&nbsp;&nbsp;&nbsp;пространство института</span></p>
     <p class="chrome__meta chrome__meta--right"><span>Москва&nbsp; /&nbsp; Online</span><span>Приём заявок открыт</span></p>
   </div>
@@ -1167,10 +1202,18 @@
     (() => {
       const tracks = [...document.querySelectorAll('.philosophy-track')];
       if (!tracks.length) return;
+      // На узких экранах лента живёт нативным горизонтальным скроллом:
+      // пин и пересчёт на каждом кадре там только мешают и дают лаги.
+      const MOBILE_RAIL = matchMedia('(max-width:780px)');
       tracks.forEach(setupRail);
       function setupRail(track) {
       const rail = track.querySelector('.philosophy__rail');
       if (!rail) return;
+      if (MOBILE_RAIL.matches) {
+        track.style.height = '';
+        rail.style.removeProperty('--rail-x');
+        return;
+      }
 
       const clamp01 = v => Math.min(1, Math.max(0, v));
       let overflow = 0;
