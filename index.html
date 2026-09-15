@@ -456,7 +456,10 @@
     @media (max-width:780px) {
       /* Нативный горизонтальный скролл вместо пина. */
       .philosophy-track { height:auto !important; margin-top:0; }
-      .philosophy-track .philosophy { position:static; min-height:auto; clip-path:none; }
+      /* Шапка на мобиле закреплена (fixed) и вышла из потока — заголовку
+         нужен собственный воздух сверху, иначе он упирается в логотип. */
+      .philosophy-track .philosophy { position:static; min-height:auto; clip-path:none; padding-top:130px; }
+      .philosophy__title { margin-top:0; }
       .philosophy__rail {
         transform:none !important;
         overflow-x:auto; overflow-y:hidden;
@@ -1299,7 +1302,12 @@
       if (!stage || !ring) return;
 
       // Заглушки под будущие карточки — дизайн придёт позже.
-      const COUNT = 10;
+      // На узком экране десять карточек слипаются: подписи налезают друг
+      // на друга. Там кольцо из пяти — шаг 72° вместо 36°, воздуха вдвое
+      // больше при той же ширине сцены.
+      const NARROW = matchMedia('(max-width:780px)');
+      const countFor = () => NARROW.matches ? 5 : 10;
+      let COUNT = countFor();
       // Шире экрана: карточки крупнее, кольцо перекрывает всю ширину.
       // Карточка вписана в контейнер: кольцо шире него, крайние карточки
       // уходят в темноту по краям — как в макете.
@@ -1328,14 +1336,15 @@
       ];
       const SENSITIVITY = 5;
 
-      const angle = 360 / COUNT;
+      let angle = 360 / COUNT;
       // Зазор между карточками на 5% шире прежнего.
-      const factor = (1 + SPACING * 0.15) * 0.60;
+      const factorFor = () => (1 + SPACING * 0.15) * (NARROW.matches ? 0.42 : 0.60);
       const degPerSec = SPEED * 6;
 
       // Пересчёт размеров от живой высоты сцены: на старте она ещё нулевая,
       // поэтому одноразовый расчёт давал кольцо 0x0.
       const resize = () => {
+        if (typeof build === 'function' && COUNT !== countFor()) build();
         const stageH = stage.getBoundingClientRect().height || innerHeight * .79;
         CARD_H = Math.round(stageH - 40);
         CARD_W = Math.round(CARD_H / 1.385);
@@ -1343,7 +1352,16 @@
         // крайние карточки должны доходить до краёв — до линии логотипа
         // и кнопки. factor остаётся как поправка на плотность.
         const stageW = stage.getBoundingClientRect().width || innerWidth;
-        radius = (stageW - CARD_W) / 2 * factor;
+        if (NARROW.matches) {
+          // Пять карточек: радиус от полуширины карточки плюс зазор,
+          // иначе соседние перекрываются и кольцо схлопывается в стопку.
+          // Хорда между соседними центрами = 2·R·sin(π/COUNT). Чтобы между
+          // карточками остался зазор, она должна быть шире самой карточки.
+          const GAP = 26;
+          radius = Math.round((CARD_W + GAP) / (2 * Math.sin(Math.PI / COUNT)));
+        } else {
+          radius = (stageW - CARD_W) / 2 * factorFor();
+        }
         ring.style.width = `${CARD_W}px`;
         ring.style.height = `${CARD_H}px`;
         [...ring.children].forEach((item, i) => {
@@ -1352,46 +1370,54 @@
         if (typeof apply === 'function') apply();
       };
 
-      // Пять карточек с фото и подписями; подпись чередуется верх/низ.
-      for (let i = 0; i < COUNT; i++) {
-        const card = CARDS[i % CARDS.length];
-        const item = document.createElement('div');
-        item.className = 'ring__item';
-        // Пока во всех карточках одна и та же фотография-заглушка.
-        const tone = i % 2 === 0 ? '#171717' : '#3A0F14';
-        const front = document.createElement('div');
-        front.className = 'ring__face ring__face--front';
-        front.style.background = tone;
-        const photo = document.createElement('img');
-        photo.className = 'ring__photo';
-        photo.src = 'cards/ring-photo.jpg';
-        photo.alt = '';
-        front.appendChild(photo);
+      // Кольцо пересобирается, когда меняется число карточек: на узком
+      // экране их пять, на широком десять.
+      function build() {
+        ring.textContent = '';
+        COUNT = countFor();
+        angle = 360 / COUNT;
+        for (let i = 0; i < COUNT; i++) {
+          const card = CARDS[i % CARDS.length];
+          const item = document.createElement('div');
+          item.className = 'ring__item';
+          // Пока во всех карточках одна и та же фотография-заглушка.
+          const tone = i % 2 === 0 ? '#171717' : '#3A0F14';
+          const front = document.createElement('div');
+          front.className = 'ring__face ring__face--front';
+          front.style.background = tone;
+          const photo = document.createElement('img');
+          photo.className = 'ring__photo';
+          photo.src = 'cards/ring-photo.jpg';
+          photo.alt = '';
+          front.appendChild(photo);
 
-        const copy = document.createElement('div');
-        copy.className = `ring__copy ring__copy--${card.place}`;
-        const name = document.createElement('p');
-        name.className = 'ring__name';
-        name.textContent = card.name;
-        const note = document.createElement('p');
-        note.className = 'ring__note';
-        note.textContent = card.note;
-        copy.append(name, note);
-        front.appendChild(copy);
+          const copy = document.createElement('div');
+          copy.className = `ring__copy ring__copy--${card.place}`;
+          const name = document.createElement('p');
+          name.className = 'ring__name';
+          name.textContent = card.name;
+          const note = document.createElement('p');
+          note.className = 'ring__note';
+          note.textContent = card.note;
+          copy.append(name, note);
+          front.appendChild(copy);
 
-        // Обратная сторона — то же фото, приглушённое: карточка читается
-        // как один объект, а не как две разные с изнанки.
-        const back = document.createElement('div');
-        back.className = 'ring__face ring__face--back';
-        back.style.background = tone;
-        const backPhoto = document.createElement('img');
-        backPhoto.className = 'ring__photo';
-        backPhoto.src = 'cards/ring-photo.jpg';
-        backPhoto.alt = '';
-        back.appendChild(backPhoto);
-        item.append(front, back);
-        ring.appendChild(item);
+          // Обратная сторона — то же фото, приглушённое: карточка читается
+          // как один объект, а не как две разные с изнанки.
+          const back = document.createElement('div');
+          back.className = 'ring__face ring__face--back';
+          back.style.background = tone;
+          const backPhoto = document.createElement('img');
+          backPhoto.className = 'ring__photo';
+          backPhoto.src = 'cards/ring-photo.jpg';
+          backPhoto.alt = '';
+          back.appendChild(backPhoto);
+          item.append(front, back);
+          ring.appendChild(item);
+        }
+
       }
+      build();
 
       const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
       if (reduce) return;
