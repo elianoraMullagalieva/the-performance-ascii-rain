@@ -653,7 +653,7 @@
   <script>
     (() => {
       const HOLD_GLOBE = 1710;
-      const TRANSITION = 6325;
+      const TRANSITION = 5200;
       const BG = 0xFBFBFB;
       const INK = '#2B2B29';
       const preloader = document.querySelector('.preloader');
@@ -916,8 +916,12 @@
           // Begin the permanent vector contour the moment the last particles
           // reach their mapped SVG positions. This overlaps the two layers,
           // rather than leaving a static particle-only hold before the compass.
-          compass.style.opacity = String(ease(clamp01((e - .695) / .16)));
-          compassNeedle.style.opacity = String(ease(clamp01((e - .84) / .12)));
+          // Один множитель на передачу: контур растёт как handoff, частицы
+          // гаснут как (1 - handoff). Сумма плотностей держится около
+          // единицы — нет ни наложения двух картинок, ни белого провала.
+          const handoff = ease(clamp01((e - .70) / .14));
+          compass.style.opacity = String(handoff);
+          compassNeedle.style.opacity = String(ease(clamp01((e - .80) / .12)));
           if (!contentRevealStarted && e >= .32) {
             contentRevealStarted = true;
             hero.classList.add('is-revealing');
@@ -939,7 +943,7 @@
               const y = mix(fieldY, particle.targetY, assembly);
               // Keep the particles fine, but give a small portion more ink so
               // the eye reads an actual material breakup rather than a fade.
-              const alpha = Math.min(.93, (.70 + assembly * .21) * released * particle.ink);
+              const alpha = Math.min(.93, (.70 + assembly * .21) * released * particle.ink) * (1 - handoff);
               context.globalAlpha = alpha;
               context.fillStyle = INK;
               context.fillRect(x - particle.size * .5, y - particle.size * .5, particle.size, particle.size);
