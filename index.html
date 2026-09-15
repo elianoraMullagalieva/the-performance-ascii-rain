@@ -1210,25 +1210,47 @@
     (() => {
       const shells = [...document.querySelectorAll('.chrome--section')];
       if (!shells.length) return;
-      shells.forEach(shell => {
-        const host = shell.closest('.philosophy, .circle-section');
-        if (!host) return;
-        // На десктопе шапка проявляется, когда блок занял центр экрана.
-        // На мобиле блоки короткие: при быстрой прокрутке они проскакивают
-        // эту полосу, шапка не успевает переключиться, и последняя
-        // сработавшая (светлая, от карусели) остаётся висеть.
-        const NARROW_CHROME = matchMedia('(max-width:780px)');
-        let io = null;
-        const attach = () => {
-          if (io) io.disconnect();
-          io = new IntersectionObserver(([entry]) => {
-            shell.classList.toggle('is-in', entry.isIntersecting);
-          }, { rootMargin: NARROW_CHROME.matches ? '0px' : '-25% 0px -25% 0px' });
-          io.observe(host);
-        };
-        attach();
-        NARROW_CHROME.addEventListener('change', attach);
+      // Пары «шапка — её блок». На границе двух блоков экран пересекают оба,
+      // и по одному лишь isIntersecting зажигались обе разом: тёмная от
+      // «Философии» и светлая от карусели накладывались друг на друга.
+      // Поэтому горит ровно одна — та, чей блок ближе к центру экрана.
+      const pairs = shells
+        .map(shell => ({ shell, host: shell.closest('.philosophy, .circle-section') }))
+        .filter(pair => pair.host);
+      if (!pairs.length) return;
+
+      const pick = () => {
+        const middle = innerHeight / 2;
+        let winner = null, best = Infinity;
+        pairs.forEach(({ host }) => {
+          const box = host.getBoundingClientRect();
+          // Блок вне экрана в выборе не участвует: иначе у самого верха
+          // страницы «ближайшим» оказывался блок, которого ещё не видно.
+          if (box.bottom <= 0 || box.top >= innerHeight) return;
+          const distance = Math.abs((box.top + box.bottom) / 2 - middle);
+          if (distance < best) { best = distance; winner = host; }
+        });
+        pairs.forEach(({ shell, host }) => shell.classList.toggle('is-in', host === winner));
+      };
+
+      let pending = false;
+      const schedule = () => {
+        if (pending) return;
+        pending = true;
+        requestAnimationFrame(() => { pending = false; pick(); });
+      };
+      addEventListener('scroll', schedule, { passive:true });
+      addEventListener('resize', schedule, { passive:true });
+      // В фоновой вкладке requestAnimationFrame не тикает, и уже поставленный
+      // флаг завис бы вместе с ним: вернувшись на вкладку, страница осталась
+      // бы с шапкой от того блока, на котором её свернули. Поэтому на возврате
+      // флаг сбрасывается и выбор считается заново.
+      addEventListener('visibilitychange', () => {
+        if (document.visibilityState !== 'visible') return;
+        pending = false;
+        pick();
       });
+      pick();
     })();
 
     // ───────── «Философия»: блок прилипает, лента едет вбок ─────────
