@@ -46,7 +46,7 @@
       --ring-h:min(50svh, 40vw);
       /* Карточка шире и ниже прежнего: пропорция 1.0 — ширина ещё +20%. */
       --card-h:calc(var(--ring-h) - 40px);
-      --card-w:calc(var(--card-h) / 1.8);
+      --card-w:calc(var(--card-h) / 1.385);
       /* Сцена уже кольца, чтобы крайние карточки уходили за края. */
       --stage-w:calc(100vw - var(--edge-x));
     }
@@ -96,7 +96,8 @@
     /* Трек наезжает на блок фраз: светлая «Философия» начинает подниматься,
        пока последняя фраза ещё растворяется, а не после пустого чёрного
        экрана. Наезд равен доле прокрутки, отданной на подъём. */
-    .philosophy-track { position:relative; z-index:3; margin-top:-88svh; }
+    .philosophy-track { position:relative; z-index:3; }
+    #philosophy-track { margin-top:-88svh; }
     .philosophy-track .philosophy {
       position:sticky; top:0; min-height:100svh; display:grid; align-content:center;
       /* Тот же приём, что у тёмной шторки: блок открывается снизу вверх.
@@ -523,7 +524,7 @@
     <h2 class="philosophy__title">Философия</h2>
     <div class="philosophy__rail">
       <article class="pcard pcard--red pcard--brand">
-        <img class="pcard__media" src="cards/photo-2.png" alt="">
+        <img class="pcard__media" src="cards/card-silk-sm.jpg" srcset="cards/card-silk-sm.jpg 370w, cards/card-silk-lg.jpg 586w" sizes="(max-width:780px) 74vw, 26.6vw" alt="" decoding="async">
         <div class="pcard__brand">
           <img src="cards/logo-big.svg" alt="">
           <p class="pcard__brand-name">The Performance</p>
@@ -533,7 +534,7 @@
       </article>
 
       <article class="pcard pcard--green">
-        <img class="pcard__media" src="cards/photo-3.png" alt="">
+        <img class="pcard__media" src="cards/card-green-sm.jpg" srcset="cards/card-green-sm.jpg 370w, cards/card-green-lg.jpg 586w" sizes="(max-width:780px) 74vw, 26.6vw" alt="" decoding="async">
         <div class="pcard__badges">
           <span class="pcard__badge">01</span><span class="pcard__badge">принцип</span>
         </div>
@@ -544,7 +545,7 @@
       </article>
 
       <article class="pcard pcard--light">
-        <img class="pcard__media" src="cards/photo-1.png" alt="">
+        <img class="pcard__media" src="cards/card-bird-sm.jpg" srcset="cards/card-bird-sm.jpg 370w, cards/card-bird-lg.jpg 586w" sizes="(max-width:780px) 74vw, 26.6vw" alt="" decoding="async">
         <div class="pcard__badges">
           <span class="pcard__badge">02</span><span class="pcard__badge">принцип</span>
         </div>
@@ -555,7 +556,7 @@
       </article>
 
       <article class="pcard pcard--dark">
-        <img class="pcard__media" src="cards/placeholder.jpg" alt="">
+        <img class="pcard__media" src="cards/card-deep-sm.jpg" srcset="cards/card-deep-sm.jpg 370w, cards/card-deep-lg.jpg 586w" sizes="(max-width:780px) 74vw, 26.6vw" alt="" decoding="async">
         <div class="pcard__badges">
           <span class="pcard__badge">03</span><span class="pcard__badge">принцип</span>
         </div>
@@ -579,7 +580,7 @@
     <h2 class="philosophy__title">Философия</h2>
     <div class="philosophy__rail">
       <article class="pcard pcard--red pcard--brand">
-        <img class="pcard__media" src="cards/photo-2.png" alt="">
+        <img class="pcard__media" src="cards/card-silk-sm.jpg" srcset="cards/card-silk-sm.jpg 370w, cards/card-silk-lg.jpg 586w" sizes="(max-width:780px) 74vw, 26.6vw" alt="" decoding="async">
         <div class="pcard__brand">
           <img src="cards/logo-big.svg" alt="">
           <p class="pcard__brand-name">The Performance</p>
@@ -589,7 +590,7 @@
       </article>
 
       <article class="pcard pcard--green">
-        <img class="pcard__media" src="cards/photo-3.png" alt="">
+        <img class="pcard__media" src="cards/card-green-sm.jpg" srcset="cards/card-green-sm.jpg 370w, cards/card-green-lg.jpg 586w" sizes="(max-width:780px) 74vw, 26.6vw" alt="" decoding="async">
         <div class="pcard__badges">
           <span class="pcard__badge">01</span><span class="pcard__badge">принцип</span>
         </div>
@@ -600,7 +601,7 @@
       </article>
 
       <article class="pcard pcard--light">
-        <img class="pcard__media" src="cards/photo-1.png" alt="">
+        <img class="pcard__media" src="cards/card-bird-sm.jpg" srcset="cards/card-bird-sm.jpg 370w, cards/card-bird-lg.jpg 586w" sizes="(max-width:780px) 74vw, 26.6vw" alt="" decoding="async">
         <div class="pcard__badges">
           <span class="pcard__badge">02</span><span class="pcard__badge">принцип</span>
         </div>
@@ -611,7 +612,7 @@
       </article>
 
       <article class="pcard pcard--dark">
-        <img class="pcard__media" src="cards/placeholder.jpg" alt="">
+        <img class="pcard__media" src="cards/card-deep-sm.jpg" srcset="cards/card-deep-sm.jpg 370w, cards/card-deep-lg.jpg 586w" sizes="(max-width:780px) 74vw, 26.6vw" alt="" decoding="async">
         <div class="pcard__badges">
           <span class="pcard__badge">03</span><span class="pcard__badge">принцип</span>
         </div>
@@ -1247,7 +1248,7 @@
 
       const angle = 360 / COUNT;
       // Зазор между карточками на 5% шире прежнего.
-      const factor = (1 + SPACING * 0.15) * 0.62;
+      const factor = (1 + SPACING * 0.15) * 0.60;
       const degPerSec = SPEED * 6;
 
       // Пересчёт размеров от живой высоты сцены: на старте она ещё нулевая,
@@ -1255,7 +1256,7 @@
       const resize = () => {
         const stageH = stage.getBoundingClientRect().height || innerHeight * .79;
         CARD_H = Math.round(stageH - 40);
-        CARD_W = Math.round(CARD_H / 1.8);
+        CARD_W = Math.round(CARD_H / 1.385);
         // Кольцо разворачиваем по ширине сцены, а не по ширине карточки:
         // крайние карточки должны доходить до краёв — до линии логотипа
         // и кнопки. factor остаётся как поправка на плотность.
