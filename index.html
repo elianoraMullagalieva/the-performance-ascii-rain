@@ -119,9 +119,12 @@
     .circle-section[data-ring="off"] { min-height:70svh; }
     .circle-title {
       margin:0; padding:0 20px;
-      font-family:Manrope,Arial,sans-serif;
-      font-size:var(--fz-phrase);
-      font-weight:300; line-height:1.1; letter-spacing:-.02em;
+      /* Та же гарнитура, что у «Философии»: Anticva, прописные.
+         Цвет остаётся светлым — блок тёмный. */
+      font-family:Anticva,Georgia,serif;
+      font-size:clamp(2.3rem,1.1rem + 3.4vw,4.3rem);
+      font-weight:400; line-height:1.111; letter-spacing:.01em;
+      text-transform:uppercase;
       text-align:center; text-wrap:balance;
       color:var(--light);
     }
@@ -192,10 +195,14 @@
       .chrome__cta-label--desktop { display:none; }
       .chrome__cta-label--mobile { display:block; }
       .chrome__meta { font-size:8px; }
-      /* Шапка секций на мобиле видна всегда: на десктопе она проявляется
-         по мере входа блока, но на коротких мобильных блоках это читается
-         как «меню появляется, только когда остановишься». */
-      .chrome--section { opacity:1; transition:none; position:fixed; }
+      /* Anticva прописными заметно шире Manrope: длинное слово
+         «единомышленников» не влезало в узкий экран. */
+      .circle-title { font-size:clamp(1.5rem,6.2vw,2.3rem); padding:0 16px; }
+      /* Шапка переключается мгновенно, без плавного проявления: именно
+         полусекундный переход читался как «меню появляется, только когда
+         остановишься». Видимостью по-прежнему управляет наблюдатель,
+         иначе все четыре шапки висят разом и накладываются на герое. */
+      .chrome--section { transition:none; position:fixed; }
       /* Бургер — ровно там же, где на первом экране. */
       .chrome__toggle {
         position:absolute; z-index:4; top:42px; left:20px;
@@ -1150,8 +1157,11 @@
         const chromeVisible = chromeIn * (1 - chromeOut);
         // На мобиле шапка закреплена и не гаснет между блоками: иначе
         // меню видно только когда прокрутка остановилась.
+        // Ступенькой, а не плавно: на мобиле переход .5s читался как
+        // «шапка появляется только когда прокрутка остановилась».
         chrome.style.opacity = matchMedia('(max-width:780px)').matches
-          ? '1' : chromeVisible.toFixed(3);
+          ? (chromeVisible > .35 ? '1' : '0')
+          : chromeVisible.toFixed(3);
         chrome.classList.toggle('is-on', chromeVisible > .5);
 
         // Фразы занимают не весь остаток, а до .88: у последней остаётся
@@ -1203,9 +1213,21 @@
       shells.forEach(shell => {
         const host = shell.closest('.philosophy, .circle-section');
         if (!host) return;
-        new IntersectionObserver(([entry]) => {
-          shell.classList.toggle('is-in', entry.isIntersecting);
-        }, { rootMargin:'-25% 0px -25% 0px' }).observe(host);
+        // На десктопе шапка проявляется, когда блок занял центр экрана.
+        // На мобиле блоки короткие: при быстрой прокрутке они проскакивают
+        // эту полосу, шапка не успевает переключиться, и последняя
+        // сработавшая (светлая, от карусели) остаётся висеть.
+        const NARROW_CHROME = matchMedia('(max-width:780px)');
+        let io = null;
+        const attach = () => {
+          if (io) io.disconnect();
+          io = new IntersectionObserver(([entry]) => {
+            shell.classList.toggle('is-in', entry.isIntersecting);
+          }, { rootMargin: NARROW_CHROME.matches ? '0px' : '-25% 0px -25% 0px' });
+          io.observe(host);
+        };
+        attach();
+        NARROW_CHROME.addEventListener('change', attach);
       });
     })();
 
@@ -1347,7 +1369,7 @@
         if (typeof build === 'function' && COUNT !== countFor()) build();
         const stageH = stage.getBoundingClientRect().height || innerHeight * .79;
         CARD_H = Math.round(stageH - 40);
-        CARD_W = Math.round(CARD_H / 1.385);
+        CARD_W = Math.round(CARD_H / (NARROW.matches ? 1.204 : 1.385));
         // Кольцо разворачиваем по ширине сцены, а не по ширине карточки:
         // крайние карточки должны доходить до краёв — до линии логотипа
         // и кнопки. factor остаётся как поправка на плотность.
@@ -1357,7 +1379,9 @@
           // иначе соседние перекрываются и кольцо схлопывается в стопку.
           // Хорда между соседними центрами = 2·R·sin(π/COUNT). Чтобы между
           // карточками остался зазор, она должна быть шире самой карточки.
-          const GAP = 26;
+          // GAP берём с запасом: перспектива сближает спроецированные
+          // центры сильнее, чем даёт плоский расчёт по хорде.
+          const GAP = 58;
           radius = Math.round((CARD_W + GAP) / (2 * Math.sin(Math.PI / COUNT)));
         } else {
           radius = (stageW - CARD_W) / 2 * factorFor();
