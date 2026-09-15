@@ -113,7 +113,7 @@
       min-height:100svh; padding:clamp(24px,4svh,56px) 0;
       background:var(--void);
     }
-    /* Карусель временно скрыта: убрать data-ring="off" у секции, чтобы
+    /* Карусель временно скрыта: убрать у секции, чтобы
        вернуть её обратно. Разметка и скрипт остаются нетронутыми. */
     .circle-section[data-ring="off"] .ring-stage { display:none; }
     .circle-section[data-ring="off"] { min-height:70svh; }
@@ -625,7 +625,7 @@
   </div>
 
   <!-- Среда единомышленников: карусель идёт после «Философии». -->
-  <section class="circle-section" data-ring="off" aria-label="Среда единомышленников">
+  <section class="circle-section" aria-label="Среда единомышленников">
     <div class="chrome chrome--section chrome--light" aria-hidden="true">
       <span class="chrome__brand"><img src="HERO/10%20%E2%80%94%20EYE/%D0%9B%D0%9E%D0%93%D0%9E%D0%9B%D0%9E%D0%93%D0%9E.svg" alt=""></span>
       <span class="chrome__cta"><span>Запросить участие</span><img src="figma-arrow.svg" alt=""></span>
@@ -1166,7 +1166,7 @@
         // доезжала спокойным движением, а не мгновенно.
         // Трек длиннее на долю холостого хода, иначе мёртвая зона в начале
         // съела бы ход ленты и последняя карточка перестала бы доезжать.
-        const scroll = (overflow * 1.9 + innerHeight * .25) / (1 - LEAD_IN);
+        const scroll = (overflow * 2.2 + innerHeight * .45) / (1 - LEAD_IN);
         track.style.height = `calc(100svh + ${Math.round(scroll)}px)`;
       };
 
@@ -1178,7 +1178,11 @@
         const rect = track.getBoundingClientRect();
         const travel = track.offsetHeight - innerHeight;
         const progress = travel > 0 ? clamp01(-rect.top / travel) : 0;
-        const moved = clamp01((progress - LEAD_IN) / (1 - LEAD_IN));
+        // Лента укладывается в окно LEAD_IN…RAIL_END, дальше блок просто
+        // стоит: последняя карточка успевает доехать и «отдышаться»
+        // до того, как следующая секция начнёт наезжать.
+        const RAIL_END = 0.78;
+        const moved = clamp01((progress - LEAD_IN) / (RAIL_END - LEAD_IN));
         rail.style.setProperty('--rail-x', (moved * overflow).toFixed(1));
       };
 
