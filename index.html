@@ -418,11 +418,11 @@
     /* Планшетная полоса: мобильное центрирование логотипа и смещение
        кнопки здесь неуместны — все четыре угла на общей сетке. */
     @media (min-width:601px) and (max-width:780px) {
-      .brand { top:var(--edge-y); left:var(--edge-x); transform:none; }
-      .chrome__brand { left:var(--edge-x); transform:none; }
-      .cta, .chrome__cta { top:var(--edge-y); right:var(--edge-x); }
-      .meta--left { left:var(--edge-x); }
-      .meta--right { right:var(--edge-x); }
+      body .brand { top:var(--edge-y); left:var(--edge-x); transform:none; }
+      body .chrome__brand { left:var(--edge-x); transform:none; }
+      body .cta, body .chrome__cta { top:var(--edge-y); right:var(--edge-x); }
+      body .meta--left { left:var(--edge-x); }
+      body .meta--right { right:var(--edge-x); }
     }
     @media (max-width:360px) { .brand { width:110px; }.menu-toggle { left:14px; }.cta { right:12px; width:64px; padding:0 10px; }.title { width:calc(100% - 28px); font-size:clamp(36px,12.56vw,42px); }.side-note--left { left:14px; }.side-note--right { right:12px; }.meta--left { left:12px; }.meta--right { right:12px; } }
     @media (hover:none), (pointer:coarse) { .compass.is-idle .compass__needle { animation:needle-drift 7.2s cubic-bezier(.45,0,.55,1) infinite alternate; } }
