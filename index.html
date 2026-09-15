@@ -757,10 +757,19 @@
 
       const sizeParticles = () => {
         const ratio = Math.min(devicePixelRatio || 1, 2);
-        particlesCanvas.width = Math.round(innerWidth * ratio);
-        particlesCanvas.height = Math.round(innerHeight * ratio);
+        // Размер берём у самого канваса, а не у окна: innerWidth включает
+        // полосу прокрутки, а канвас — нет. Из-за этих ~15px рисунок частиц
+        // сжимался по горизонтали и облако собиралось левее вектора.
+        const box = particlesCanvas.getBoundingClientRect();
+        const cssW = box.width || innerWidth;
+        const cssH = box.height || innerHeight;
+        particlesCanvas.width = Math.round(cssW * ratio);
+        particlesCanvas.height = Math.round(cssH * ratio);
         const context = particlesCanvas.getContext('2d');
-        context.setTransform(ratio, 0, 0, ratio, 0, 0);
+        // Масштаб считаем из фактических размеров — тогда одна единица
+        // контекста равна ровно одному CSS-пикселю страницы.
+        context.setTransform(particlesCanvas.width / cssW, 0, 0,
+                             particlesCanvas.height / cssH, 0, 0);
         return context;
       };
       const ease = value => value * value * (3 - 2 * value);
@@ -927,7 +936,9 @@
             hero.classList.add('is-revealing');
             requestAnimationFrame(() => hero.classList.add('is-revealed'));
           }
-          context.clearRect(0, 0, innerWidth, innerHeight);
+          // Чистим по фактическому боксу канваса: по innerWidth правая
+          // полоса шириной со скроллбар оставалась бы неочищенной.
+          context.clearRect(0, 0, particlesCanvas.width, particlesCanvas.height);
           if (!reduceMotion) {
             particles.forEach(particle => {
               const released = ease(clamp01((material.uniforms.dissolve.value - particle.dissolve - particle.releaseJitter) / .171));
