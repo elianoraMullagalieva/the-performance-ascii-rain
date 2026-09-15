@@ -1220,7 +1220,10 @@
       }
 
       const clamp01 = v => Math.min(1, Math.max(0, v));
-      let overflow = 0;
+      // Вынос храним на треке: setupRail может вызваться повторно
+      // (смена брейкпоинта), и второй экземпляр не должен начинать
+      // с нулём, пока живы слушатели от первого.
+      if (typeof track._railOverflow !== 'number') track._railOverflow = 0;
 
       const measure = () => {
         // Реальный вынос ленты за правый край экрана.
@@ -1231,12 +1234,12 @@
         // иначе замер зависит от того, где лента стоит в момент измерения.
         const shift = parseFloat(rail.style.getPropertyValue('--rail-x')) || 0;
         const right = last.getBoundingClientRect().right + shift;
-        overflow = Math.max(0, Math.round(right - innerWidth));
+        track._railOverflow = Math.max(0, Math.round(right - innerWidth));
         // Прокрутка на фиксации: вынос плюс запас, чтобы последняя карточка
         // доезжала спокойным движением, а не мгновенно.
         // Трек длиннее на долю холостого хода, иначе мёртвая зона в начале
         // съела бы ход ленты и последняя карточка перестала бы доезжать.
-        const scroll = (overflow * 2.2 + innerHeight * .45) / (1 - LEAD_IN);
+        const scroll = (track._railOverflow * 2.2 + innerHeight * .45) / (1 - LEAD_IN);
         track.style.height = `calc(100svh + ${Math.round(scroll)}px)`;
       };
 
@@ -1253,14 +1256,25 @@
         // до того, как следующая секция начнёт наезжать.
         const RAIL_END = 0.78;
         const moved = clamp01((progress - LEAD_IN) / (RAIL_END - LEAD_IN));
-        rail.style.setProperty('--rail-x', (moved * overflow).toFixed(1));
+        rail.style.setProperty('--rail-x', (moved * track._railOverflow).toFixed(1));
       };
 
       let ticking = false;
       const request = () => { if (!ticking) { ticking = true; requestAnimationFrame(() => { ticking = false; paint(); }); } };
-      addEventListener('scroll', request, { passive:true });
-      addEventListener('resize', () => { measure(); paint(); }, { passive:true });
-      document.fonts.ready.then(() => { measure(); paint(); });
+      if (!track._railBound) {
+        track._railBound = true;
+        addEventListener('scroll', () => { if (!MOBILE_RAIL.matches) request(); }, { passive:true });
+        addEventListener('resize', () => { if (!MOBILE_RAIL.matches) { measure(); paint(); } }, { passive:true });
+        document.fonts.ready.then(() => { if (!MOBILE_RAIL.matches) { measure(); paint(); } });
+      }
+      // Первый measure() успевает отработать раньше, чем карточки получат
+      // финальную ширину (фото грузятся отдельно), и запоминает нулевой
+      // вынос — лента потом не едет вовсе. Пересчитываем, когда лента
+      // реально меняет размеры.
+      if (!track._railObserved && typeof ResizeObserver === 'function') {
+        track._railObserved = true;
+        new ResizeObserver(() => { measure(); paint(); }).observe(rail);
+      }
       measure();
       paint();
       }
