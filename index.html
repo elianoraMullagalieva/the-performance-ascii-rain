@@ -1206,6 +1206,10 @@
       // пин и пересчёт на каждом кадре там только мешают и дают лаги.
       const MOBILE_RAIL = matchMedia('(max-width:780px)');
       tracks.forEach(setupRail);
+      // Ширина может смениться уже после загрузки (поворот экрана, ресайз
+      // окна): пересобираем поведение ленты, иначе она остаётся в режиме,
+      // выбранном на старте, и на десктопе не едет вовсе.
+      MOBILE_RAIL.addEventListener('change', () => tracks.forEach(setupRail));
       function setupRail(track) {
       const rail = track.querySelector('.philosophy__rail');
       if (!rail) return;
