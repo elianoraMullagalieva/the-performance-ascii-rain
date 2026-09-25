@@ -11,11 +11,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400&family=Manrope:wght@300;400;500;600&family=Onest:wght@300&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
   <noscript><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400&family=Manrope:wght@300;400;500;600&family=Onest:wght@300&display=swap" rel="stylesheet"></noscript>
   <script>document.documentElement.classList.add('is-preloading');</script>
-  <!-- 654 КБ библиотеки держали страницу белой, пока не скачаются: разбор
-       останавливался на этом теге. Теперь она грузится параллельно, а код
-       заставки ждёт её сам и умеет обойтись без неё — см. bootGlobe ниже. -->
-  <link rel="preload" href="three.min.js" as="script">
-  <script src="three.min.js" async></script>
+  <!-- Своя мини-реализация вместо three.js: сцене нужны одна сфера с
+       текстурой, свой шейдер и пара матриц — 654 КБ ради этого не нужны.
+       15 КБ грузятся мгновенно, страница больше не ждёт их белым экраном.
+       Код заставки всё равно умеет обойтись без неё — см. whenThree. -->
+  <script src="globe-lite.js"></script>
   <style>
     @font-face { font-family:"Anticva"; src:url("fonts/Anticva-Regular.otf") format("opentype"); font-style:normal; font-weight:400; font-display:block; }
     :root {
