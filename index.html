@@ -11,11 +11,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400&family=Manrope:wght@300;400;500;600&family=Onest:wght@300&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
   <noscript><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400&family=Manrope:wght@300;400;500;600&family=Onest:wght@300&display=swap" rel="stylesheet"></noscript>
   <script>document.documentElement.classList.add('is-preloading');</script>
+  <!-- 654 КБ библиотеки держали страницу белой, пока не скачаются: разбор
+       останавливался на этом теге. Теперь она грузится параллельно, а код
+       заставки ждёт её сам и умеет обойтись без неё — см. bootGlobe ниже. -->
   <link rel="preload" href="three.min.js" as="script">
-  <!-- Без defer: инлайновый скрипт ниже создаёт WebGLRenderer прямо во время
-       разбора страницы, поэтому THREE обязан быть уже определён. Отложить
-       загрузку можно только вместе с переносом инициализации в DOMContentLoaded. -->
-  <script src="three.min.js"></script>
+  <script src="three.min.js" async></script>
   <style>
     @font-face { font-family:"Anticva"; src:url("fonts/Anticva-Regular.otf") format("opentype"); font-style:normal; font-weight:400; font-display:block; }
     :root {
@@ -279,19 +279,29 @@
       align-items:center;
       padding-bottom:clamp(10px,1.4svh,20px);
       overflow:visible;
-      -webkit-mask-image:linear-gradient(to right, transparent 0, #000 7%, #000 93%, transparent 100%);
-      mask-image:linear-gradient(to right, transparent 0, #000 7%, #000 93%, transparent 100%);
       perspective:3000px;
       cursor:grab; touch-action:pan-y;
       user-select:none;
     }
     .ring-stage.is-dragging { cursor:grabbing; }
+    /* Края кольца прячем накладкой в цвет фона, а не маской на сцене:
+       маска в WebKit создаёт собственный слой и плющит перспективу —
+       карточки переставали скрывать свою обратную сторону, и сквозь
+       дальние просвечивал зеркальный текст. Накладка 3D не трогает. */
+    .circle-section::before,
+    .circle-section::after {
+      content:''; position:absolute; z-index:2; top:0; bottom:0;
+      width:clamp(40px,7vw,120px); pointer-events:none;
+    }
+    .circle-section::before { left:0; background:linear-gradient(to right, var(--bg-light), rgba(241,236,236,0)); }
+    .circle-section::after { right:0; background:linear-gradient(to left, var(--bg-light), rgba(241,236,236,0)); }
     .ring-tilt { transform:rotateX(-7deg); transform-style:preserve-3d; }
     .ring { position:relative; transform-style:preserve-3d; }
     .ring__item { position:absolute; inset:0; transform-style:preserve-3d; }
     .ring__face {
       position:absolute; inset:0;
       border-radius:14px; overflow:hidden;
+      -webkit-backface-visibility:hidden;
       backface-visibility:hidden;
       background-size:cover; background-position:center;
       box-shadow:0 16px 40px rgba(22,21,20,.22);
@@ -677,7 +687,52 @@
 
   <i class="cursor-mark" aria-hidden="true"></i>
   <script>
-    (() => {
+    // Библиотека грузится параллельно со страницей, поэтому к этому месту
+    // её может ещё не быть. Ждём её появления, но не бесконечно: если она
+    // не пришла (медленный канал, блокировщик, сбой сети), заставка просто
+    // снимается и человек видит готовый первый экран. Белого экрана не
+    // будет ни при каком раскладе — раньше именно он и пугал.
+    const whenThree = (timeout = 6000) => new Promise(resolve => {
+      if (window.THREE) return resolve(true);
+      const started = Date.now();
+      const tick = () => {
+        if (window.THREE) return resolve(true);
+        if (Date.now() - started > timeout) return resolve(false);
+        setTimeout(tick, 40);
+      };
+      tick();
+    });
+
+    // Запасной путь: снимаем заставку и показываем первый экран как есть.
+    const skipPreloader = () => {
+      const preloader = document.querySelector('.preloader');
+      const hero = document.querySelector('.hero');
+      const compass = document.querySelector('.compass');
+      const needle = document.querySelector('.compass__needle');
+      document.documentElement.classList.remove('is-preloading');
+      if (compass) compass.style.opacity = '1';
+      if (needle) needle.style.opacity = '1';
+      if (hero) {
+        hero.classList.remove('is-assembly');
+        hero.classList.add('is-revealing');
+        requestAnimationFrame(() => hero.classList.add('is-revealed'));
+      }
+      if (preloader) {
+        preloader.classList.add('is-transitioning');
+        preloader.classList.add('is-complete');
+      }
+      if (compass) {
+        compass.classList.add('is-idle');
+        dispatchEvent(new Event('compass:interaction-ready'));
+      }
+    };
+
+    whenThree().then(ready => {
+      if (!ready) { skipPreloader(); return; }
+      startPreloader();
+    });
+
+    function startPreloader() {
       // Заставка укорочена: на медленном канале клиентка видела 8-14 секунд
       // белого экрана и решила, что сайт не открылся. Сфера держится ровно
       // столько, чтобы прочитать логотип, переход — вдвое быстрее прежнего.
@@ -1066,7 +1121,7 @@
         await wait(Math.max(0, HOLD_GLOBE - (performance.now() - startedAt)));
         animateTransition();
       })();
-    })();
+    }
 
     // ───────── Шторка + фразы ─────────
     // Единственный источник истины — позиция прокрутки. Никаких «сработало
