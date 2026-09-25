@@ -3,6 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Safari держал страницу в кэше и показывал старую вёрстку с новым
+       фоном: правки «не доходили» до клиентки. Саму страницу не кэшируем,
+       а её файлы помечены версией в адресе. -->
+  <meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
   <title>The Performance — Институт культуры влияния</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,11 +15,12 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400&family=Manrope:wght@300;400;500;600&family=Onest:wght@300&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
   <noscript><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400&family=Manrope:wght@300;400;500;600&family=Onest:wght@300&display=swap" rel="stylesheet"></noscript>
   <script>document.documentElement.classList.add('is-preloading');</script>
-  <!-- Своя мини-реализация вместо three.js: сцене нужны одна сфера с
-       текстурой, свой шейдер и пара матриц — 654 КБ ради этого не нужны.
-       15 КБ грузятся мгновенно, страница больше не ждёт их белым экраном.
-       Код заставки всё равно умеет обойтись без неё — см. whenThree. -->
-  <script src="globe-lite.js"></script>
+  <!-- Своя мини-реализация давала не тот глобус: обратная сторона сферы
+       выходила белой вместо приглушённой. Возвращаем проверенную
+       библиотеку — она грузится параллельно и не держит страницу белой,
+       а код заставки умеет обойтись без неё совсем (см. whenThree). -->
+  <link rel="preload" href="three.min.js?v=202609251533" as="script">
+  <script src="three.min.js?v=202609251533" async></script>
   <style>
     @font-face { font-family:"Anticva"; src:url("fonts/Anticva-Regular.otf") format("opentype"); font-style:normal; font-weight:400; font-display:block; }
     :root {
@@ -46,7 +51,12 @@
       /* Карусель на 30% мельче прежнего. На узких экранах в min() побеждает
          доля ширины, поэтому она выше: иначе карточка ужимается сильнее,
          чем на 30%, и становится совсем мелкой. */
-      --ring-h:clamp(280px, min(50svh, 40vw), 560px);
+      /* Высота кольца — остаток экрана после всего прочего, посчитанный
+         явно: заголовок (~130px), отступы сверху и снизу, зазор под ним и
+         запас сцены под тени. Прежняя доля (50svh) ничего этого не учитывала,
+         блок перерастал экран на 44-132px, и вёрстка ехала. */
+      --ring-chrome:clamp(330px, 42svh, 470px);
+      --ring-h:clamp(200px, min(calc(100svh - var(--ring-chrome)), 40vw), 560px);
       /* Карточка шире и ниже прежнего: пропорция 1.0 — ширина ещё +20%. */
       --card-h:calc(var(--ring-h) - 40px);
       --card-w:calc(var(--card-h) / 1.385);
@@ -112,14 +122,14 @@
       position:relative; z-index:2;
       display:grid; justify-items:center;
       /* Зазор больше — кольцо опускается ниже под заголовок. */
-      gap:clamp(40px,7svh,92px);
+      gap:clamp(24px,4svh,56px);
       min-height:100svh; padding:clamp(24px,4svh,56px) 0;
       /* Группа стояла высоко на экране ноутбука: сцена берёт заметный
          запас под тени, и он поднимал всё вверх. Опускаем группу, задав
          её положение в блоке, а не переносом — перенос при высоте ровно
          в экран ничего не давал. */
       align-content:start;
-      padding-top:clamp(74px,11svh,128px);
+      padding-top:clamp(40px,6svh,84px);
       background:var(--bg-light);
     }
     /* Карусель временно скрыта: убрать у секции, чтобы
@@ -272,7 +282,7 @@
          Высота с запасом: задний ряд кольца выше переднего, и тень
          падает ниже самой карточки. */
       width:100%; margin-inline:auto;
-      height:calc(var(--ring-h) + clamp(150px,20svh,240px));
+      height:calc(var(--ring-h) + clamp(80px,10svh,130px));
       /* Запас нужен с обеих сторон, но снизу больше: тень падает вниз.
          Кольцо смещено кверху ровно настолько, чтобы над ним осталось
          место под тень, а лишняя высота ушла вниз. */
@@ -592,12 +602,12 @@
   </section>
   <main class="hero">
     <button class="menu-toggle" type="button" aria-label="Открыть меню" aria-expanded="false"><i></i><i></i><i></i></button>
-    <a class="brand" href="#" aria-label="The Performance — на главную"><img class="brand__art" src="HERO/10%20%E2%80%94%20EYE/%D0%9B%D0%9E%D0%93%D0%9E%D0%9B%D0%9E%D0%93%D0%9E.svg" alt=""></a>
+    <a class="brand" href="#" aria-label="The Performance — на главную"><img class="brand__art" src="HERO/10%20%E2%80%94%20EYE/%D0%9B%D0%9E%D0%93%D0%9E%D0%9B%D0%9E%D0%93%D0%9E.svg?v=202609251533" alt=""></a>
     <nav class="menu" aria-label="Основная навигация"><div class="menu__group"><b>Институт</b><a class="active" href="#">Манифест</a><a href="#">Методология</a></div><div class="menu__group"><b>Развитие</b><a href="#">Направления</a><a href="#">Пути</a></div><div class="menu__group"><b>Пространство</b><a href="#">События</a><a href="#">Истории</a></div><div class="menu__group"><b>Медиа</b><a href="#">Публикации</a><a href="#">FAQ</a></div></nav>
-    <button class="cta" type="button"><span class="cta__label cta__label--desktop">Запросить участие</span><span class="cta__label cta__label--mobile">Участие</span><img class="cta__arrow" src="figma-arrow.svg" alt="" aria-hidden="true"></button>
+    <button class="cta" type="button"><span class="cta__label cta__label--desktop">Запросить участие</span><span class="cta__label cta__label--mobile">Участие</span><img class="cta__arrow" src="figma-arrow.svg?v=202609251533" alt="" aria-hidden="true"></button>
     <section class="copy" aria-labelledby="hero-title"><p class="eyebrow">The Performance&nbsp;&nbsp;—&nbsp;&nbsp;Est. 2016</p><h1 class="title" id="hero-title"><span class="title__line title__line--primary"><span class="side-note side-note--left"><span>Видеть</span><span>иначе</span></span><span class="title__word">Институт</span><span class="side-note side-note--right"><span>Говорить</span><span>убедительно</span></span></span><span class="title__line title__line--secondary">Культуры <br class="mobile-only">влияния</span></h1></section>
-    <div class="mobile-mantra" aria-hidden="true"><span class="mobile-mantra__dots"><img src="figma-dot-large.svg" alt=""><img src="figma-dot-medium.svg" alt=""><img src="figma-dot-small.svg" alt=""></span><span>видеть иначе</span></div>
-    <div class="compass" aria-label="Интерактивный компас"><img class="compass__base" src="compass-base.svg" alt=""><img class="compass__needle" src="compass-needle.svg" alt=""></div>
+    <div class="mobile-mantra" aria-hidden="true"><span class="mobile-mantra__dots"><img src="figma-dot-large.svg?v=202609251533" alt=""><img src="figma-dot-medium.svg?v=202609251533" alt=""><img src="figma-dot-small.svg?v=202609251533" alt=""></span><span>видеть иначе</span></div>
+    <div class="compass" aria-label="Интерактивный компас"><img class="compass__base" src="compass-base.svg?v=202609251533" alt=""><img class="compass__needle" src="compass-needle.svg?v=202609251533" alt=""></div>
     <i class="cross cross--left" aria-hidden="true">＋</i><i class="cross cross--right" aria-hidden="true">＋</i>
     <p class="meta meta--left"><span>＋&nbsp; Листайте и&nbsp;исследуйте</span><span>&nbsp;&nbsp;&nbsp;&nbsp;пространство института</span></p><p class="meta meta--right"><span>Москва&nbsp; /&nbsp; Online</span><span>Приём заявок открыт</span></p>
   </main>
@@ -618,17 +628,17 @@
   <div class="philosophy-track" id="philosophy-track">
   <section class="philosophy philosophy--v2" aria-label="Философия">
     <div class="chrome chrome--section chrome--dark" aria-hidden="true">
-      <span class="chrome__toggle" aria-hidden="true"><i></i><i></i><i></i></span><span class="chrome__brand"><img src="HERO/10%20%E2%80%94%20EYE/%D0%9B%D0%9E%D0%93%D0%9E%D0%9B%D0%9E%D0%93%D0%9E.svg" alt=""></span>
-      <span class="chrome__cta"><span class="chrome__cta-label chrome__cta-label--desktop">Запросить участие</span><span class="chrome__cta-label chrome__cta-label--mobile">Участие</span><img src="figma-arrow.svg" alt=""></span>
+      <span class="chrome__toggle" aria-hidden="true"><i></i><i></i><i></i></span><span class="chrome__brand"><img src="HERO/10%20%E2%80%94%20EYE/%D0%9B%D0%9E%D0%93%D0%9E%D0%9B%D0%9E%D0%93%D0%9E.svg?v=202609251533" alt=""></span>
+      <span class="chrome__cta"><span class="chrome__cta-label chrome__cta-label--desktop">Запросить участие</span><span class="chrome__cta-label chrome__cta-label--mobile">Участие</span><img src="figma-arrow.svg?v=202609251533" alt=""></span>
       <p class="chrome__meta chrome__meta--left"><span>＋&nbsp; Листайте и&nbsp;исследуйте</span><span>&nbsp;&nbsp;&nbsp;&nbsp;пространство института</span></p>
       <p class="chrome__meta chrome__meta--right"><span>Москва&nbsp; /&nbsp; Online</span><span>Приём заявок открыт</span></p>
     </div>
     <h2 class="philosophy__title">Философия</h2>
     <div class="philosophy__rail">
       <article class="pcard pcard--red pcard--brand">
-        <picture><source media="(min-width:1200px)" srcset="cards/card-silk-lg.jpg"><img class="pcard__media" src="cards/card-silk-sm.jpg" alt="" decoding="async"></picture>
+        <picture><source media="(min-width:1200px)" srcset="cards/card-silk-lg.jpg"><img class="pcard__media" src="cards/card-silk-sm.jpg?v=202609251533" alt="" decoding="async"></picture>
         <div class="pcard__brand">
-          <img src="cards/logo-big.svg" alt="">
+          <img src="cards/logo-big.svg?v=202609251533" alt="">
           <p class="pcard__brand-name">The Performance</p>
           <p class="pcard__brand-note">Пространство на&nbsp;пересечении культуры, образования и&nbsp;лидерства.</p>
         </div>
@@ -636,7 +646,7 @@
       </article>
 
       <article class="pcard pcard--green">
-        <picture><source media="(min-width:1200px)" srcset="cards/card-green-lg.jpg"><img class="pcard__media" src="cards/card-green-sm.jpg" alt="" decoding="async"></picture>
+        <picture><source media="(min-width:1200px)" srcset="cards/card-green-lg.jpg"><img class="pcard__media" src="cards/card-green-sm.jpg?v=202609251533" alt="" decoding="async"></picture>
         <div class="pcard__badges">
           <span class="pcard__badge">01</span><span class="pcard__badge">принцип</span>
         </div>
@@ -647,7 +657,7 @@
       </article>
 
       <article class="pcard pcard--light">
-        <picture><source media="(min-width:1200px)" srcset="cards/card-bird-lg.jpg"><img class="pcard__media" src="cards/card-bird-sm.jpg" alt="" decoding="async"></picture>
+        <picture><source media="(min-width:1200px)" srcset="cards/card-bird-lg.jpg"><img class="pcard__media" src="cards/card-bird-sm.jpg?v=202609251533" alt="" decoding="async"></picture>
         <div class="pcard__badges">
           <span class="pcard__badge">02</span><span class="pcard__badge">принцип</span>
         </div>
@@ -658,7 +668,7 @@
       </article>
 
       <article class="pcard pcard--dark">
-        <picture><source media="(min-width:1200px)" srcset="cards/card-deep-lg.jpg"><img class="pcard__media" src="cards/card-deep-sm.jpg" alt="" decoding="async"></picture>
+        <picture><source media="(min-width:1200px)" srcset="cards/card-deep-lg.jpg"><img class="pcard__media" src="cards/card-deep-sm.jpg?v=202609251533" alt="" decoding="async"></picture>
         <div class="pcard__badges">
           <span class="pcard__badge">03</span><span class="pcard__badge">принцип</span>
         </div>
@@ -674,8 +684,8 @@
   <!-- Среда единомышленников: карусель идёт после «Философии». -->
   <section class="circle-section" aria-label="Среда единомышленников">
     <div class="chrome chrome--section chrome--dark" aria-hidden="true">
-      <span class="chrome__toggle" aria-hidden="true"><i></i><i></i><i></i></span><span class="chrome__brand"><img src="HERO/10%20%E2%80%94%20EYE/%D0%9B%D0%9E%D0%93%D0%9E%D0%9B%D0%9E%D0%93%D0%9E.svg" alt=""></span>
-      <span class="chrome__cta"><span class="chrome__cta-label chrome__cta-label--desktop">Запросить участие</span><span class="chrome__cta-label chrome__cta-label--mobile">Участие</span><img src="figma-arrow.svg" alt=""></span>
+      <span class="chrome__toggle" aria-hidden="true"><i></i><i></i><i></i></span><span class="chrome__brand"><img src="HERO/10%20%E2%80%94%20EYE/%D0%9B%D0%9E%D0%93%D0%9E%D0%9B%D0%9E%D0%93%D0%9E.svg?v=202609251533" alt=""></span>
+      <span class="chrome__cta"><span class="chrome__cta-label chrome__cta-label--desktop">Запросить участие</span><span class="chrome__cta-label chrome__cta-label--mobile">Участие</span><img src="figma-arrow.svg?v=202609251533" alt=""></span>
       <p class="chrome__meta chrome__meta--left"><span>＋&nbsp; Листайте и&nbsp;исследуйте</span><span>&nbsp;&nbsp;&nbsp;&nbsp;пространство института</span></p>
       <p class="chrome__meta chrome__meta--right"><span>Москва&nbsp; /&nbsp; Online</span><span>Приём заявок открыт</span></p>
     </div>
@@ -690,8 +700,8 @@
 
   <!-- Та же обвязка, что на первом экране: не двигается, только цвет. -->
   <div class="chrome" id="chrome" aria-hidden="true">
-    <span class="chrome__toggle" aria-hidden="true"><i></i><i></i><i></i></span><span class="chrome__brand"><img src="HERO/10%20%E2%80%94%20EYE/%D0%9B%D0%9E%D0%93%D0%9E%D0%9B%D0%9E%D0%93%D0%9E.svg" alt=""></span>
-    <span class="chrome__cta"><span class="chrome__cta-label chrome__cta-label--desktop">Запросить участие</span><span class="chrome__cta-label chrome__cta-label--mobile">Участие</span><img src="figma-arrow.svg" alt=""></span>
+    <span class="chrome__toggle" aria-hidden="true"><i></i><i></i><i></i></span><span class="chrome__brand"><img src="HERO/10%20%E2%80%94%20EYE/%D0%9B%D0%9E%D0%93%D0%9E%D0%9B%D0%9E%D0%93%D0%9E.svg?v=202609251533" alt=""></span>
+    <span class="chrome__cta"><span class="chrome__cta-label chrome__cta-label--desktop">Запросить участие</span><span class="chrome__cta-label chrome__cta-label--mobile">Участие</span><img src="figma-arrow.svg?v=202609251533" alt=""></span>
     <p class="chrome__meta chrome__meta--left"><span>＋&nbsp; Листайте и&nbsp;исследуйте</span><span>&nbsp;&nbsp;&nbsp;&nbsp;пространство института</span></p>
     <p class="chrome__meta chrome__meta--right"><span>Москва&nbsp; /&nbsp; Online</span><span>Приём заявок открыт</span></p>
   </div>
