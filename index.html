@@ -1539,7 +1539,25 @@
       let rotY = 0, velocity = 0, last = 0, frame = 0;
       const drag = { active:false, x:0 };
 
-      const apply = () => { ring.style.transform = `translateZ(${-radius}px) rotateY(${rotY}deg)`; };
+      // Safari не скрывает изнанку карточки надёжно: при вложенных 3D-слоях
+      // backface-visibility у него не срабатывает, и сквозь дальнюю половину
+      // кольца просвечивал зеркальный текст подписей. Поэтому гасим дальние
+      // карточки сами, по углу поворота — это одинаково во всех браузерах.
+      const apply = () => {
+        ring.style.transform = `translateZ(${-radius}px) rotateY(${rotY}deg)`;
+        const cards = ring.children;
+        for (let i = 0; i < cards.length; i++) {
+          // Угол карточки относительно зрителя: 0 — лицом, 180 — спиной.
+          let facing = (rotY + i * angle) % 360;
+          if (facing < 0) facing += 360;
+          const away = facing > 90 && facing < 270;
+          const card = cards[i];
+          if (card._away !== away) {
+            card._away = away;
+            card.style.visibility = away ? 'hidden' : '';
+          }
+        }
+      };
       // Только здесь: карточки уже созданы, apply объявлен. Пересчитываем
       // при ресайзе и после загрузки шрифтов, когда сцена получает высоту.
       resize();
