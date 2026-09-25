@@ -112,7 +112,7 @@
       position:relative; z-index:2;
       display:grid; align-content:center; justify-items:center;
       /* Зазор больше — кольцо опускается ниже под заголовок. */
-      gap:clamp(28px,5svh,64px);
+      gap:clamp(40px,7svh,92px);
       min-height:100svh; padding:clamp(24px,4svh,56px) 0;
       background:var(--bg-light);
     }
@@ -125,11 +125,13 @@
       /* Та же гарнитура, что у «Философии»: Anticva, прописные.
          Блок светлый — надпись тёмная, как в «Философии». */
       font-family:Anticva,Georgia,serif;
-      font-size:clamp(2.3rem,1.1rem + 3.4vw,4.3rem);
+      font-size:clamp(1.9rem,.9rem + 2.8vw,3.6rem);
       font-weight:400; line-height:1.111; letter-spacing:.01em;
       text-transform:uppercase;
       text-align:center; text-wrap:balance;
       color:var(--ink);
+      /* Приподнят над кольцом: прежде почти касался верхних карточек. */
+      margin-top:clamp(-40px,-3svh,-16px);
     }
     .veil__line {
       margin:0;
@@ -257,9 +259,17 @@
       /* Сцена уже кольца: при пяти карточках диаметр ~2x ширины карточки,
          поэтому узкая сцена нужна, чтобы крайние уходили за края.
          Без потолка — на больших мониторах всё растёт пропорционально. */
-      width:var(--stage-w); margin-inline:auto;
-      height:var(--ring-h);
-      overflow:hidden;
+      /* Во всю ширину и без жёсткой обрезки: прежний overflow резал по
+         прямой прямо по светлому полю — обрывались и тени, и скругления
+         дальних карточек. Вместо реза края растворяются маской, поэтому
+         оборваться нечему ни при каком размере экрана.
+         Высота с запасом: задний ряд кольца выше переднего, и тень
+         падает ниже самой карточки. */
+      width:100%; margin-inline:auto;
+      height:calc(var(--ring-h) + clamp(150px,20svh,240px));
+      overflow:visible;
+      -webkit-mask-image:linear-gradient(to right, transparent 0, #000 7%, #000 93%, transparent 100%);
+      mask-image:linear-gradient(to right, transparent 0, #000 7%, #000 93%, transparent 100%);
       perspective:3000px;
       cursor:grab; touch-action:pan-y;
       user-select:none;
@@ -669,7 +679,7 @@
       // Перетекание сферы в компас идёт в прежнем темпе: ускорение вдвое
       // спасало не время загрузки (его держали ассеты), а только красоту —
       // и читалось как дёрганое.
-      const TRANSITION = 5200;
+      const TRANSITION = 4500;
       const BG = 0xF1ECEC;
       const INK = '#2B2B29';
       const preloader = document.querySelector('.preloader');
@@ -1369,8 +1379,12 @@
       const resize = () => {
         if (typeof build === 'function' && COUNT !== countFor()) build();
         const stageH = stage.getBoundingClientRect().height || innerHeight * .79;
-        CARD_H = Math.round(stageH - 40);
-        CARD_W = Math.round(CARD_H / (NARROW.matches ? 1.204 : 1.22));
+        // Поле вокруг кольца: тень падает ниже карточки и шире её, а сцена
+        // всё-таки обрезает по себе. Растягивать одну высоту было мало —
+        // карточка считается от неё же и росла следом, съедая запас.
+        const BLEED = Math.round(Math.min(200, Math.max(120, stageH * .26)));
+        CARD_H = Math.round((stageH - BLEED) * 0.9);
+        CARD_W = Math.round(CARD_H / (NARROW.matches ? 1.49 : 1.22));
         // Кольцо разворачиваем по ширине сцены, а не по ширине карточки:
         // крайние карточки должны доходить до краёв — до линии логотипа
         // и кнопки. factor остаётся как поправка на плотность.
