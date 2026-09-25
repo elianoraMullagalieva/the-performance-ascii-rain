@@ -314,7 +314,9 @@
       -webkit-backface-visibility:hidden;
       backface-visibility:hidden;
       background-size:cover; background-position:center;
-      box-shadow:0 10px 22px rgba(22,21,20,.20);
+      /* Без тени: размытие пересчитывалось на каждом кадре для каждой
+         из десяти карточек, и видеокарта не успевала — на экране ползли
+         тёмные пятна, которых не было на скриншотах. */
     }
     /* Изнанка больше не рисуется: отвёрнутые карточки скрываются по углу,
        а её затемнённая копия успевала мелькнуть чёрной заливкой в момент
@@ -353,16 +355,10 @@
        сплошной градиент сверху и снизу пачкал фото. */
     /* Подпись лежит прямо на фото: радиальная подложка читалась как
        грязное чёрное пятно под текстом. */
-    .ring__copy {
-      isolation:isolate; text-shadow:0 1px 3px rgba(0,0,0,.6);
-      /* Safari выносит текст в собственный слой, и он перестаёт наследовать
-         backface-visibility у грани: сквозь дальние карточки просвечивал
-         зеркальный текст. Правило нужно на самом слое с текстом. */
-      -webkit-backface-visibility:hidden;
-      backface-visibility:hidden;
-      -webkit-transform:translateZ(0);
-      transform:translateZ(0);
-    }
+    /* Ни тени под текстом, ни отдельного слоя: слой ставился против
+       зеркального текста в Safari, но отвёрнутые карточки теперь скрыты
+       по углу — а каждая подпись держала собственный буфер видеопамяти. */
+    .ring__copy { isolation:isolate; }
 
     @media (prefers-reduced-motion:reduce) {
       .ring-stage { height:auto; overflow-x:auto; perspective:none; }
