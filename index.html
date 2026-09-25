@@ -114,7 +114,7 @@
       /* Зазор больше — кольцо опускается ниже под заголовок. */
       gap:clamp(28px,5svh,64px);
       min-height:100svh; padding:clamp(24px,4svh,56px) 0;
-      background:var(--void);
+      background:var(--bg-light);
     }
     /* Карусель временно скрыта: убрать у секции, чтобы
        вернуть её обратно. Разметка и скрипт остаются нетронутыми. */
@@ -123,13 +123,13 @@
     .circle-title {
       margin:0; padding:0 20px;
       /* Та же гарнитура, что у «Философии»: Anticva, прописные.
-         Цвет остаётся светлым — блок тёмный. */
+         Блок светлый — надпись тёмная, как в «Философии». */
       font-family:Anticva,Georgia,serif;
       font-size:clamp(2.3rem,1.1rem + 3.4vw,4.3rem);
       font-weight:400; line-height:1.111; letter-spacing:.01em;
       text-transform:uppercase;
       text-align:center; text-wrap:balance;
-      color:var(--light);
+      color:var(--ink);
     }
     .veil__line {
       margin:0;
@@ -273,11 +273,11 @@
       border-radius:14px; overflow:hidden;
       backface-visibility:hidden;
       background-size:cover; background-position:center;
-      box-shadow:0 18px 48px rgba(0,0,0,.55);
+      box-shadow:0 16px 40px rgba(22,21,20,.22);
     }
     .ring__face--back { transform:rotateY(180deg); filter:brightness(.35); }
     .ring__photo { position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
-      filter:saturate(.86) brightness(.62); }
+      filter:saturate(.9) brightness(.72); }
     /* Подпись поверх фото: чередуется сверху и снизу, как в макете. */
     .ring__copy {
       position:absolute; z-index:2; left:11.1%; right:11.1%;
@@ -304,7 +304,7 @@
        сплошной градиент сверху и снизу пачкал фото. */
     /* Подпись лежит прямо на фото: радиальная подложка читалась как
        грязное чёрное пятно под текстом. */
-    .ring__copy { isolation:isolate; text-shadow:0 1px 12px rgba(0,0,0,.55); }
+    .ring__copy { isolation:isolate; text-shadow:0 1px 10px rgba(0,0,0,.45); }
 
     @media (prefers-reduced-motion:reduce) {
       .ring-stage { height:auto; overflow-x:auto; perspective:none; }
@@ -631,7 +631,7 @@
 
   <!-- Среда единомышленников: карусель идёт после «Философии». -->
   <section class="circle-section" aria-label="Среда единомышленников">
-    <div class="chrome chrome--section chrome--light" aria-hidden="true">
+    <div class="chrome chrome--section chrome--dark" aria-hidden="true">
       <span class="chrome__toggle" aria-hidden="true"><i></i><i></i><i></i></span><span class="chrome__brand"><img src="HERO/10%20%E2%80%94%20EYE/%D0%9B%D0%9E%D0%93%D0%9E%D0%9B%D0%9E%D0%93%D0%9E.svg" alt=""></span>
       <span class="chrome__cta"><span class="chrome__cta-label chrome__cta-label--desktop">Запросить участие</span><span class="chrome__cta-label chrome__cta-label--mobile">Участие</span><img src="figma-arrow.svg" alt=""></span>
       <p class="chrome__meta chrome__meta--left"><span>＋&nbsp; Листайте и&nbsp;исследуйте</span><span>&nbsp;&nbsp;&nbsp;&nbsp;пространство института</span></p>
@@ -1367,7 +1367,7 @@
         if (typeof build === 'function' && COUNT !== countFor()) build();
         const stageH = stage.getBoundingClientRect().height || innerHeight * .79;
         CARD_H = Math.round(stageH - 40);
-        CARD_W = Math.round(CARD_H / (NARROW.matches ? 1.204 : 1.385));
+        CARD_W = Math.round(CARD_H / (NARROW.matches ? 1.204 : 1.22));
         // Кольцо разворачиваем по ширине сцены, а не по ширине карточки:
         // крайние карточки должны доходить до краёв — до линии логотипа
         // и кнопки. factor остаётся как поправка на плотность.
@@ -1380,7 +1380,7 @@
         // карточками остался просвет, она должна быть шире самой карточки.
         // GAP берём с запасом: перспектива сближает спроецированные центры
         // сильнее, чем даёт плоский расчёт.
-        const GAP = NARROW.matches ? 29 : 150;
+        const GAP = NARROW.matches ? 29 : 105;
         radius = Math.round((CARD_W + GAP) / (2 * Math.sin(Math.PI / COUNT)));
         ring.style.width = `${CARD_W}px`;
         ring.style.height = `${CARD_H}px`;
@@ -1401,7 +1401,7 @@
           const item = document.createElement('div');
           item.className = 'ring__item';
           // Пока во всех карточках одна и та же фотография-заглушка.
-          const tone = i % 2 === 0 ? '#171717' : '#3A0F14';
+          const tone = i % 2 === 0 ? '#2A2724' : '#6E1B1B';
           const front = document.createElement('div');
           front.className = 'ring__face ring__face--front';
           front.style.background = tone;
