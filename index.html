@@ -6,7 +6,10 @@
   <title>The Performance — Институт культуры влияния</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400&family=Manrope:wght@300;400;500;600&family=Onest:wght@300&display=swap" rel="stylesheet">
+  <!-- Шрифты не блокируют первую отрисовку: подключаются как print и
+       переключаются на экранные сразу после загрузки. -->
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400&family=Manrope:wght@300;400;500;600&family=Onest:wght@300&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400&family=Manrope:wght@300;400;500;600&family=Onest:wght@300&display=swap" rel="stylesheet"></noscript>
   <script>document.documentElement.classList.add('is-preloading');</script>
   <link rel="preload" href="three.min.js" as="script">
   <!-- Без defer: инлайновый скрипт ниже создаёт WebGLRenderer прямо во время
@@ -571,63 +574,7 @@
   <!-- Философия: блок прилипает, и прокрутка листает ленту по горизонтали.
        Страница идёт дальше только когда доехала последняя карточка. -->
   <div class="philosophy-track" id="philosophy-track">
-  <section class="philosophy" aria-label="Философия">
-    <div class="chrome chrome--section chrome--dark" aria-hidden="true">
-      <span class="chrome__toggle" aria-hidden="true"><i></i><i></i><i></i></span><span class="chrome__brand"><img src="HERO/10%20%E2%80%94%20EYE/%D0%9B%D0%9E%D0%93%D0%9E%D0%9B%D0%9E%D0%93%D0%9E.svg" alt=""></span>
-      <span class="chrome__cta"><span class="chrome__cta-label chrome__cta-label--desktop">Запросить участие</span><span class="chrome__cta-label chrome__cta-label--mobile">Участие</span><img src="figma-arrow.svg" alt=""></span>
-      <p class="chrome__meta chrome__meta--left"><span>＋&nbsp; Листайте и&nbsp;исследуйте</span><span>&nbsp;&nbsp;&nbsp;&nbsp;пространство института</span></p>
-      <p class="chrome__meta chrome__meta--right"><span>Москва&nbsp; /&nbsp; Online</span><span>Приём заявок открыт</span></p>
-    </div>
-    <h2 class="philosophy__title">Философия</h2>
-    <div class="philosophy__rail">
-      <article class="pcard pcard--red pcard--brand">
-        <picture><source media="(min-width:1200px)" srcset="cards/card-silk-lg.jpg"><img class="pcard__media" src="cards/card-silk-sm.jpg" alt="" decoding="async"></picture>
-        <div class="pcard__brand">
-          <img src="cards/logo-big.svg" alt="">
-          <p class="pcard__brand-name">The Performance</p>
-          <p class="pcard__brand-note">Пространство на&nbsp;пересечении культуры, образования и&nbsp;лидерства.</p>
-        </div>
-        <span class="pcard__brand-tag">Перформанс</span>
-      </article>
-
-      <article class="pcard pcard--green">
-        <picture><source media="(min-width:1200px)" srcset="cards/card-green-lg.jpg"><img class="pcard__media" src="cards/card-green-sm.jpg" alt="" decoding="async"></picture>
-        <div class="pcard__badges">
-          <span class="pcard__badge">01</span><span class="pcard__badge">принцип</span>
-        </div>
-        <div class="pcard__copy">
-          <h3 class="pcard__name">Мыслить через слово</h3>
-          <p class="pcard__note">Речь развивает интеллект, а&nbsp;не&nbsp;украшает его</p>
-        </div>
-      </article>
-
-      <article class="pcard pcard--light">
-        <picture><source media="(min-width:1200px)" srcset="cards/card-bird-lg.jpg"><img class="pcard__media" src="cards/card-bird-sm.jpg" alt="" decoding="async"></picture>
-        <div class="pcard__badges">
-          <span class="pcard__badge">02</span><span class="pcard__badge">принцип</span>
-        </div>
-        <div class="pcard__copy">
-          <h3 class="pcard__name">Формировать влияние</h3>
-          <p class="pcard__note">Говорить так, чтобы менялась не&nbsp;тема разговора, а&nbsp;положение дел</p>
-        </div>
-      </article>
-
-      <article class="pcard pcard--dark">
-        <picture><source media="(min-width:1200px)" srcset="cards/card-deep-lg.jpg"><img class="pcard__media" src="cards/card-deep-sm.jpg" alt="" decoding="async"></picture>
-        <div class="pcard__badges">
-          <span class="pcard__badge">03</span><span class="pcard__badge">принцип</span>
-        </div>
-        <div class="pcard__copy">
-          <h3 class="pcard__name">Соединять культуру и&nbsp;лидерство</h3>
-          <p class="pcard__note">Влияние без&nbsp;фундамента&nbsp;—<br>громкость</p>
-        </div>
-      </article>
-    </div>
-  </section>
-  </div>
-
-  <div class="philosophy-track" id="philosophy-track-v2">
-  <section class="philosophy philosophy--v2" aria-label="Философия — вариант 2">
+  <section class="philosophy philosophy--v2" aria-label="Философия">
     <div class="chrome chrome--section chrome--dark" aria-hidden="true">
       <span class="chrome__toggle" aria-hidden="true"><i></i><i></i><i></i></span><span class="chrome__brand"><img src="HERO/10%20%E2%80%94%20EYE/%D0%9B%D0%9E%D0%93%D0%9E%D0%9B%D0%9E%D0%93%D0%9E.svg" alt=""></span>
       <span class="chrome__cta"><span class="chrome__cta-label chrome__cta-label--desktop">Запросить участие</span><span class="chrome__cta-label chrome__cta-label--mobile">Участие</span><img src="figma-arrow.svg" alt=""></span>
@@ -710,8 +657,16 @@
   <i class="cursor-mark" aria-hidden="true"></i>
   <script>
     (() => {
-      const HOLD_GLOBE = 1710;
-      const TRANSITION = 5200;
+      // Заставка укорочена: на медленном канале клиентка видела 8-14 секунд
+      // белого экрана и решила, что сайт не открылся. Сфера держится ровно
+      // столько, чтобы прочитать логотип, переход — вдвое быстрее прежнего.
+      // Сфера держится минимум столько — за это время догружается всё
+      // нужное для первого экрана и для ближайших блоков.
+      const HOLD_GLOBE = 1500;
+      // Верхний потолок ожидания: на плохой связи сайт не должен висеть
+      // белым бесконечно — показываем как есть, остальное дойдёт следом.
+      const ASSET_CEILING = 4000;
+      const TRANSITION = 2600;
       const BG = 0xF1ECEC;
       const INK = '#2B2B29';
       const preloader = document.querySelector('.preloader');
@@ -811,7 +766,23 @@
         material.uniforms.map.value = createTexture();
         previous?.dispose();
       });
-      const criticalAssets = Promise.all([textureReady, document.fonts.ready, ...[...document.querySelectorAll('.compass img')].map(image => image.decode?.().catch(() => undefined) || Promise.resolve())]);
+      // Ждём не только шрифты и компас, но и фотографии первых блоков:
+      // без этого заставка уходила раньше картинок, и человек попадал на
+      // пустые тёмные карточки — «половина блоков не открылась».
+      const decodeAll = (nodes) => [...nodes].map(image => {
+        if (image.decode) return image.decode().catch(() => undefined);
+        if (image.complete) return Promise.resolve();
+        return new Promise(done => {
+          image.addEventListener('load', done, { once:true });
+          image.addEventListener('error', done, { once:true });
+        });
+      });
+      const criticalAssets = Promise.all([
+        textureReady,
+        document.fonts.ready,
+        ...decodeAll(document.querySelectorAll('.compass img')),
+        ...decodeAll(document.querySelectorAll('.pcard__media, .ring__photo'))
+      ]);
 
       let pixelScale = 1;
       const sizeParticles = () => {
@@ -1064,7 +1035,10 @@
       });
 
       (async () => {
-        await Promise.race([criticalAssets, wait(1710)]);
+        // Сначала ждём сами ресурсы (с потолком), и только потом добираем
+        // остаток минимального показа сферы. Прежний порядок обрывал
+        // ожидание по таймеру и выпускал страницу с недогруженными фото.
+        await Promise.race([criticalAssets, wait(ASSET_CEILING)]);
         await wait(Math.max(0, HOLD_GLOBE - (performance.now() - startedAt)));
         animateTransition();
       })();
@@ -1366,7 +1340,6 @@
       // Размеры берём из фактической геометрии сцены, а не из строки
       // кастомного свойства: getPropertyValue на :root возвращает исходный
       // calc(...) текстом, и parseFloat дал бы NaN.
-      const SPACING = 3;    // параметр кольца из Originkit: factor = 1 + spacing*0.15
       const SPEED = 2.6;    // ~15 град/с: карточка сменяется за ~3 с
       // Размеры пересчитываются, а не берутся один раз: на старте сцена ещё
       // не имеет реальной высоты, и кольцо получалось нулевым.
@@ -1377,17 +1350,15 @@
       // Фото из папки «фото сайт», размер 370x551 — ровно карточка из макета.
       // Присланные фото карусели (307x443 — размер карточки из макета).
       const CARDS = [
-        { image:'cards/ring-2.png', name:'Предприниматели', note:'Которым важно доносить\u00A0идеи', place:'bottom' },
-        { image:'cards/ring-1.png', name:'Преподаватели',   note:'Которым важно доносить\u00A0идеи', place:'top' },
-        { image:'cards/ring-2.png', name:'Руководители',    note:'Которым важно вести за\u00A0собой', place:'bottom' },
-        { image:'cards/ring-1.png', name:'Исследователи',   note:'Которым важно быть\u00A0понятыми', place:'top' },
-        { image:'cards/ring-2.png', name:'Авторы',          note:'Которым важно звучать\u00A0точно', place:'bottom' }
+        { name:'Предприниматели', note:'Которым важно доносить\u00A0идеи', place:'bottom' },
+        { name:'Преподаватели',   note:'Которым важно доносить\u00A0идеи', place:'top' },
+        { name:'Руководители',    note:'Которым важно вести за\u00A0собой', place:'bottom' },
+        { name:'Исследователи',   note:'Которым важно быть\u00A0понятыми', place:'top' },
+        { name:'Авторы',          note:'Которым важно звучать\u00A0точно', place:'bottom' }
       ];
       const SENSITIVITY = 5;
 
       let angle = 360 / COUNT;
-      // Зазор между карточками на 5% шире прежнего.
-      const factorFor = () => (1 + SPACING * 0.15) * (NARROW.matches ? 0.42 : 0.60);
       const degPerSec = SPEED * 6;
 
       // Пересчёт размеров от живой высоты сцены: на старте она ещё нулевая,
@@ -1401,18 +1372,16 @@
         // крайние карточки должны доходить до краёв — до линии логотипа
         // и кнопки. factor остаётся как поправка на плотность.
         const stageW = stage.getBoundingClientRect().width || innerWidth;
-        if (NARROW.matches) {
-          // Пять карточек: радиус от полуширины карточки плюс зазор,
-          // иначе соседние перекрываются и кольцо схлопывается в стопку.
-          // Хорда между соседними центрами = 2·R·sin(π/COUNT). Чтобы между
-          // карточками остался зазор, она должна быть шире самой карточки.
-          // GAP берём с запасом: перспектива сближает спроецированные
-          // центры сильнее, чем даёт плоский расчёт по хорде.
-          const GAP = 29;
-          radius = Math.round((CARD_W + GAP) / (2 * Math.sin(Math.PI / COUNT)));
-        } else {
-          radius = (stageW - CARD_W) / 2 * factorFor();
-        }
+        // Радиус всегда считаем от хорды, а не от ширины сцены. Прежняя
+        // десктопная формула (доля от ширины сцены) зазор не гарантировала:
+        // на 1440x900 она давала радиус 487 при карточке 296, и десять
+        // карточек вставали внахлёст — сплошная стопка вместо кольца.
+        // Хорда между соседними центрами = 2·R·sin(π/COUNT); чтобы между
+        // карточками остался просвет, она должна быть шире самой карточки.
+        // GAP берём с запасом: перспектива сближает спроецированные центры
+        // сильнее, чем даёт плоский расчёт.
+        const GAP = NARROW.matches ? 29 : 150;
+        radius = Math.round((CARD_W + GAP) / (2 * Math.sin(Math.PI / COUNT)));
         ring.style.width = `${CARD_W}px`;
         ring.style.height = `${CARD_H}px`;
         [...ring.children].forEach((item, i) => {
