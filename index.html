@@ -110,10 +110,16 @@
     /* Заголовок и карусель — одна группа: в один экран, с общим воздухом. */
     .circle-section {
       position:relative; z-index:2;
-      display:grid; align-content:center; justify-items:center;
+      display:grid; justify-items:center;
       /* Зазор больше — кольцо опускается ниже под заголовок. */
       gap:clamp(40px,7svh,92px);
       min-height:100svh; padding:clamp(24px,4svh,56px) 0;
+      /* Группа стояла высоко на экране ноутбука: сцена берёт заметный
+         запас под тени, и он поднимал всё вверх. Опускаем группу, задав
+         её положение в блоке, а не переносом — перенос при высоте ровно
+         в экран ничего не давал. */
+      align-content:start;
+      padding-top:clamp(74px,11svh,128px);
       background:var(--bg-light);
     }
     /* Карусель временно скрыта: убрать у секции, чтобы
@@ -131,7 +137,7 @@
       text-align:center; text-wrap:balance;
       color:var(--ink);
       /* Приподнят над кольцом: прежде почти касался верхних карточек. */
-      margin-top:clamp(-40px,-3svh,-16px);
+      margin-top:calc(clamp(-40px,-3svh,-16px) + 10px);
     }
     .veil__line {
       margin:0;
@@ -267,6 +273,11 @@
          падает ниже самой карточки. */
       width:100%; margin-inline:auto;
       height:calc(var(--ring-h) + clamp(150px,20svh,240px));
+      /* Запас нужен с обеих сторон, но снизу больше: тень падает вниз.
+         Кольцо смещено кверху ровно настолько, чтобы над ним осталось
+         место под тень, а лишняя высота ушла вниз. */
+      align-items:center;
+      padding-bottom:clamp(10px,1.4svh,20px);
       overflow:visible;
       -webkit-mask-image:linear-gradient(to right, transparent 0, #000 7%, #000 93%, transparent 100%);
       mask-image:linear-gradient(to right, transparent 0, #000 7%, #000 93%, transparent 100%);
