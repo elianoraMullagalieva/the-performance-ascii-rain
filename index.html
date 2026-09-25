@@ -308,7 +308,9 @@
     }
     .ring__face--back { transform:rotateY(180deg); filter:brightness(.35); }
     .ring__photo { position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
-      filter:saturate(.9) brightness(.72); }
+      filter:saturate(.9) brightness(.72);
+      -webkit-backface-visibility:hidden;
+      backface-visibility:hidden; }
     /* Подпись поверх фото: чередуется сверху и снизу, как в макете. */
     .ring__copy {
       position:absolute; z-index:2; left:11.1%; right:11.1%;
@@ -335,7 +337,16 @@
        сплошной градиент сверху и снизу пачкал фото. */
     /* Подпись лежит прямо на фото: радиальная подложка читалась как
        грязное чёрное пятно под текстом. */
-    .ring__copy { isolation:isolate; text-shadow:0 1px 10px rgba(0,0,0,.45); }
+    .ring__copy {
+      isolation:isolate; text-shadow:0 1px 10px rgba(0,0,0,.45);
+      /* Safari выносит текст в собственный слой, и он перестаёт наследовать
+         backface-visibility у грани: сквозь дальние карточки просвечивал
+         зеркальный текст. Правило нужно на самом слое с текстом. */
+      -webkit-backface-visibility:hidden;
+      backface-visibility:hidden;
+      -webkit-transform:translateZ(0);
+      transform:translateZ(0);
+    }
 
     @media (prefers-reduced-motion:reduce) {
       .ring-stage { height:auto; overflow-x:auto; perspective:none; }
