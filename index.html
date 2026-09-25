@@ -316,7 +316,10 @@
       background-size:cover; background-position:center;
       box-shadow:0 16px 40px rgba(22,21,20,.22);
     }
-    .ring__face--back { transform:rotateY(180deg); filter:brightness(.35); }
+    /* Изнанка больше не рисуется: отвёрнутые карточки скрываются по углу,
+       а её затемнённая копия успевала мелькнуть чёрной заливкой в момент
+       переключения — это и читалось как лаг. */
+    .ring__face--back { display:none; }
     .ring__photo { position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
       filter:saturate(.9) brightness(.72);
       -webkit-backface-visibility:hidden;
@@ -742,6 +745,12 @@
         preloader.classList.add('is-transitioning');
         preloader.classList.add('is-complete');
       }
+      // Холсты заставки освобождаем явно: сфера, нарисованная до срыва,
+      // иначе остаётся серым кругом поверх компаса.
+      document.querySelectorAll('#three-canvas, #preloader-particles').forEach(canvas => {
+        canvas.width = canvas.height = 0;
+        canvas.style.display = 'none';
+      });
       if (compass) {
         compass.classList.add('is-idle');
         dispatchEvent(new Event('compass:interaction-ready'));
@@ -1526,17 +1535,10 @@
           copy.append(name, note);
           front.appendChild(copy);
 
-          // Обратная сторона — то же фото, приглушённое: карточка читается
-          // как один объект, а не как две разные с изнанки.
-          const back = document.createElement('div');
-          back.className = 'ring__face ring__face--back';
-          back.style.background = tone;
-          const backPhoto = document.createElement('img');
-          backPhoto.className = 'ring__photo';
-          backPhoto.src = 'cards/ring-photo.jpg';
-          backPhoto.alt = '';
-          back.appendChild(backPhoto);
-          item.append(front, back);
+          // Обратной стороны нет: отвёрнутые карточки скрываются по углу,
+          // так что изнанку никто не увидит. Десять лишних фотографий в
+          // разметке только нагружали прокрутку и мелькали чёрным.
+          item.append(front);
           ring.appendChild(item);
         }
 
@@ -1564,6 +1566,11 @@
           const card = cards[i];
           if (card._away !== away) {
             card._away = away;
+            // Прячем именно грань: тень и фон живут на ней, и при скрытии
+            // одного лишь родителя Safari продолжал рисовать их тёмными
+            // пятнами поверх светлого блока.
+            const face = card.firstElementChild;
+            if (face) face.style.display = away ? 'none' : '';
             card.style.visibility = away ? 'hidden' : '';
           }
         }
