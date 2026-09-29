@@ -607,7 +607,7 @@
     <h2 class="philosophy__title">Философия</h2>
     <div class="philosophy__rail">
       <article class="pcard pcard--red pcard--brand">
-        <picture><source media="(min-width:1200px)" srcset="cards/card-silk-lg.jpg"><img class="pcard__media" src="cards/card-silk-sm.jpg" alt="" decoding="async"></picture>
+        <picture><source media="(min-width:1200px)" srcset="cards/card-silk-lg.jpg"><img class="pcard__media" loading="lazy" decoding="async" src="cards/card-silk-sm.jpg" alt="" decoding="async"></picture>
         <div class="pcard__brand">
           <img src="cards/logo-big.svg" alt="">
           <p class="pcard__brand-name">The Performance</p>
@@ -617,7 +617,7 @@
       </article>
 
       <article class="pcard pcard--green">
-        <picture><source media="(min-width:1200px)" srcset="cards/card-green-lg.jpg"><img class="pcard__media" src="cards/card-green-sm.jpg" alt="" decoding="async"></picture>
+        <picture><source media="(min-width:1200px)" srcset="cards/card-green-lg.jpg"><img class="pcard__media" loading="lazy" decoding="async" src="cards/card-green-sm.jpg" alt="" decoding="async"></picture>
         <div class="pcard__badges">
           <span class="pcard__badge">01</span><span class="pcard__badge">принцип</span>
         </div>
@@ -628,7 +628,7 @@
       </article>
 
       <article class="pcard pcard--light">
-        <picture><source media="(min-width:1200px)" srcset="cards/card-bird-lg.jpg"><img class="pcard__media" src="cards/card-bird-sm.jpg" alt="" decoding="async"></picture>
+        <picture><source media="(min-width:1200px)" srcset="cards/card-bird-lg.jpg"><img class="pcard__media" loading="lazy" decoding="async" src="cards/card-bird-sm.jpg" alt="" decoding="async"></picture>
         <div class="pcard__badges">
           <span class="pcard__badge">02</span><span class="pcard__badge">принцип</span>
         </div>
@@ -639,7 +639,7 @@
       </article>
 
       <article class="pcard pcard--dark">
-        <picture><source media="(min-width:1200px)" srcset="cards/card-deep-lg.jpg"><img class="pcard__media" src="cards/card-deep-sm.jpg" alt="" decoding="async"></picture>
+        <picture><source media="(min-width:1200px)" srcset="cards/card-deep-lg.jpg"><img class="pcard__media" loading="lazy" decoding="async" src="cards/card-deep-sm.jpg" alt="" decoding="async"></picture>
         <div class="pcard__badges">
           <span class="pcard__badge">03</span><span class="pcard__badge">принцип</span>
         </div>
@@ -844,8 +844,10 @@
       const criticalAssets = Promise.all([
         textureReady,
         document.fonts.ready,
-        ...decodeAll(document.querySelectorAll('.compass img')),
-        ...decodeAll(document.querySelectorAll('.pcard__media, .ring__photo'))
+        // Ждём только то, что видно на первом экране. Фото «Философии»
+        // теперь грузятся отложенно — ждать их здесь значило бы держать
+        // заставку до конца их загрузки, а человек их ещё не скоро увидит.
+        ...decodeAll(document.querySelectorAll('.compass img'))
       ]);
 
       let pixelScale = 1;
