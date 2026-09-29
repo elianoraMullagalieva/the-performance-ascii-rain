@@ -1,0 +1,3002 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Performance — Институт культуры влияния</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Шрифты не блокируют первую отрисовку: подключаются как print и
+       переключаются на экранные сразу после загрузки. -->
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400&family=Manrope:wght@300;400;500;600&family=Onest:wght@300&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400&family=Manrope:wght@300;400;500;600&family=Onest:wght@300&display=swap" rel="stylesheet"></noscript>
+  <script>document.documentElement.classList.add('is-preloading');</script>
+  <link rel="preload" href="three.min.js" as="script">
+  <!-- Без defer: инлайновый скрипт ниже создаёт WebGLRenderer прямо во время
+       разбора страницы, поэтому THREE обязан быть уже определён. Отложить
+       загрузку можно только вместе с переносом инициализации в DOMContentLoaded. -->
+  <!-- async: 654 КБ держали страницу белой, пока не скачаются. Теперь
+       грузится параллельно, а код заставки ждёт библиотеку сам. -->
+  <script src="three.min.js" async></script>
+  <style>
+    @font-face { font-family:"Anticva"; src:url("fonts/Anticva-Regular.otf") format("opentype"); font-style:normal; font-weight:400; font-display:swap; }
+    :root {
+      --bg-light:#F1ECEC; --ink:#161514; --accent:#A71F1F;
+      /* Шторка и СВЕТЛЫЙ — оттенки из макета 441:332. */
+      --void:#111111; --light:#EFEAE4;
+      /* Правило 02: clamp с обязательной rem-частью.
+         Опорные точки фразы: 30px@375 / 68px@1440 / потолок 92px. */
+      --fz-phrase:clamp(1.875rem, 1.0169rem + 3.662vw, 5.75rem);
+    }
+    /* Правило 04: ступени по высоте — крупная фраза обязана помещаться. */
+    @media (min-width:901px) and (max-height:820px) { :root { --fz-phrase:clamp(1.8rem,.9rem + 3vw,4.2rem); } }
+    @media (min-width:901px) and (max-height:700px) { :root { --fz-phrase:clamp(1.65rem,.85rem + 2.6vw,3.6rem); } }
+    @media (min-width:901px) and (max-height:620px) { :root { --fz-phrase:clamp(1.5rem,.8rem + 2.2vw,3rem); } }
+    @media (max-width:600px) and (max-height:760px) { :root { --fz-phrase:clamp(1.55rem,1rem + 3vw,2.3rem); } }
+    * { box-sizing:border-box; }
+    .mobile-only { display:none; }
+    html,body { min-width:320px; min-height:100%; margin:0; max-width:100%; overflow-x:clip; -webkit-text-size-adjust:100%; text-size-adjust:100%; }
+    body { background:var(--bg-light); color:var(--ink); font-family:Manrope,Arial,sans-serif; font-synthesis:none; }
+
+    /* Поля рамки — одной переменной, чтобы верх и низ дышали одинаково
+       и подстраивались под высоту экрана (а не жили числами вразнобой). */
+    :root {
+      --edge-y:clamp(18px,2.6svh,30px); --edge-x:clamp(14px,1.7vw,30px);
+    }
+
+    .hero { position:sticky; top:0; z-index:1; height:100vh; height:100svh; overflow:hidden; }
+    .brand { position:absolute; top:var(--edge-y); left:var(--edge-x); display:block; width:140px; color:inherit; text-decoration:none; }
+    .brand__art { display:block; width:100%; height:auto; }
+    .menu { position:absolute; top:var(--edge-y); left:50%; display:grid; grid-template-columns:repeat(4,130px); gap:38px; transform:translateX(-50%); }
+    .menu__group { display:grid; gap:8px; align-content:start; }
+    .menu b,.menu a,.cta,.eyebrow,.side-note,.meta { font-size:clamp(11px,1vw,13px); font-weight:500; line-height:1.32; letter-spacing:.06em; text-transform:uppercase; }
+    .menu b,.menu a { font-size:clamp(10px,.92vw,12px); font-weight:400; letter-spacing:.04em; }/* Ховер и на ссылках, и на заголовках колонок: верхняя строка — это <b>,
+   а не <a>, поэтому раньше она одна не реагировала на курсор. */
+.menu a,.menu b { position:relative; display:inline-block; width:max-content; color:inherit; text-decoration:none; cursor:pointer; transition:color .24s cubic-bezier(.16,1,.3,1),transform .24s cubic-bezier(.16,1,.3,1); }.menu a:before,.menu b:before { content:""; position:absolute; top:50%; left:-10px; width:4px; height:4px; background:var(--accent); opacity:0; transform:translateY(-50%) scale(.3); transition:opacity .18s ease,transform .24s cubic-bezier(.16,1,.3,1); }.menu a:hover,.menu b:hover { color:var(--accent); transform:translateX(4px); }.menu a:hover:before,.menu b:hover:before { opacity:1; transform:translateY(-50%) scale(1); }
+    .cta { position:absolute; top:var(--edge-y); right:var(--edge-x); display:flex; align-items:center; justify-content:space-between; width:224px; height:50px; padding:0 17px; border:1px solid var(--ink); color:var(--ink); background:transparent; cursor:pointer; transition:border-color .24s cubic-bezier(.16,1,.3,1),color .24s cubic-bezier(.16,1,.3,1),background .24s cubic-bezier(.16,1,.3,1),transform .24s cubic-bezier(.16,1,.3,1); }.cta:hover { border-color:var(--accent); color:var(--bg-light); background:var(--accent); transform:translateY(-1px); }.cta:active { transform:translateY(0) scale(.98); }.cta:hover .cta__arrow { filter:brightness(0) invert(1); }.cta__label--mobile,.menu-toggle,.mobile-mantra { display:none; }.cta__arrow { width:12px; height:12px; object-fit:contain; transition:filter .24s cubic-bezier(.16,1,.3,1); }
+    .copy { position:absolute; top:22.3%; left:0; width:100%; text-align:center; }.eyebrow { margin:0 0 14px; letter-spacing:.32px; }.title { margin:0; display:flex; flex-direction:column; align-items:center; font-family:Anticva,serif; font-size:clamp(49px,4.85vw,70px); font-weight:400; line-height:.98; letter-spacing:-2.8px; text-transform:uppercase; }.title__line,.title__word { display:block; white-space:nowrap; }.title__line--primary { position:relative; }.title > .title__line + .title__line { margin-top:10px; }.side-note { position:absolute; top:50%; width:max-content; font-family:Onest,Manrope,sans-serif; font-size:clamp(11px,.86vw,12px); font-weight:300; text-align:left; line-height:1.35; letter-spacing:.03em; transform:translateY(-50%); }.side-note span,.meta span { display:block; }.side-note--left { right:calc(100% + clamp(18px,1.857vw,32px)); }.side-note--right { left:calc(100% + clamp(18px,1.857vw,32px)); }
+    .compass { position:absolute; top:50.4%; left:50%; width:clamp(300px,32vw,460px); aspect-ratio:1; transform:translateX(-50%); }.compass__base,.compass__needle { position:absolute; inset:0; width:100%; height:100%; }.compass__needle { z-index:2; transform-origin:50% 50%; transition:opacity .239s cubic-bezier(.16,1,.3,1); will-change:transform,opacity; }.compass.is-arriving .compass__needle { animation:needle-arrival .615s cubic-bezier(.22,1,.36,1) both; }
+    .meta { position:absolute; bottom:calc(var(--edge-y) + env(safe-area-inset-bottom,0px)); line-height:1.45; letter-spacing:.06em; }.meta--left { left:var(--edge-x); }.meta--right { right:var(--edge-x); text-align:right; }.cross { position:absolute; top:58.2%; font-family:Anticva,serif; font-size:32px; font-weight:300; opacity:.55; }.cross--left { left:11px; }.cross--right { right:11px; }
+    /* ───────── Шторка и блок фраз ─────────
+       Всё считается от позиции прокрутки, а не от событий «докрутил докуда-то»:
+       такая схема симметрично отрабатывает скролл вверх, потому что нет
+       состояний, которые можно проскочить и залипнуть. */
+    /* Трек короткий: на шторку приходится ~76px прокрутки — это два
+       обычных движения трекпада, а не пять. Считать в «щелчках колеса»
+       нельзя: на трекпаде шаг втрое мельче. */
+    /* Трек наезжает на герой: шторка начинает подниматься, пока первый
+       экран ещё виден, а не после 100svh прокрутки вхолостую. */
+    /* Темп задаётся только длиной трека — сглаживания прокрутки нет.
+       460svh на четыре фразы плюс шторку: примерно экран прокрутки на
+       каждую фразу, этого хватает, чтобы прочитать. */
+    .veil-track { position:relative; height:300vh; height:300svh; margin-top:-72vh; margin-top:-72svh; }
+    .veil {
+      position:sticky; top:0; z-index:2;
+      display:grid; place-items:center;
+      height:100vh; height:100svh; overflow:hidden;
+      background:var(--void);
+      /* Подъём шторки снизу вверх. --veil: 0 — опущена, 1 — закрыла экран. */
+      clip-path:inset(calc((1 - var(--veil,1)) * 100%) 0 0 0);
+      /* Сглаживается только сама шторка: за то же движение прокрутки край
+         доезжает мягко, а не рывком вслед за пальцем. Фраз и длины трека
+         это не касается. */
+      /* Без перехода: значение и так меняется на каждом кадре прокрутки,
+         а переход заставлял браузер сглаживать ещё и между кадрами —
+         обрезка всего экрана пересчитывалась дважды за кадр. */
+    }
+    .veil__phrases { grid-area:1/1; width:min(88vw,1100px); padding:0 20px; z-index:2; }
+    /* Блок «Философия» прилипает, пока лента едет по горизонтали:
+       трек даёт прокрутку, секция внутри стоит на месте. */
+    /* Трек наезжает на блок фраз: светлая «Философия» начинает подниматься,
+       пока последняя фраза ещё растворяется, а не после пустого чёрного
+       экрана. Наезд равен доле прокрутки, отданной на подъём. */
+    .philosophy-track { position:relative; z-index:3; }
+    #philosophy-track { margin-top:-88vh; margin-top:-88svh; }
+    .philosophy-track .philosophy {
+      position:sticky; top:0; min-height:100vh; min-height:100svh; display:grid; align-content:center;
+      /* Тот же приём, что у тёмной шторки: блок открывается снизу вверх.
+         --handoff считается в блоке фраз и растёт на уходе последней. */
+      clip-path:inset(calc((1 - var(--handoff,1)) * 100%) 0 0 0);
+    }
+    .veil__line {
+      margin:0;
+      font-family:Manrope,Arial,sans-serif;
+      font-size:var(--fz-phrase);
+      font-weight:300; line-height:1.1; letter-spacing:-.02em;
+      text-align:center; text-wrap:balance;
+      color:var(--light);
+    }
+    /* will-change ставится только на время работы буквы: постоянный слой на
+       каждую из 89 букв держится ради 26 анимирующих в пике. */
+    .veil__line .l { display:inline-block; }
+    .veil__line .l.is-moving { will-change:filter,opacity; }
+    .veil__line .w { display:inline-block; white-space:nowrap; }
+
+    /* Обвязка первого экрана перекрашивается в светлый, когда шторка встала.
+       Сами элементы не двигаются — меняется только цвет (как в макете). */
+    .chrome { position:fixed; z-index:3; inset:0; pointer-events:none; opacity:0; }
+    /* Обвязка секций: появляется, когда блок занял экран. На светлой
+       «Философии» — тёмная, на «Среде» — светлая. */
+    .chrome--section { position:absolute; opacity:0; transition:opacity .5s cubic-bezier(.16,1,.3,1); }
+    .philosophy-track .philosophy .chrome--section,
+    .circle-section .chrome--section { position:fixed; }
+    .chrome--section.is-in { opacity:1; }
+    .chrome--dark .chrome__brand img { filter:none; }
+    .chrome--dark .chrome__cta { border-color:var(--ink); color:var(--ink); }
+    .chrome--dark .chrome__cta img { filter:none; }
+    .chrome--dark .chrome__meta { color:var(--ink); }
+    /* На «Философии» карточки доходят до низа экрана — нижние подписи
+       выглядывали бы из-под них. Шапка сверху остаётся. */
+    .philosophy .chrome__meta { display:none; }
+    .chrome.is-on { pointer-events:auto; }
+    .chrome__brand { position:absolute; top:var(--edge-y); left:var(--edge-x); width:140px; }
+    .chrome__brand img { display:block; width:100%; height:auto; filter:brightness(0) invert(1); }
+    .chrome__cta {
+      position:absolute; top:var(--edge-y); right:var(--edge-x);
+      display:flex; align-items:center; justify-content:space-between;
+      width:224px; height:50px; padding:0 17px;
+      border:1px solid var(--light); background:transparent; color:var(--light);
+      font-size:clamp(11px,1vw,13px); font-weight:500; letter-spacing:.06em; text-transform:uppercase;
+      cursor:pointer;
+    }
+    .chrome__cta img { width:12px; height:12px; filter:brightness(0) invert(1); }
+    .chrome__meta {
+      position:absolute; bottom:calc(var(--edge-y) + env(safe-area-inset-bottom,0px));
+      color:var(--light); font-size:clamp(11px,1vw,13px); font-weight:500;
+      line-height:1.45; letter-spacing:.06em; text-transform:uppercase;
+    }
+    .chrome__meta span { display:block; }
+    .chrome__meta--left { left:var(--edge-x); }
+    .chrome__meta--right { right:var(--edge-x); text-align:right; }
+
+    /* Шапка секций повторяет мобильную шапку первого экрана:
+       бургер слева, логотип по центру, короткая кнопка справа.
+       Цвет наследуется от темы блока. */
+    .chrome__toggle { display:none; }
+    .chrome__cta-label--mobile { display:none; }
+    .chrome__cta { gap:10px; }
+    .cta { gap:12px; }
+
+    @media (max-width:960px) { .chrome__cta { width:auto; height:34px; padding:0 12px; font-size:9px; gap:10px; } }
+    @media (max-width:780px) {
+      .chrome__brand { left:50%; width:119px; transform:translateX(-50%); }
+      .chrome__cta { top:42px; right:20px; width:74px; height:28px; padding:0 14px 0 12px; font-size:7px; gap:6px; }
+      .chrome__cta img { width:5px; height:5px; }
+      .chrome__cta-label--desktop { display:none; }
+      .chrome__cta-label--mobile { display:block; }
+      .chrome__meta { font-size:8px; }
+      /* На телефоне закреплённого меню после блока фраз нет: три слоя
+         position:fixed поверх всей страницы держали композитор занятым на
+         каждом кадре прокрутки. Шапка остаётся только на первом экране.
+         На десктопе секционные шапки работают по-прежнему. */
+      .chrome--section { display:none; }
+      /* Бургер — ровно там же, где на первом экране. */
+      .chrome__toggle {
+        position:absolute; z-index:4; top:42px; left:20px;
+        display:flex; flex-direction:column; gap:6px; width:27px;
+      }
+      .chrome__toggle i { display:block; width:27px; height:1px; background:currentColor; }
+      .chrome__toggle i:nth-child(2) { width:16px; }
+      /* По умолчанию светлый — обвязка блока фраз лежит на тёмном фоне
+         и не имеет модификатора темы. Секции переопределяют ниже. */
+      .chrome__toggle { color:var(--light); }
+      .chrome--dark .chrome__toggle { color:var(--ink); }
+      .chrome--light .chrome__toggle { color:var(--light); }
+    }
+    @media (max-width:360px) {
+      .chrome__toggle { left:14px; }
+      .chrome__cta { right:12px; width:64px; padding:0 10px; }
+    }
+
+    @media (prefers-reduced-motion:reduce) {
+      .veil-track { height:auto; }
+      .veil { position:static; height:auto; padding:14svh 0; clip-path:none; }
+      .veil__line .l { filter:none !important; opacity:1 !important; }
+    }
+
+
+    /* ───────── Философия, вариант 2 ─────────
+       Подписи по центру и на одной высоте, бейджи сверху по центру. */
+    .philosophy--v2 .pcard__copy {
+      left:clamp(14px,2.4vw,34px); right:clamp(14px,2.4vw,34px);
+      top:72%; bottom:auto;
+      align-items:center; text-align:center; gap:clamp(8px,1vw,14px);
+    }
+    .philosophy--v2 .pcard__name { max-width:18ch; }
+    .philosophy--v2 .pcard__note { max-width:30ch; }
+    .philosophy--v2 .pcard__badges {
+      left:50%; right:auto; transform:translateX(-50%);
+      top:clamp(14px,1.9vw,28px);
+    }
+    .philosophy--v2 .pcard { aspect-ratio:370 / 600; }
+    .philosophy--v2 .pcard--brand { align-content:end; }
+    .philosophy--v2 .pcard__brand { padding-bottom:clamp(30px,4.6vw,64px); }
+
+    /* ───────── Философия ─────────
+       Пиксель-перфект по макету 441:800 (холст 1440x900).
+       Все размеры — доли от 1440, чтобы пропорции держались на любой ширине.
+       Правило 02: clamp с обязательной rem-частью — кегль реагирует на Cmd+. */
+    .philosophy {
+      position:relative; z-index:2;
+      padding:clamp(46px,6.94vw,100px) 0 clamp(40px,5.5vw,80px);
+      background:var(--bg-light);
+      overflow:hidden;
+    }
+    /* Заголовок: x=58 (4.028%), Anticva 72px, line-height 80/72 */
+    .philosophy__title {
+      /* Карточки стали ниже — заголовок опускаем в освободившийся воздух.
+         Боковой padding убран: при text-align:center он сдвигал строку
+         вбок, поэтому слово стояло не по центру экрана. */
+      /* Секция — grid, и её колонка равна ширине ленты (шире экрана).
+         Заголовок надо держать по ширине ЭКРАНА, иначе text-align:center
+         центрирует его по ленте и слово уезжает вправо на половину выноса. */
+      justify-self:start;
+      width:100vw; max-width:100vw;
+      margin:clamp(20px,3.4svh,46px) 0 clamp(34px,4.4vw,62px);
+      padding:0;
+      text-align:center;
+      font-family:Anticva,Georgia,serif;
+      font-size:clamp(2.3rem,1.1rem + 3.4vw,4.3rem);
+      font-weight:400; line-height:1.111; letter-spacing:.01em;
+      text-transform:uppercase; color:#171717;
+    }
+    /* Лента: карточка 370 (25.694%), зазор 15 (1.042%), левое поле 53 (3.681%).
+       Четвёртая уходит за правый край — как в макете. */
+    /* Лента едет трансформацией от прокрутки, а не собственным скроллом:
+       так последняя карточка гарантированно доезжает до края. */
+    .philosophy__rail {
+      display:flex; gap:clamp(8px,1.042vw,15px);
+      overflow:visible;
+      transform:translate3d(calc(var(--rail-x,0) * -1px),0,0);
+    }
+    .philosophy__rail::-webkit-scrollbar { display:none; }
+    /* Левое поле 53px (3.681%) — отдельной распоркой: padding у flex-контейнера
+       с overflow-x не удерживает отступ первой карточки при прокрутке. */
+    .philosophy__rail::before {
+      content:""; flex:none;
+      width:calc(clamp(20px,3.681vw,53px) - clamp(8px,1.042vw,15px));
+    }
+    /* Карточка 370x632, радиус 30 */
+    /* Ширина 26.627% — ровно три карточки целиком плюс половина четвёртой
+       в видимой зоне (экран минус левое поле), как просили: последний
+       скролл доводит четвёртую, первая уходит за край. */
+    /* Высота ограничена экраном: низ карточек не должен обрезаться.
+       Ширина по-прежнему доля экрана — три целых плюс половина четвёртой. */
+    .pcard {
+      position:relative; flex:none;
+      width:max(230px, 26.627vw);
+      max-height:66svh;
+      /* Карточка ниже макетной: 370/632 давала слишком высокую плашку,
+         при ширине по 26.627vw высота упиралась в экран. */
+      aspect-ratio:370 / 548;
+      border-radius:clamp(18px,2.083vw,30px);
+      overflow:hidden; background:#171717;
+      scroll-snap-align:start;
+    }
+    .pcard__media { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+    /* Цветокоррекция из макета: шейдер Figma заменён CSS-фильтром —
+       рантайм требует WebGPU и экспериментальных флагов браузера. */
+    .pcard--red   .pcard__media { filter:saturate(.79) contrast(1.16) brightness(.92) hue-rotate(-4deg); }
+    .pcard--light .pcard__media { filter:saturate(1.04) brightness(1.02); }
+    /* Фото остаётся цветным: saturate(0) выжимал из него весь бордовый. */
+    .pcard--dark  .pcard__media { filter:saturate(.92) brightness(.78); }
+        .pcard--dark::after {
+      content:""; position:absolute; inset:0;
+      background:linear-gradient(180deg, rgba(120,20,14,.42), rgba(23,23,23,.85));
+    }
+    /* Бейджи: 12px, радиус 50, padding 12/4, пара с зазором 37-38=нет, стык 37 */
+    .pcard__badges {
+      position:absolute; z-index:2; display:flex;
+      top:clamp(12px,1.389vw,20px); right:clamp(12px,1.528vw,22px);
+    }
+    .pcard__badge {
+      display:flex; align-items:center; justify-content:center;
+      height:26px; padding:0 13px; border:1px solid currentColor; border-radius:50px;
+      font-family:Manrope,Arial,sans-serif;
+      font-size:clamp(.625rem,.55rem + .22vw,.75rem);
+      line-height:1; letter-spacing:.04em; white-space:nowrap;
+      font-variant-numeric:tabular-nums;
+    }
+    /* Пилюли стоят рядом с честным зазором: наложение в -1px давало
+       кривой стык контуров. */
+    .pcard__badge + .pcard__badge { margin-left:5px; }
+    /* Подписи: тайтл 24px tracking -.24, текст 16px line-height 1.19 */
+    /* Подпись поднята от нижнего края и строка уже: длинные висячие строки
+       рядом с короткими смотрелись неряшливо. */
+    .pcard__copy {
+      position:absolute; z-index:2; left:clamp(14px,2.222vw,32px);
+      right:clamp(14px,2.222vw,32px); top:70%;
+      display:flex; flex-direction:column; gap:7px;
+      font-family:Manrope,Arial,sans-serif;
+    }
+    .pcard__name {
+      margin:0; max-width:32ch;
+      /* Заголовок карточки на 12% крупнее: все три члена clamp подняты
+         одинаково, чтобы шкала сохранилась на любой ширине. */
+      font-size:clamp(1.188rem,.814rem + 1.04vw,1.697rem);
+      font-weight:400; line-height:1.12; letter-spacing:-.01em;
+      text-wrap:balance;
+    }
+    .pcard__note {
+      margin:0; max-width:34ch;
+      font-size:clamp(.8rem,.66rem + .39vw,1rem);
+      font-weight:300; line-height:1.34; letter-spacing:.02em;
+      text-wrap:pretty;
+    }
+    .pcard--light .pcard__copy { color:#282828; }
+    .pcard--light .pcard__badge { color:#4A4A4A; }
+    .pcard--red .pcard__copy, .pcard--green .pcard__copy,
+    .pcard--dark .pcard__copy { color:#fff; }
+    .pcard--green .pcard__badge, .pcard--dark .pcard__badge { color:#fff; }
+    /* Первая карточка: логотип по центру, подпись, кнопка снизу */
+    .pcard--brand { display:grid; place-items:center; text-align:center; }
+    .pcard__brand {
+      position:relative; z-index:2; display:flex;
+      flex-direction:column; align-items:center;
+      padding:0 clamp(16px,2.4vw,34px); color:#fff;
+    }
+    .pcard__brand img { width:clamp(34px,3.9vw,56px); height:auto; }
+    .pcard__brand-name {
+      margin:clamp(10px,1.1vw,16px) 0 0;
+      font-family:"Cormorant Garamond",Georgia,serif;
+      font-size:clamp(.95rem,.6rem + .98vw,1.47rem);
+      font-weight:400; line-height:1.04; letter-spacing:.03em;
+      text-transform:uppercase; white-space:nowrap;
+    }
+    .pcard__brand-note {
+      margin:clamp(14px,1.8vw,26px) 0 0;
+      max-width:26ch;
+      font-family:Manrope,Arial,sans-serif;
+      font-size:clamp(.8rem,.66rem + .39vw,1rem);
+      font-weight:300; line-height:1.19; letter-spacing:.02em;
+      text-wrap:pretty;
+    }
+    .pcard__brand-tag {
+      position:absolute; z-index:2; left:50%; transform:translateX(-50%);
+      top:clamp(14px,1.9vw,28px);
+      display:flex; align-items:center; justify-content:center;
+      height:26px; padding:0 13px; border:1px solid #fff; border-radius:50px;
+      color:#fff; font-family:Manrope,Arial,sans-serif;
+      font-size:clamp(.625rem,.55rem + .22vw,.75rem);
+      line-height:1; letter-spacing:.04em; white-space:nowrap;
+    }
+
+    @media (max-width:780px) {
+      /* Нативный горизонтальный скролл вместо пина. */
+      .philosophy-track { height:auto !important; margin-top:0; }
+      /* Шапка на мобиле закреплена (fixed) и вышла из потока — заголовку
+         нужен собственный воздух сверху, иначе он упирается в логотип. */
+      .philosophy-track .philosophy { position:static; min-height:auto; clip-path:none; padding-top:130px; }
+      .philosophy__title { margin-top:0; }
+      .philosophy__rail {
+        transform:none !important;
+        overflow-x:auto; overflow-y:hidden;
+        scroll-snap-type:x mandatory;
+        -webkit-overflow-scrolling:touch;
+        scroll-padding-left:20px;
+        padding-bottom:4px;
+      }
+      .philosophy__rail::-webkit-scrollbar { display:none; }
+      .philosophy__rail { scrollbar-width:none; }
+      .pcard { width:74vw; scroll-snap-align:center; }
+    }
+
+    @media (max-width:1120px) { .menu { grid-template-columns:repeat(4,108px); gap:20px; } }
+    @media (max-width:960px) { .menu { display:none; }.copy { top:19%; }.menu-toggle { position:absolute; z-index:4; top:32px; left:30px; display:flex; flex-direction:column; gap:6px; width:27px; padding:0; border:0; background:transparent; cursor:pointer; }.menu-toggle i { display:block; width:27px; height:1px; background:var(--ink); }.menu-toggle i:nth-child(2) { width:16px; }.hero.menu-open .menu { position:absolute; z-index:3; top:84px; left:20px; display:grid; grid-template-columns:repeat(2,minmax(120px,1fr)); width:calc(100% - 40px); gap:24px; padding:18px; background:rgba(241,236,236,.96); border:1px solid rgba(22,21,20,.25); transform:none; } }
+    @media (max-width:780px) { .brand { top:24px; left:50%; width:119px; transform:translateX(-50%); }.brand__mark { width:22px; height:27px; margin-bottom:6px; }.brand__name { font-size:10.73px; letter-spacing:.429px; }.brand__sub { margin-top:3px; font-size:5.11px; font-weight:300; letter-spacing:.06em; }.menu-toggle { top:42px; left:20px; }.cta { top:36px; right:20px; width:74px; height:28px; padding:0 14px 0 12px; font-size:7px; }.cta__label--desktop { display:none; }.cta__label--mobile { display:block; }.cta__arrow { width:5px; height:5px; }.copy { top:clamp(156px,22.75svh,192px); }.eyebrow { margin-bottom:14px; font-size:10px; letter-spacing:.4px; }.title { width:calc(100% - 40px); margin:0 auto; font-size:42px; line-height:1.05; letter-spacing:-1.26px; font-synthesis:none; }.title > .title__line + .title__line { margin-top:0; }.title__line--primary { position:static; }.title br.mobile-only { display:block; }.side-note { top:35.3svh; width:70px; font-size:9px; line-height:1.2; letter-spacing:.04em; transform:none; }.hero.is-revealing.is-revealed .side-note { transform:none; }.side-note--left { left:20px; right:auto; }.side-note--right { left:auto; right:18px; }.mobile-mantra { position:absolute; z-index:2; top:clamp(370px,47.6svh,402px); left:50%; display:flex; flex-direction:column; align-items:center; transform:translateX(-50%); color:#474540; font-family:Onest,Manrope,sans-serif; font-size:18px; font-weight:300; line-height:1; white-space:nowrap; }.mobile-mantra__dots { display:flex; flex-direction:column; align-items:center; gap:3px; height:19px; margin-bottom:12px; }.mobile-mantra__dots img { display:block; object-fit:contain; }.mobile-mantra__dots img:nth-child(1) { width:5px; height:5px; }.mobile-mantra__dots img:nth-child(2) { width:3px; height:3px; }.mobile-mantra__dots img:nth-child(3) { width:1.5px; height:1.5px; }.compass { top:clamp(400px,58svh,490px); width:min(64vw,248px); }.meta { bottom:clamp(20px,3.1svh,26px); font-size:8px; line-height:1.5; letter-spacing:.24px; }.meta--left { left:20px; }.meta--right { right:20px; }.cross { display:none; } }
+
+    /* Планшетная полоса: мобильное центрирование логотипа и смещение
+       кнопки здесь неуместны — все четыре угла на общей сетке. */
+    @media (min-width:601px) and (max-width:780px) {
+      body .brand { top:var(--edge-y); left:var(--edge-x); width:140px; transform:none; }
+      body .chrome__brand { left:var(--edge-x); transform:none; }
+      body .cta, body .chrome__cta { top:var(--edge-y); right:var(--edge-x); }
+      body .meta--left { left:var(--edge-x); }
+      body .meta--right { right:var(--edge-x); }
+    }
+    @media (max-width:360px) { .brand { width:110px; }.menu-toggle { left:14px; }.cta { right:12px; width:64px; padding:0 10px; }.title { width:calc(100% - 28px); font-size:clamp(36px,12.56vw,42px); }.side-note--left { left:14px; }.side-note--right { right:12px; }.meta--left { left:12px; }.meta--right { right:12px; } }
+    @media (hover:none), (pointer:coarse) { .compass.is-idle .compass__needle { animation:needle-drift 7.2s cubic-bezier(.45,0,.55,1) infinite alternate; } }
+    @keyframes needle-drift { from { transform:rotate(-15deg); } to { transform:rotate(15deg); } }
+    @keyframes needle-arrival { 0% { transform:rotate(-4deg); } 56% { transform:rotate(2.2deg); } 78% { transform:rotate(-1deg); } 100% { transform:rotate(0deg); } }
+    @media (prefers-reduced-motion:reduce) { .compass__needle { animation:none; transition:none; } }
+    @media (hover:hover) and (pointer:fine) { body.has-cursor-mark a:not(.brand),body.has-cursor-mark button,body.has-cursor-mark .menu b { cursor:none; }body.has-cursor-mark .brand { cursor:pointer; }.cursor-mark { position:fixed; z-index:20; top:0; left:0; width:8px; height:8px; background:var(--accent); pointer-events:none; opacity:0; transform:translate3d(var(--cursor-x,-20px),var(--cursor-y,-20px),0) translate(-50%,-50%) scale(.35); transition:opacity .16s ease,transform .18s cubic-bezier(.16,1,.3,1); will-change:transform,opacity; }.cursor-mark.is-active { opacity:1; transform:translate3d(var(--cursor-x,-20px),var(--cursor-y,-20px),0) translate(-50%,-50%) scale(1); }.menu-toggle:hover i { background:var(--accent); }.menu-toggle i { transition:background .24s cubic-bezier(.16,1,.3,1); } }
+    /* Клавиатурная навигация: без этого фокус не виден нигде. */
+    a:focus-visible, button:focus-visible, .menu b:focus-visible {
+      outline:2px solid var(--accent); outline-offset:3px; border-radius:2px;
+    }
+    body.has-cursor-mark a:focus-visible,
+    body.has-cursor-mark button:focus-visible { cursor:auto; }
+
+    .preloader { position:fixed; z-index:30; inset:0; overflow:hidden; background:var(--bg-light); opacity:1; visibility:visible; transition:background-color .42s ease,opacity .62s cubic-bezier(.16,1,.3,1),visibility .62s step-end; }.preloader.is-transitioning { background-color:transparent; }.preloader.is-complete { opacity:0; visibility:hidden; pointer-events:none; }.preloader__globe,.preloader__particles { position:absolute; inset:0; display:block; width:100%; height:100%; }.preloader__particles { pointer-events:none; }.loader-counter { position:absolute; left:50%; bottom:clamp(32px,8.9vh,96px); color:#2B2B29; font:300 clamp(22px,1.56vw,30px)/1 Onest,sans-serif; letter-spacing:-.03em; transform:translateX(-50%); transition:opacity .26s ease; user-select:none; }.preloader.is-transitioning .loader-counter { opacity:0; }.is-preloading .hero > * { opacity:0; }.hero > * { transition:opacity .46s cubic-bezier(.16,1,.3,1),transform .46s cubic-bezier(.16,1,.3,1); }.hero.is-assembly > * { opacity:0; }.hero.is-assembly .compass { transition:none; }.hero.is-revealing .copy { opacity:1; }.hero.is-revealing .brand,.hero.is-revealing .menu,.hero.is-revealing .cta,.hero.is-revealing .meta,.hero.is-revealing .cross { opacity:0; }.hero.is-revealing .eyebrow,.hero.is-revealing .title__word,.hero.is-revealing .title__line--secondary,.hero.is-revealing .side-note { opacity:0; transform:translateY(8px); }.hero.is-revealing.is-revealed .brand,.hero.is-revealing.is-revealed .menu,.hero.is-revealing.is-revealed .cta { opacity:1; transition-delay:.08s; }.hero.is-revealing.is-revealed .eyebrow { opacity:1; transform:none; transition:opacity .34s ease .04s,transform .46s cubic-bezier(.16,1,.3,1) .04s; }.hero.is-revealing.is-revealed .title__word { opacity:1; transform:none; transition:opacity .38s ease .14s,transform .52s cubic-bezier(.16,1,.3,1) .14s; }.hero.is-revealing.is-revealed .title__line--secondary { opacity:1; transform:none; transition:opacity .38s ease .24s,transform .52s cubic-bezier(.16,1,.3,1) .24s; }.hero.is-revealing.is-revealed .side-note { opacity:1; transform:translateY(-50%); transition:opacity .34s ease .34s,transform .46s cubic-bezier(.16,1,.3,1) .34s; }.hero.is-revealing.is-revealed .meta,.hero.is-revealing.is-revealed .cross { opacity:1; transition-delay:.22s; }
+    @media (prefers-reduced-motion:reduce) { .preloader__particles { display:none; } }
+    /* Mobile frame: exact editorial proportions from the 390 px Figma layout. */
+    .brand__art { image-rendering:auto; }
+    @media (max-width:780px) {
+      .brand { width:127px; }
+      .cta { top:35px; width:76px; height:30px; padding:0 13px; font-size:7.5px; }
+      .cta__arrow { width:5.35px; height:5.35px; }
+      .title { width:min(339px,calc(100% - 40px)); }
+    }
+    @media (max-width:360px) {
+      .brand { width:118px; }
+      .cta { width:68px; height:30px; padding:0 11px; }
+    }
+
+    /* One reveal cascade for both desktop and mobile: header → eyebrow → title → notes. */
+    .hero.is-revealing .menu-toggle,
+    .hero.is-revealing .mobile-mantra { opacity:0; }
+    .hero.is-revealing .mobile-mantra { transform:translateX(-50%) translateY(8px); }
+    .hero.is-revealing.is-revealed .brand,
+    .hero.is-revealing.is-revealed .menu,
+    .hero.is-revealing.is-revealed .menu-toggle,
+    .hero.is-revealing.is-revealed .cta { opacity:1; transition-delay:.04s; }
+    .hero.is-revealing.is-revealed .eyebrow { transition-delay:.12s; }
+    .hero.is-revealing.is-revealed .title__word { transition-delay:.20s; }
+    .hero.is-revealing.is-revealed .title__line--secondary { transition-delay:.30s; }
+    .hero.is-revealing.is-revealed .side-note { transition-delay:.40s; }
+    .hero.is-revealing.is-revealed .mobile-mantra { opacity:1; transform:translateX(-50%); transition:opacity .34s ease .48s,transform .46s cubic-bezier(.16,1,.3,1) .48s; }
+    .hero.is-revealing.is-revealed .meta,
+    .hero.is-revealing.is-revealed .cross { transition-delay:.56s; }
+    @media (max-width:780px) { .hero.is-revealing.is-revealed .side-note { transform:none; } }
+  </style>
+  <style id="zone-styles">
+    /* ═════════ ЗОНА НИЖЕ ГРАНИЦЫ · v4 ═════════
+       Всё от «Среды единомышленников» до подвала. Выше этих стилей
+       ничего не меняется. Приборы — SVG, без WebGL: падать нечему.
+       Палитра зоны закрыта: #F1ECEC #161514 #111111 #EFEAE4 #A71F1F
+       #2A2724 #6E1B1B. Прозрачность этих же цветов — не новый оттенок. */
+    :root {
+      --graphite:#2A2724; --bordeaux:#6E1B1B;
+      --gap:clamp(10px,1.4vw,20px);
+      --ease:cubic-bezier(.16,1,.3,1);
+      --ease-line:cubic-bezier(.65,0,.35,1);
+      --fz-h:clamp(1.9rem,.9rem + 2.8vw,3.6rem);
+      --fz-name:clamp(1.188rem,.814rem + 1.04vw,1.697rem);
+      --fz-sub:clamp(.95rem,.6rem + .98vw,1.47rem);
+      --fz-text:clamp(.85rem,.62rem + .6vw,1.2rem);
+      --fz-small:clamp(.75rem,.7rem + .1vw,.8125rem);
+      /* Кнопка не мельче 12px: у шапки сайта она доходила до 9px. */
+      --fz-btn:clamp(.75rem,.66rem + .16vw,.8125rem);
+      /* Кегли вне шкалы — каждый несёт идею своего блока:
+         роль — главное слово строки, от неё идёт провод к кольцу;
+         стена — десять названий читаются как один текст, а не как список;
+         римская цифра стоит на месте иконки и принимает луч;
+         манифест — единственная фраза, которую произносит сам институт,
+         поэтому она занимает экран целиком;
+         фраза клуба — Cormorant, как положено крупной фразе на тёмном. */
+      --fz-role:clamp(2.2rem,.9rem + 3.9vw,5rem);
+      --fz-wall:clamp(1.6rem,.5rem + 3.3vw,4rem);
+      --fz-roman:clamp(4.5rem,1rem + 11vw,13rem);
+      --fz-manifest:clamp(1.9rem,.3rem + 8.7vw,10.5rem);
+      --fz-lead:clamp(1.9rem,1rem + 2.9vw,4.2rem);
+      /* Шаг колонки общей сетки — для лесенок вне грида. */
+      --colw:calc((100vw - var(--edge-x) * 2 + var(--gap)) / 12);
+    }
+    /* Манифест обязан помещаться по высоте: на низком экране кегль ниже. */
+    @media (min-width:781px) and (max-height:760px) { :root { --fz-manifest:clamp(1.9rem,.3rem + 7.4vw,7.4rem); } }
+    @media (min-width:781px) and (max-height:620px) { :root { --fz-manifest:clamp(1.9rem,.3rem + 6vw,5.6rem); } }
+    /* Телефон: самая длинная строка «мы формируем» обязана войти в 360px. */
+    @media (max-width:780px) { :root { --fz-manifest:clamp(1.9rem,.2rem + 8vw,3.6rem); } }
+
+    .zone { position:relative; z-index:2; background:var(--bg-light); --rule-c:rgba(22,21,20,.22); }
+    /* :where — нулевая специфичность: сброс не должен перебивать отступы блоков. */
+    :where(.zone) :where(p,h2,h3,ul,dl,dd,dt) { margin:0; padding:0; }
+    :where(.zone) ul { list-style:none; }
+    .zone a:focus-visible { outline-color:currentColor; }
+    .zone .chrome__meta { display:none; }
+    /* Блоки зоны длиннее экрана и едут под шапкой. При прокрутке вниз шапка
+       уходит целиком — и логотип, и кнопка: в v3 кнопка с подложкой
+       перекрывала текст, проходящий под правым углом. Вверх — возвращается. */
+    .zone__chrome .chrome__cta { background:var(--void); text-decoration:none; font-size:var(--fz-btn); transition:background .4s var(--ease),color .4s var(--ease),border-color .4s var(--ease),opacity .4s var(--ease),transform .5s var(--ease); }
+    .zone__chrome.chrome--dark .chrome__cta { background:var(--bg-light); }
+    .zone__chrome.is-in .chrome__cta { pointer-events:auto; }
+    .zone__chrome .chrome__brand { transition:opacity .4s var(--ease),transform .5s var(--ease); }
+    .zone__chrome.is-down .chrome__brand,
+    .zone__chrome.is-down .chrome__cta { opacity:0; transform:translate3d(0,-10px,0); }
+    .zone__chrome.is-down .chrome__cta { pointer-events:none; }
+
+    .g { display:grid; grid-template-columns:repeat(12,minmax(0,1fr)); column-gap:var(--gap); padding-inline:var(--edge-x); }
+    .h-sec { font-family:Anticva,Georgia,serif; font-size:var(--fz-h); font-weight:400; line-height:1.111; letter-spacing:.01em; text-transform:uppercase; }
+    .t { font-size:var(--fz-text); font-weight:300; line-height:1.42; letter-spacing:.01em; text-wrap:pretty; }
+    .small { font-family:Onest,Manrope,sans-serif; font-size:var(--fz-small); font-weight:300; line-height:1.35; letter-spacing:.06em; text-transform:uppercase; }
+    .dark { background:var(--void); color:var(--light); --rule-c:rgba(239,234,228,.22); }
+    .hr { display:block; height:1px; background:var(--rule-c); transform-origin:left center; }
+    /* Маска под подъём строки: запас снизу, чтобы не резать Щ, Ц и Д. */
+    .ln { display:block; overflow:hidden; padding-bottom:.16em; margin-bottom:-.16em; }
+    .ln__i { display:block; }
+    .nw { white-space:nowrap; }
+    /* Номер листа атласа — техническая подпись в углу блока, не над заголовком. */
+    .plate { position:absolute; z-index:2; left:var(--edge-x); bottom:clamp(18px,3vh,30px); opacity:.55; font-variant-numeric:tabular-nums; pointer-events:none; }
+    .plate--flow,.env__foot .plate { position:static; }
+
+    .btn { display:inline-flex; align-items:center; justify-content:space-between; gap:20px; width:224px; height:50px; padding:0 17px; border:1px solid currentColor; background:transparent; color:inherit; text-decoration:none; white-space:nowrap; font:500 var(--fz-btn)/1 Manrope,sans-serif; letter-spacing:.06em; text-transform:uppercase; cursor:pointer; transition:background .24s var(--ease),color .24s var(--ease),transform .24s var(--ease); }
+    .btn img { width:12px; height:12px; transition:filter .24s var(--ease); }
+    .btn:hover { background:var(--ink); color:var(--bg-light); transform:translateY(-1px); }
+    .btn:active { transform:translateY(0) scale(.98); }
+    .btn:hover img { filter:brightness(0) invert(1); }
+    .dark .btn img { filter:brightness(0) invert(1); }
+    .dark .btn:hover { background:var(--light); color:var(--void); }
+    .dark .btn:hover img { filter:none; }
+
+    /* ── Появление. Скрытое состояние живёт только под .motion: класс ставит
+       скрипт. Не дошёл скрипт — всё видно как есть.
+       Длительности разные намеренно: линия идёт дольше текста, маска фото —
+       дольше линии. Иначе слои сливаются в одно движение. ── */
+    .motion .a-fade { opacity:0; transform:translate3d(0,14px,0); transition:opacity .7s var(--ease) var(--d,0ms),transform .7s var(--ease) var(--d,0ms); }
+    .motion .is-in .a-fade,.motion .a-fade.is-in { opacity:1; transform:none; }
+    .motion .btn.a-fade { transition:opacity .7s var(--ease) var(--d,0ms),transform .7s var(--ease) var(--d,0ms),background .24s var(--ease),color .24s var(--ease); }
+    .motion .is-in .btn.a-fade { transition-delay:var(--d,0ms),var(--d,0ms),0ms,0ms; }
+    .motion .a-rise .ln__i { transform:translate3d(0,114%,0); transition:transform .9s var(--ease) var(--d,0ms); }
+    .motion .a-rise .ln + .ln .ln__i { transition-delay:calc(var(--d,0ms) + 90ms); }
+    .motion .is-in .a-rise .ln__i,.motion .a-rise.is-in .ln__i { transform:none; }
+    .motion .a-rule { transform:scaleX(0); transition:transform 1.1s var(--ease-line) var(--d,0ms); }
+    .motion .is-in .a-rule,.motion .a-rule.is-in { transform:none; }
+    .motion .a-clip { clip-path:inset(100% 0 0 0); transition:clip-path 1.2s var(--ease) var(--d,0ms); }
+    .motion .is-in .a-clip,.motion .a-clip.is-in { clip-path:inset(0 0 0 0); }
+    .motion .a-clip .ph { transform:scale(1.12); transition:transform 1.6s var(--ease) var(--d,0ms); }
+    .motion .is-in .a-clip .ph,.motion .a-clip.is-in .ph { transform:none; }
+    .motion .a-draw { stroke-dasharray:1; stroke-dashoffset:1; transition:stroke-dashoffset .8s var(--ease-line) var(--d,0ms); }
+    .motion .is-in .a-draw { stroke-dashoffset:0; }
+    .motion .a-pop { opacity:0; transition:opacity .5s var(--ease) var(--d,0ms); }
+    .motion .is-in .a-pop { opacity:1; }
+
+    /* Заглушка под растровую графику заказчицы. Красный — градиентом
+       с уходом в тёмное, только цвета палитры. */
+    .shot { position:absolute; inset:0; overflow:hidden; }
+    .ph { width:100%; height:100%; background:linear-gradient(165deg,var(--graphite) 0%,var(--ink) 42%,var(--bordeaux) 100%); }
+    /* Подпись заглушки лежит отдельным слоем: фон под ней сдвигается и
+       масштабируется, а текст обязан оставаться в кадре. */
+    .ph__note { position:absolute; left:18px; right:18px; bottom:18px; color:var(--light); opacity:.7; }
+
+    /* ───────── 1. Среда единомышленников ─────────
+       Самая большая пауза зоны: блок идёт сразу после ленты «Философии». */
+    .env { position:relative; padding:clamp(150px,22vh,230px) 0 clamp(40px,6vh,70px); overflow:clip; }
+    .env__head { align-items:end; margin-bottom:clamp(48px,8vh,96px); }
+    .env__head h2 { grid-column:1 / span 7; }
+    .env__intro { grid-column:9 / span 4; max-width:40ch; }
+    .env__body { position:relative; }
+    /* Сфера уходит за правый край на пятую часть: прибор больше листа. */
+    .env__sphere { position:absolute; z-index:1; top:50%; left:82%; width:min(96vh,58vw); aspect-ratio:1; transform:translate(-50%,-50%); overflow:visible; pointer-events:none; }
+    .env__wires { position:absolute; z-index:1; inset:0; width:100%; height:100%; overflow:visible; pointer-events:none; }
+    .env__list { position:relative; z-index:2; margin-inline:var(--edge-x); }
+    /* Длину линии считает скрипт: она обрывается на круге сферы.
+       Без скрипта линия идёт во всю ширину. */
+    .env__rule { width:var(--w,100%); }
+    .env__row { display:grid; grid-template-columns:calc((100% + var(--gap)) / 12) minmax(0,1fr); align-items:baseline; padding-top:clamp(20px,3vh,34px); transition:color .5s var(--ease); cursor:default; }
+    /* Приглушение — только когда скрипт жив и сам выбирает активную строку.
+       Без скрипта весь текст стоит в полную силу. */
+    .is-live .env__row { color:rgba(22,21,20,.34); }
+    .is-live .env__row.is-active { color:var(--ink); }
+    .env__num { grid-column:1; }
+    .env__who { grid-column:2; min-width:0; }
+    .env__role { font-size:var(--fz-role); font-weight:300; line-height:1.02; letter-spacing:-.035em; white-space:nowrap; transition:transform .7s var(--ease); }
+    .env__row.is-active .env__role { transform:translate3d(14px,0,0); }
+    .env__note { margin-top:clamp(6px,1vh,12px); }
+    .env__row .env__rule { grid-column:1 / -1; margin-top:clamp(20px,3vh,34px); }
+    .env__foot { position:relative; z-index:2; margin-top:clamp(24px,4vh,44px); align-items:baseline; }
+    .env__foot .plate { grid-column:1 / span 4; }
+    .env__mark { grid-column:6 / span 7; justify-self:end; display:flex; gap:clamp(18px,2.4vw,40px); }
+    .env__mark > span:first-child { opacity:.6; }
+    .env__index { font-variant-numeric:tabular-nums; }
+
+    /* ───────── 2. Развитие компетенций ─────────
+       Текст обтекает фигуру: float с shape-outside. Круг сдвинут вправо
+       на --shift от ширины, и фигура уходит за край экрана. */
+    .comp { --orb:min(78vh,48vw); --shift:.14; position:relative; min-height:100vh; min-height:100svh; padding:clamp(104px,14vh,140px) var(--edge-x) clamp(70px,10vh,110px); overflow:clip; clip-path:inset(var(--cut,0px) 0 0 0); }
+    .comp__wall { margin-top:clamp(30px,6vh,70px); }
+    .comp__wall::after { content:""; display:block; clear:both; }
+    .comp__shape { float:right; position:relative; width:var(--orb); height:var(--orb); margin:clamp(0px,2vh,24px) 0 0 clamp(10px,1.4vw,24px); shape-outside:circle(50% at calc(50% + var(--shift) * 100%) 50%); shape-margin:clamp(12px,1.6vw,26px); }
+    /* Без скрипта приборы не нарисованы — и места под них не остаётся. */
+    .zone:not(.is-live) .comp__shape,.zone:not(.is-live) .club__field { display:none; }
+    .comp__svg { position:absolute; inset:0; width:100%; height:100%; overflow:visible; pointer-events:none; }
+    .comp__names { --raise:calc(var(--fz-wall) * .5); font-size:var(--fz-wall); font-weight:300; line-height:1.17; letter-spacing:-.03em; }
+    .comp__names li { display:inline; }
+    .comp__name { transition:color .6s var(--ease); cursor:default; }
+    .is-live .comp__name { color:rgba(239,234,228,.36); }
+    .is-live .comp__name.is-active { color:var(--light); }
+    /* Номер поднят к верхней линии прописных: он индекс, а не слово. */
+    .comp__name i { position:relative; top:calc(var(--raise) * -1); margin-right:.55em; font-style:normal; line-height:0; }
+    .comp__sep { margin:0 .1em 0 .3em; color:rgba(239,234,228,.22); font-weight:200; }
+    .motion .comp__name.a-pop { transition:opacity .5s var(--ease) var(--d,0ms),color .6s var(--ease); }
+    .comp__para { margin-top:clamp(28px,5vh,56px); max-width:38ch; }
+
+    /* ───────── 3. Школа ─────────
+       Средняя пауза. Заголовок и абзац стоят в левой колонке над призмой,
+       первая запись начинается на уровне заголовка. */
+    .school { --stair:calc((100% + var(--gap)) / 7); position:relative; padding:clamp(120px,17vh,180px) 0 clamp(80px,12vh,140px); overflow:clip; }
+    .school__rays { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:1; }
+    .school__main { position:relative; z-index:2; align-items:start; }
+    .school__aside { grid-column:1 / span 5; align-self:stretch; }
+    .school__head p { margin-top:clamp(16px,2.6vh,26px); max-width:36ch; }
+    .school__prism { position:sticky; top:calc(50vh - clamp(113px,13vw,200px)); width:clamp(260px,30vw,460px); margin:clamp(40px,8vh,96px) 0 0 4%; }
+    .school__prism svg { display:block; width:100%; height:auto; overflow:visible; }
+    .school__list { grid-column:6 / span 7; }
+    /* Лесенка: каждая запись на колонку правее — как расходящиеся лучи. */
+    .entry { display:grid; grid-template-columns:auto minmax(0,1fr); column-gap:clamp(18px,2.6vw,44px); margin-left:calc(var(--stair) * var(--step,0)); padding-bottom:clamp(64px,12vh,140px); transition:color .6s var(--ease); }
+    .entry:nth-child(2) { --step:1; }
+    .entry:nth-child(3) { --step:2; padding-bottom:0; }
+    .is-live .entry { color:rgba(22,21,20,.5); }
+    .is-live .entry.is-active { color:var(--ink); }
+    .entry__rule { grid-column:1 / -1; margin-bottom:clamp(18px,3vh,32px); }
+    .entry__num { font-family:Anticva,serif; font-size:var(--fz-roman); line-height:.84; letter-spacing:-.02em; }
+    .entry__name { font-size:clamp(1.4rem,.9rem + 1.4vw,2.2rem); font-weight:400; line-height:1.08; letter-spacing:-.02em; }
+    .entry__desc { margin-top:clamp(12px,1.6vh,18px); max-width:44ch; }
+    .entry__progs { margin-top:clamp(22px,3.6vh,40px); }
+    .entry__progs li { display:grid; grid-template-columns:1fr auto; align-items:baseline; font-size:var(--fz-sub); font-weight:300; letter-spacing:-.01em; }
+    .entry__progs li > span:not(.hr) { padding:13px 0; }
+    .entry__progs li .hr { grid-column:1 / -1; }
+    .entry__progs li .small { opacity:.6; }
+    /* Действие — последняя строка таблицы, а не четвёртая одинаковая кнопка. */
+    .entry__go a { grid-column:1 / -1; position:relative; isolation:isolate; display:flex; align-items:center; justify-content:space-between; padding:17px 0; color:inherit; text-decoration:none; font:500 var(--fz-btn)/1 Manrope,sans-serif; letter-spacing:.06em; text-transform:uppercase; transition:color .3s var(--ease),padding .4s var(--ease); }
+    .entry__go a::before { content:""; position:absolute; z-index:-1; inset:0; background:var(--ink); transform:scaleY(0); transform-origin:50% 100%; transition:transform .4s var(--ease); }
+    .entry__go img { width:12px; height:12px; transition:filter .3s var(--ease),transform .4s var(--ease); }
+    .entry__go a:hover,.entry__go a:focus-visible { padding-inline:16px; color:var(--bg-light); }
+    .entry__go a:hover::before,.entry__go a:focus-visible::before { transform:scaleY(1); }
+    .entry__go a:hover img,.entry__go a:focus-visible img { filter:brightness(0) invert(1); transform:translate(2px,-2px); }
+    .motion .entry__go a.a-fade { transition:opacity .7s var(--ease) var(--d,0ms),transform .7s var(--ease) var(--d,0ms),color .3s var(--ease),padding .4s var(--ease); }
+    .motion .is-in .entry__go a.a-fade { transition-delay:var(--d,0ms),var(--d,0ms),0ms,0ms; }
+
+    /* ───────── 4. Философский клуб ─────────
+       Плотный вход: темнота приходит куполом. Купол режет только слой неба,
+       содержимое лежит выше — поэтому фото может свисать за границу блока. */
+    .club { --pb:clamp(56px,9vh,100px); --hang:clamp(50px,11vh,120px); position:relative; z-index:3; padding:clamp(110px,15vh,160px) 0 var(--pb); }
+    .motion .club { background:none; }
+    .club__night { position:absolute; inset:0; overflow:hidden; background:var(--void); }
+    .motion .club__night { clip-path:circle(var(--dome-r,400vmax) at 50% var(--dome-y,0px)); }
+    .motion .club.is-flat .club__night { clip-path:none; }
+    .club__grid,.club__sky { position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
+    .club__names { position:absolute; inset:0; pointer-events:none; }
+    .club__name { position:absolute; white-space:nowrap; font-size:var(--fz-name); font-weight:300; line-height:1; letter-spacing:-.01em; color:rgba(239,234,228,.6); transition:color .5s var(--ease),opacity .6s var(--ease) var(--d,0ms); }
+    .club__name.is-near { color:var(--light); }
+    .motion .club__name { opacity:0; }
+    .motion .club.is-lit .club__name { opacity:1; }
+    .club__body { position:relative; z-index:2; }
+    .club h2 { grid-column:1 / span 8; }
+    .club__tag { grid-column:9 / span 4; justify-self:end; align-self:start; padding-top:.7em; opacity:.7; }
+    /* Поле под созвездие: место в потоке, рисунок лежит в слое неба. */
+    .club__field { grid-column:1 / -1; height:clamp(340px,60vh,640px); }
+    .club__copy { grid-column:1 / span 7; }
+    .club__lead { font-family:"Cormorant Garamond",Georgia,serif; font-size:var(--fz-lead); font-weight:400; line-height:1.02; letter-spacing:-.012em; }
+    .club__copy .t { margin-top:clamp(18px,3vh,30px); max-width:44ch; }
+    .club__ctx { margin-top:18px; opacity:.7; }
+    /* Контексты уже подписаны у звёзд — строка нужна только без скрипта. */
+    .club.has-sky .club__ctx { display:none; }
+    .club__photo { position:absolute; z-index:3; right:0; bottom:calc((var(--pb) + var(--hang)) * -1); width:calc((100% - var(--edge-x) * 2 + var(--gap)) / 12 * 4 - var(--gap) + var(--edge-x)); aspect-ratio:4 / 5; }
+    .star__core { animation:twinkle 5s ease-in-out infinite alternate; }
+    .star:nth-child(2n) .star__core { animation-duration:7.2s; animation-delay:-2s; }
+    .star:nth-child(3n) .star__core { animation-duration:6.1s; animation-delay:-4s; }
+    @keyframes twinkle { from { opacity:.55; } to { opacity:1; } }
+
+    /* ───────── 5. Манифест ─────────
+       Пауза — сам блок: экран типографики без графики. */
+    .manifest-track { position:relative; height:180vh; height:180svh; }
+    /* Верхний отступ держит фразу ниже шапки на невысоких экранах. */
+    .manifest { position:sticky; top:0; display:flex; flex-direction:column; justify-content:center; height:100vh; height:100svh; min-height:560px; padding:clamp(96px,13vh,130px) var(--edge-x) clamp(40px,6vh,64px); overflow:clip; }
+    .manifest__q { font-family:Anticva,serif; font-size:var(--fz-manifest); line-height:.98; letter-spacing:.005em; text-transform:uppercase; }
+    .manifest__line { display:block; white-space:nowrap; }
+    .manifest__line:nth-child(1) { position:relative; padding-left:.62em; }
+    .manifest__line .lq { position:absolute; left:0; top:0; }
+    /* Лесенка строк: вторая на две колонки правее, третья — на одну. */
+    .manifest__line:nth-child(2) { margin-left:calc(var(--colw) * 2); }
+    .manifest__line:nth-child(3) { margin-left:var(--colw); }
+    .manifest__line .w { display:inline-block; white-space:nowrap; }
+    .manifest__line .l { display:inline-block; }
+    .manifest__line .l.is-moving { will-change:filter,opacity,transform; }
+    /* Абзац встаёт справа от короткой четвёртой строки и начинается на её
+       высоте: выше — длинная третья строка, туда ему нельзя. */
+    .manifest__stack { position:relative; padding-bottom:clamp(50px,9vh,100px); }
+    .manifest__side { position:absolute; right:0; top:calc(var(--fz-manifest) * .98 * 3 + 1.5rem); width:calc(var(--colw) * 4 - var(--gap)); }
+    .manifest__side .btn { margin-top:28px; }
+    .manifest .plate { opacity:.45; }
+
+    /* ───────── 6. Основатель ─────────
+       Минимальная пауза: перед блоком целый экран манифеста.
+       Портрет доходит до нижней границы — на него наезжает шторка контакта. */
+    .founder { position:relative; display:grid; grid-template-columns:repeat(12,minmax(0,1fr)); column-gap:var(--gap); align-items:start; padding:clamp(70px,10vh,120px) var(--edge-x) 0; }
+    .founder__left { grid-column:1 / span 5; }
+    .founder__lead { margin-top:clamp(12px,2vh,20px); font-size:clamp(1.3rem,.7rem + 1.7vw,2.4rem); font-weight:300; line-height:1.08; letter-spacing:-.025em; }
+    .founder__photo { position:relative; width:calc((100% + var(--gap)) / 5 * 4 - var(--gap) + var(--edge-x)); margin:clamp(36px,7vh,80px) 0 0 calc(var(--edge-x) * -1); aspect-ratio:4 / 5; }
+    /* Маска и встречный сдвиг привязаны к прокрутке — значения ставит скрипт. */
+    .motion .founder__photo .shot { clip-path:inset(0 calc((1 - var(--open,1)) * 100%) 0 0); }
+    .motion .founder__photo .ph { transform:translate3d(0,calc(var(--drift,0) * 1%),0) scale(calc(1.14 - var(--open,1) * .06)); }
+    .founder__photo .ph__note { left:var(--edge-x); }
+    /* Приводные метки — как на листе атласа. Линии цвета текста. */
+    .crop { position:absolute; width:22px; height:22px; color:var(--ink); opacity:.6; pointer-events:none; }
+    .crop::before,.crop::after { content:""; position:absolute; background:currentColor; }
+    .crop::before { left:0; right:0; height:1px; }
+    .crop::after { top:0; bottom:0; width:1px; }
+    .crop--tr { left:calc(100% + 8px); bottom:calc(100% + 8px); }
+    .crop--tr::before { bottom:0; }
+    .crop--tr::after { left:0; }
+    .founder__cap { position:absolute; left:calc(100% + 14px); bottom:36px; writing-mode:vertical-rl; transform:rotate(180deg); white-space:nowrap; }
+    .founder__cap .l { display:inline-block; }
+    .founder__rows { grid-column:7 / span 6; padding-bottom:clamp(60px,10vh,120px); }
+    .founder__row { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); column-gap:var(--gap); align-items:baseline; padding-bottom:clamp(26px,4.6vh,48px); transition:color .6s var(--ease); }
+    .is-live .founder__row { color:rgba(22,21,20,.5); }
+    .is-live .founder__row.is-active { color:var(--ink); }
+    .founder__row .hr { grid-column:1 / -1; margin-bottom:clamp(18px,3vh,30px); }
+    /* Словарная статья ступенью: номер, термин, толкование. */
+    .founder__n { grid-column:1; }
+    .founder__row dt { grid-column:2 / span 5; font-size:var(--fz-name); font-weight:400; line-height:1.12; letter-spacing:-.02em; }
+    .founder__row dd { grid-column:3 / span 4; margin-top:clamp(10px,1.6vh,16px); }
+    .founder__end .plate { margin-top:16px; text-align:right; }
+
+    /* ───────── 7. Контакт и подвал ─────────
+       Компас больше экрана: его кольца — дуги, текст стоит поверх них. */
+    .contact { position:relative; z-index:4; clip-path:inset(var(--cut,0px) 0 0 0); }
+    .contact__stage { position:relative; min-height:100vh; min-height:100svh; padding:clamp(140px,21vh,220px) 0 clamp(40px,6vh,70px); overflow:clip; }
+    .contact__compass { position:absolute; left:50%; bottom:0; width:min(132vh,110vw); width:min(132svh,110vw); aspect-ratio:1; transform:translate(-50%,50%); color:var(--light); pointer-events:none; }
+    .contact__compass svg { position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
+    /* При любом масштабе линия остаётся линией в 1px. */
+    #contact-base * { vector-effect:non-scaling-stroke; }
+    #contact-base [data-ring] { transform-box:view-box; transform-origin:300px 300px; }
+    /* Стрелка короче колец: она не должна доставать до текста. */
+    .contact__compass .contact__needle { inset:21%; width:58%; height:58%; transform-origin:50% 50%; will-change:transform; }
+    .contact__grid { position:relative; z-index:2; }
+    .contact__phrase { grid-column:1 / span 9; font-size:var(--fz-phrase); font-weight:300; line-height:1.06; letter-spacing:-.025em; }
+    .contact__phrase .w { display:inline-block; overflow:hidden; vertical-align:top; padding-bottom:.14em; margin-bottom:-.14em; }
+    .contact__phrase .w i { display:inline-block; font-style:normal; }
+    .motion .contact__phrase .w i { transform:translate3d(0,114%,0); transition:transform .8s var(--ease) var(--d,0ms); }
+    .motion .contact__phrase.is-in .w i { transform:none; }
+    .contact__ask { grid-column:1 / span 4; margin-top:clamp(36px,6vh,64px); }
+    /* Подложка у кнопки: кольца компаса не должны идти сквозь неё. */
+    .contact__ask .btn { margin-top:24px; background:var(--void); }
+    .contact__links { grid-column:9 / span 4; margin-top:clamp(36px,6vh,64px); align-self:start; }
+    .contact__links a { display:grid; grid-template-columns:auto minmax(0,1fr); align-items:baseline; column-gap:16px; color:inherit; text-decoration:none; font-size:var(--fz-text); font-weight:300; }
+    .contact__links a > span:not(.hr) { padding:14px 0; }
+    .contact__links a > span:nth-child(2) { text-align:right; overflow-wrap:anywhere; }
+    .contact__links a .small { opacity:.6; }
+    .contact__links .hr { grid-column:1 / -1; }
+    .foot { position:relative; z-index:2; align-items:start; padding-top:22px; padding-bottom:calc(var(--edge-y) + env(safe-area-inset-bottom,0px)); border-top:1px solid var(--rule-c); background:var(--void); }
+    .foot__brand { grid-column:1 / span 3; }
+    .foot__brand img { width:140px; filter:brightness(0) invert(1); display:block; }
+    .foot__col { grid-column:span 2; display:grid; gap:8px; align-content:start; }
+    .foot__brand + .foot__col { grid-column:5 / span 2; }
+    .foot__col b { font-weight:400; }
+    .foot__col a { width:max-content; color:inherit; text-decoration:none; opacity:.6; transition:opacity .24s var(--ease),transform .24s var(--ease); }
+    .foot__col a:hover { opacity:1; transform:translateX(4px); }
+    .foot__legal { grid-column:1 / -1; display:flex; justify-content:space-between; gap:16px; margin-top:clamp(30px,6vh,60px); opacity:.6; }
+
+    @media (min-width:781px) {
+      /* Верхнюю линейку записи рисует луч из призмы. */
+      .school.has-rays .entry__rule { visibility:hidden; }
+    }
+    /* Небольшой ноутбук: лесенка короче, иначе третьей записи тесно. */
+    @media (min-width:781px) and (max-width:1180px) {
+      /* Адрес почты длинный: четырёх колонок ему мало. */
+      .contact__ask { grid-column:1 / span 6; }
+      .contact__links { grid-column:8 / span 5; }
+      .school { --stair:calc((100% + var(--gap)) / 14); }
+      .school__list { grid-column:6 / span 7; }
+      .founder__row dt { grid-column:2 / span 5; }
+      .founder__row dd { grid-column:2 / span 5; }
+    }
+
+    /* ───────── Телефон: отдельная раскладка, не сжатый десктоп ───────── */
+    @media (max-width:780px) {
+      .env__head h2,.env__intro,.club h2,.club__tag,.club__copy,
+      .contact__phrase,.contact__ask,.contact__links,
+      .foot__brand,.foot__col,.foot__brand + .foot__col { grid-column:1 / -1; }
+      .h-sec { font-size:clamp(1.5rem,6.2vw,2.3rem); }
+      .btn { width:auto; min-width:190px; }
+      .plate { bottom:16px; }
+
+      /* Среда: полусфера стоит за списком во всю его высоту,
+         строки идут колонкой, проводов нет — их заменяет сама близость. */
+      .env { padding:96px 0 36px; }
+      .env__intro { margin-top:18px; }
+      .env__head { margin-bottom:40px; }
+      .env__sphere { left:108%; width:124vw; }
+      .env__wires { display:none; }
+      .env__row { grid-template-columns:1fr; padding-top:18px; }
+      .env__num,.env__who { grid-column:1; }
+      .env__num { margin-bottom:8px; }
+      .env__row.is-active .env__role { transform:none; }
+      .env__row .env__rule { margin-top:18px; }
+      .env__rule { width:100%; }
+      .env__mark { grid-column:5 / span 8; }
+      .env__mark > span:first-child { display:none; }
+
+      /* Компетенции: фигура — полосой во всю ширину, под ней стена текста. */
+      .comp { min-height:0; padding:96px var(--edge-x) 64px; clip-path:none; }
+      .comp__wall { margin-top:0; }
+      .comp__shape { float:none; width:auto; height:88vw; margin:0 calc(var(--edge-x) * -1) 6px; shape-outside:none; }
+      .comp__names { line-height:1.22; }
+      .comp__para { margin-top:30px; }
+
+      /* Школа: призма сверху, записи колонкой, цифра над названием. */
+      .school { padding:96px 0 70px; }
+      .school__aside,.school__list { grid-column:1 / -1; }
+      .school__prism { position:static; width:62vw; margin:34px 0 46px 30%; }
+      .entry { grid-template-columns:1fr; margin-left:0; padding-bottom:56px; }
+      .entry__rule { margin-bottom:16px; }
+      .entry__num { margin-bottom:14px; }
+
+      /* Клуб: шторка вместо купола (на узком экране дуга выглядит дырой),
+         небо полосой, фото во всю ширину и не свисает. */
+      .club { padding:96px 0 0; }
+      .motion .club { background:var(--void); clip-path:inset(var(--cut,0px) 0 0 0); }
+      .motion .club__night { clip-path:none; }
+      .club__tag { justify-self:start; padding-top:10px; }
+      /* Внизу блока — фото во весь экран: номеру листа там негде встать. */
+      .club .plate { display:none; }
+      .club__field { height:104vw; }
+      .club__photo { position:relative; right:auto; bottom:auto; grid-column:1 / -1; width:auto; margin:44px calc(var(--edge-x) * -1) 0; }
+
+      /* Манифест: без фиксации, четыре строки лесенкой покороче. */
+      .manifest-track { height:auto; }
+      .manifest { position:static; display:block; height:auto; min-height:0; padding:110px var(--edge-x) 84px; }
+      .manifest__line:nth-child(2) { margin-left:12vw; }
+      .manifest__line:nth-child(3) { margin-left:0; margin-top:.3em; }
+      .manifest__line:nth-child(4) { margin-left:12vw; }
+      .manifest__line .l { opacity:1 !important; filter:none !important; transform:none !important; }
+      .manifest__stack { padding-bottom:0; }
+      .manifest__side { position:static; width:auto; margin-top:44px; }
+
+      /* Основатель: заголовок, портрет во всю ширину, статьи колонкой. */
+      .founder { display:block; padding:64px var(--edge-x) 0; }
+      .founder__photo { width:auto; margin:30px calc(var(--edge-x) * -1) 0; }
+      .motion .founder__photo .shot { clip-path:inset(calc((1 - var(--open,1)) * 100%) 0 0 0); }
+      .crop { display:none; }
+      .founder__cap { position:static; writing-mode:horizontal-tb; transform:none; padding:12px var(--edge-x) 0; white-space:normal; }
+      .founder__photo { aspect-ratio:auto; }
+      .founder__photo .shot { position:relative; inset:auto; aspect-ratio:4 / 5; }
+      .founder__rows { padding:46px 0 70px; }
+      .founder__row { grid-template-columns:28px 1fr; }
+      .founder__row .hr { grid-column:1 / -1; }
+      .founder__n { grid-column:1; }
+      .founder__row dt { grid-column:2; }
+      .founder__row dd { grid-column:2; }
+
+      /* Контакт: дуги компаса шире экрана, стрелка дрейфует сама. */
+      .contact__stage { min-height:0; padding:110px 0 66vw; }
+      .contact__links a { grid-template-columns:1fr; }
+      .contact__links a > span:nth-child(1) { padding-bottom:0; }
+      .contact__links a > span:nth-child(2) { text-align:left; padding-top:4px; }
+      .contact__compass { width:150vw; }
+      .contact .plate { display:none; }
+      .foot { row-gap:22px; }
+      .foot__legal { flex-direction:column; }
+    }
+
+    @media (prefers-reduced-motion:reduce) {
+      .comp,.club,.contact,.club__night { clip-path:none !important; }
+      .manifest-track { height:auto; }
+      .manifest { position:static; height:auto; min-height:0; }
+      .manifest__stack { padding-bottom:0; }
+      .manifest__side { position:static; margin:40px 0 0 auto; }
+      .star__core { animation:none; }
+    }
+  </style>
+</head>
+<body>
+  <section class="preloader" aria-label="Загрузка">
+    <canvas class="preloader__globe" id="three-canvas" aria-hidden="true"></canvas>
+    <canvas class="preloader__particles" id="preloader-particles" aria-hidden="true"></canvas>
+    <span class="loader-counter" id="counter" aria-live="polite">0%</span>
+  </section>
+  <main class="hero">
+    <button class="menu-toggle" type="button" aria-label="Открыть меню" aria-expanded="false"><i></i><i></i><i></i></button>
+    <a class="brand" href="#" aria-label="The Performance — на главную"><img class="brand__art" src="HERO/10%20%E2%80%94%20EYE/%D0%9B%D0%9E%D0%93%D0%9E%D0%9B%D0%9E%D0%93%D0%9E.svg" alt=""></a>
+    <nav class="menu" aria-label="Основная навигация"><div class="menu__group"><b>Институт</b><a class="active" href="#">Манифест</a><a href="#">Методология</a></div><div class="menu__group"><b>Развитие</b><a href="#">Направления</a><a href="#">Пути</a></div><div class="menu__group"><b>Пространство</b><a href="#">События</a><a href="#">Истории</a></div><div class="menu__group"><b>Медиа</b><a href="#">Публикации</a><a href="#">FAQ</a></div></nav>
+    <button class="cta" type="button"><span class="cta__label cta__label--desktop">Запросить участие</span><span class="cta__label cta__label--mobile">Участие</span><img class="cta__arrow" src="figma-arrow.svg" alt="" aria-hidden="true"></button>
+    <section class="copy" aria-labelledby="hero-title"><p class="eyebrow">The Performance&nbsp;&nbsp;—&nbsp;&nbsp;Est. 2016</p><h1 class="title" id="hero-title"><span class="title__line title__line--primary"><span class="side-note side-note--left"><span>Видеть</span><span>иначе</span></span><span class="title__word">Институт</span><span class="side-note side-note--right"><span>Говорить</span><span>убедительно</span></span></span><span class="title__line title__line--secondary">Культуры <br class="mobile-only">влияния</span></h1></section>
+    <div class="mobile-mantra" aria-hidden="true"><span class="mobile-mantra__dots"><img src="figma-dot-large.svg" alt=""><img src="figma-dot-medium.svg" alt=""><img src="figma-dot-small.svg" alt=""></span><span>видеть иначе</span></div>
+    <div class="compass" aria-label="Интерактивный компас"><img class="compass__base" src="compass-base.svg" alt=""><img class="compass__needle" src="compass-needle.svg" alt=""></div>
+    <i class="cross cross--left" aria-hidden="true">＋</i><i class="cross cross--right" aria-hidden="true">＋</i>
+    <p class="meta meta--left"><span>＋&nbsp; Листайте и&nbsp;исследуйте</span><span>&nbsp;&nbsp;&nbsp;&nbsp;пространство института</span></p><p class="meta meta--right"><span>Москва&nbsp; /&nbsp; Online</span><span>Приём заявок открыт</span></p>
+  </main>
+
+  <!-- Шторка поднимается снизу, фиксируется, и в ней сменяются фразы. -->
+  <div class="veil-track" id="veil-track">
+    <section class="veil" id="veil" aria-label="Философия">
+      <div class="veil__phrases">
+        <p class="veil__line" data-line>Мысль рождается в&nbsp;слове</p>
+        <p class="veil__line" data-line>Слово формирует влияние</p>
+        <p class="veil__line" data-line>Влияние формирует реальность</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- Философия: блок прилипает, и прокрутка листает ленту по горизонтали.
+       Страница идёт дальше только когда доехала последняя карточка. -->
+  <div class="philosophy-track" id="philosophy-track">
+  <section class="philosophy philosophy--v2" aria-label="Философия">
+    <div class="chrome chrome--section chrome--dark" aria-hidden="true">
+      <span class="chrome__toggle" aria-hidden="true"><i></i><i></i><i></i></span><span class="chrome__brand"><img src="HERO/10%20%E2%80%94%20EYE/%D0%9B%D0%9E%D0%93%D0%9E%D0%9B%D0%9E%D0%93%D0%9E.svg" alt=""></span>
+      <span class="chrome__cta"><span class="chrome__cta-label chrome__cta-label--desktop">Запросить участие</span><span class="chrome__cta-label chrome__cta-label--mobile">Участие</span><img src="figma-arrow.svg" alt=""></span>
+      <p class="chrome__meta chrome__meta--left"><span>＋&nbsp; Листайте и&nbsp;исследуйте</span><span>&nbsp;&nbsp;&nbsp;&nbsp;пространство института</span></p>
+      <p class="chrome__meta chrome__meta--right"><span>Москва&nbsp; /&nbsp; Online</span><span>Приём заявок открыт</span></p>
+    </div>
+    <h2 class="philosophy__title">Философия</h2>
+    <div class="philosophy__rail">
+      <article class="pcard pcard--red pcard--brand">
+        <picture><source media="(min-width:1200px)" srcset="cards/card-silk-lg.jpg"><img class="pcard__media" loading="lazy" decoding="async" src="cards/card-silk-sm.jpg" alt="" decoding="async"></picture>
+        <div class="pcard__brand">
+          <img src="cards/logo-big.svg" alt="">
+          <p class="pcard__brand-name">The Performance</p>
+          <p class="pcard__brand-note">Пространство на&nbsp;пересечении культуры, образования и&nbsp;лидерства.</p>
+        </div>
+        
+      </article>
+
+      <article class="pcard pcard--green">
+        <picture><source media="(min-width:1200px)" srcset="cards/card-green-lg.jpg"><img class="pcard__media" loading="lazy" decoding="async" src="cards/card-green-sm.jpg" alt="" decoding="async"></picture>
+        <div class="pcard__badges">
+          <span class="pcard__badge">01</span><span class="pcard__badge">принцип</span>
+        </div>
+        <div class="pcard__copy">
+          <h3 class="pcard__name">Мыслить через слово</h3>
+          <p class="pcard__note">Речь развивает интеллект, а&nbsp;не&nbsp;украшает его</p>
+        </div>
+      </article>
+
+      <article class="pcard pcard--light">
+        <picture><source media="(min-width:1200px)" srcset="cards/card-bird-lg.jpg"><img class="pcard__media" loading="lazy" decoding="async" src="cards/card-bird-sm.jpg" alt="" decoding="async"></picture>
+        <div class="pcard__badges">
+          <span class="pcard__badge">02</span><span class="pcard__badge">принцип</span>
+        </div>
+        <div class="pcard__copy">
+          <h3 class="pcard__name">Формировать влияние</h3>
+          <p class="pcard__note">Говорить так, чтобы менялась не&nbsp;тема разговора, а&nbsp;положение дел</p>
+        </div>
+      </article>
+
+      <article class="pcard pcard--dark">
+        <picture><source media="(min-width:1200px)" srcset="cards/card-deep-lg.jpg"><img class="pcard__media" loading="lazy" decoding="async" src="cards/card-deep-sm.jpg" alt="" decoding="async"></picture>
+        <div class="pcard__badges">
+          <span class="pcard__badge">03</span><span class="pcard__badge">принцип</span>
+        </div>
+        <div class="pcard__copy">
+          <h3 class="pcard__name">Соединять культуру и&nbsp;лидерство</h3>
+          <p class="pcard__note">Влияние без&nbsp;фундамента&nbsp;—<br>громкость</p>
+        </div>
+      </article>
+    </div>
+  </section>
+  </div>
+
+  <!-- ═════════ ЗОНА НИЖЕ ГРАНИЦЫ · v4 ═════════
+       Класс circle-section оставлен как крючок: по нему существующий скрипт
+       выбирает, чья шапка горит — «Философии» или этой зоны. -->
+  <div class="circle-section zone" id="zone">
+    <div class="chrome chrome--section chrome--dark zone__chrome" id="zone-chrome">
+      <span class="chrome__toggle" aria-hidden="true"><i></i><i></i><i></i></span><span class="chrome__brand" aria-hidden="true"><img src="HERO/10%20%E2%80%94%20EYE/%D0%9B%D0%9E%D0%93%D0%9E%D0%9B%D0%9E%D0%93%D0%9E.svg" alt=""></span>
+      <a class="chrome__cta" href="https://t.me/theperformance_assistant" target="_blank" rel="noopener"><span class="chrome__cta-label chrome__cta-label--desktop">Запросить участие</span><span class="chrome__cta-label chrome__cta-label--mobile">Участие</span><img src="figma-arrow.svg" alt=""></a>
+    </div>
+
+    <!-- 1. Среда единомышленников.
+         Линии строк обрываются на круге сферы и продолжаются выносками
+         к узлам на кольцах: строка и её кольцо связаны проводом. -->
+    <section class="env" id="env" data-theme="light" aria-labelledby="env-title">
+      <header class="g env__head">
+        <h2 class="h-sec a-rise" id="env-title" data-in><span class="ln"><span class="ln__i">Среда</span></span><span class="ln"><span class="ln__i">единомышленников</span></span></h2>
+        <p class="t env__intro a-fade" data-in style="--d:260ms">Наш институт объединяет людей действия, которые уже состоялись в&nbsp;своих индустриях, но&nbsp;ощущают потребность в&nbsp;обретении нового уровня коммуникационной свободы.</p>
+      </header>
+      <div class="env__body" id="env-body">
+        <svg class="env__sphere" id="env-sphere" viewBox="-300 -300 600 600" aria-hidden="true">
+          <defs>
+            <radialGradient id="bead" cx="38%" cy="34%" r="80%"><stop offset="0" stop-color="#A71F1F"/><stop offset=".5" stop-color="#6E1B1B"/><stop offset="1" stop-color="#161514"/></radialGradient>
+          </defs>
+        </svg>
+        <svg class="env__wires" id="env-wires" aria-hidden="true"></svg>
+        <div class="env__list" id="env-list">
+          <div class="env__cap" data-in><span class="hr a-rule env__rule" style="--d:380ms"></span></div>
+          <div class="env__row" data-in><span class="small env__num a-fade" style="--d:60ms">01</span><div class="env__who"><h3 class="env__role a-rise" style="--d:100ms"><span class="ln"><span class="ln__i">Предприниматели</span></span></h3><p class="t env__note a-fade" style="--d:320ms">Которым важно доносить&nbsp;идеи</p></div><span class="hr a-rule env__rule" style="--d:420ms"></span></div>
+          <div class="env__row" data-in><span class="small env__num a-fade" style="--d:60ms">02</span><div class="env__who"><h3 class="env__role a-rise" style="--d:100ms"><span class="ln"><span class="ln__i">Преподаватели</span></span></h3><p class="t env__note a-fade" style="--d:320ms">Которым важно формировать мышление</p></div><span class="hr a-rule env__rule" style="--d:420ms"></span></div>
+          <div class="env__row" data-in><span class="small env__num a-fade" style="--d:60ms">03</span><div class="env__who"><h3 class="env__role a-rise" style="--d:100ms"><span class="ln"><span class="ln__i">Руководители</span></span></h3><p class="t env__note a-fade" style="--d:320ms">Которым важно вести за&nbsp;собой</p></div><span class="hr a-rule env__rule" style="--d:420ms"></span></div>
+          <div class="env__row" data-in><span class="small env__num a-fade" style="--d:60ms">04</span><div class="env__who"><h3 class="env__role a-rise" style="--d:100ms"><span class="ln"><span class="ln__i">Исследователи</span></span></h3><p class="t env__note a-fade" style="--d:320ms">Которым важно быть&nbsp;понятыми</p></div><span class="hr a-rule env__rule" style="--d:420ms"></span></div>
+          <div class="env__row" data-in><span class="small env__num a-fade" style="--d:60ms">05</span><div class="env__who"><h3 class="env__role a-rise" style="--d:100ms"><span class="ln"><span class="ln__i">Авторы</span></span></h3><p class="t env__note a-fade" style="--d:320ms">Которым важно звучать&nbsp;точно</p></div><span class="hr a-rule env__rule" style="--d:420ms"></span></div>
+        </div>
+      </div>
+      <div class="g env__foot">
+        <p class="small plate" data-in><span class="a-fade" style="--d:300ms">Лист&nbsp;I&nbsp;/&nbsp;VII</span></p>
+        <p class="small env__mark" data-in><span class="a-fade" style="--d:420ms">55°45′ N&nbsp;&nbsp;37°37′ E</span><span class="a-fade env__index" style="--d:520ms"><span id="env-index">01</span>&nbsp;/&nbsp;05</span></p>
+      </div>
+    </section>
+
+    <!-- 2. Развитие компетенций.
+         Десять названий — сплошным текстом, который обтекает фигуру по кругу.
+         Названия лежат в разметке: без скрипта они на месте. -->
+    <section class="comp dark" id="comp" data-theme="dark" aria-labelledby="comp-title">
+      <h2 class="h-sec a-rise" id="comp-title" data-in><span class="ln"><span class="ln__i">Развитие компетенций</span></span></h2>
+      <div class="comp__wall" id="comp-wall" data-in>
+        <div class="comp__shape" id="comp-shape" aria-hidden="true">
+          <svg class="comp__svg" id="comp-svg">
+            <defs>
+              <linearGradient id="facet" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#A71F1F"/><stop offset=".6" stop-color="#6E1B1B"/><stop offset="1" stop-color="#6E1B1B" stop-opacity=".12"/></linearGradient>
+            </defs>
+            <g id="comp-orbit"></g>
+            <g id="comp-faces"></g>
+            <g id="comp-edges"></g>
+            <g id="comp-verts"></g>
+            <g id="comp-lead"></g>
+          </svg>
+        </div>
+        <ul class="comp__names" id="comp-names">
+          <li class="comp__name a-pop" style="--d:120ms"><span class="nw"><i class="small">01</i>Мышление<span class="comp__sep" aria-hidden="true">/</span></span></li>
+          <li class="comp__name a-pop" style="--d:200ms"><span class="nw"><i class="small">02</i>Публичная</span> <span class="nw">речь<span class="comp__sep" aria-hidden="true">/</span></span></li>
+          <li class="comp__name a-pop" style="--d:280ms"><span class="nw"><i class="small">03</i>Речь<span class="comp__sep" aria-hidden="true">/</span></span></li>
+          <li class="comp__name a-pop" style="--d:360ms"><span class="nw"><i class="small">04</i>Аргументация<span class="comp__sep" aria-hidden="true">/</span></span></li>
+          <li class="comp__name a-pop" style="--d:440ms"><span class="nw"><i class="small">05</i>Присутствие<span class="comp__sep" aria-hidden="true">/</span></span></li>
+          <li class="comp__name a-pop" style="--d:520ms"><span class="nw"><i class="small">06</i>Харизма<span class="comp__sep" aria-hidden="true">/</span></span></li>
+          <li class="comp__name a-pop" style="--d:600ms"><span class="nw"><i class="small">07</i>Культурный</span> <span class="nw">кругозор<span class="comp__sep" aria-hidden="true">/</span></span></li>
+          <li class="comp__name a-pop" style="--d:680ms"><span class="nw"><i class="small">08</i>Лидерская</span> <span class="nw">коммуникация<span class="comp__sep" aria-hidden="true">/</span></span></li>
+          <li class="comp__name a-pop" style="--d:760ms"><span class="nw"><i class="small">09</i>Стиль</span> <span class="nw">и&nbsp;этикет<span class="comp__sep" aria-hidden="true">/</span></span></li>
+          <li class="comp__name a-pop" style="--d:840ms"><span class="nw"><i class="small">10</i>Интеллектуальная</span> <span class="nw">уверенность</span></li>
+        </ul>
+        <p class="t comp__para a-fade" style="--d:980ms">Мы не&nbsp;тренируем шаблоны. Мы последовательно пересобираем 10&nbsp;фундаментальных граней вашего проявления в&nbsp;мире.</p>
+      </div>
+      <p class="small plate" data-in><span class="a-fade" style="--d:300ms">Лист&nbsp;II&nbsp;/&nbsp;VII</span></p>
+    </section>
+
+    <!-- 3. Школа.
+         Луч выходит из призмы и становится верхней линейкой записи:
+         отдельных разделителей у записей нет. -->
+    <section class="school" id="school" data-theme="light" aria-labelledby="school-title">
+      <svg class="school__rays" id="school-rays" aria-hidden="true"></svg>
+      <div class="g school__main">
+        <div class="school__aside">
+          <header class="school__head">
+            <h2 class="h-sec a-rise" id="school-title" data-in><span class="ln"><span class="ln__i">Школа</span></span></h2>
+            <p class="t a-fade" data-in style="--d:260ms">Учебный процесс структурирован по&nbsp;трём ключевым направлениям, каждое из&nbsp;которых закрывает определённый пласт личной проявленности.</p>
+          </header>
+          <div class="school__prism" id="school-prism">
+            <svg viewBox="0 0 300 260" aria-hidden="true">
+              <defs>
+                <linearGradient id="glass" x1="1" y1=".9" x2="0" y2=".35"><stop offset="0" stop-color="#A71F1F" stop-opacity=".92"/><stop offset=".34" stop-color="#6E1B1B" stop-opacity=".62"/><stop offset=".78" stop-color="#6E1B1B" stop-opacity="0"/></linearGradient>
+                <clipPath id="tri"><path d="M150 14L288 246H12Z"/></clipPath>
+              </defs>
+              <path id="prism-glass" d="M150 14L288 246H12Z" fill="url(#glass)"/>
+              <g clip-path="url(#tri)"><g id="prism-hatch" stroke="#161514" stroke-width="1" opacity=".5">
+                <path d="M136 -20L296 250M148 -20L308 250M160 -20L320 250M172 -20L332 250M184 -20L344 250M196 -20L356 250M208 -20L368 250M220 -20L380 250M232 -20L392 250M244 -20L404 250"/>
+              </g></g>
+              <g fill="none" stroke="#161514" stroke-linejoin="round">
+                <path id="prism-outline" d="M150 14L288 246H12Z" stroke-width="1.4" pathLength="1"/>
+                <g id="prism-detail">
+                  <path d="M150 36L266 232H34Z" stroke-width="1" stroke-dasharray="1 4" opacity=".7"/>
+                  <path d="M150 14V246" stroke-width="1" stroke-dasharray="1 9" opacity=".6"/>
+                  <path d="M142 246v12M158 246v12M150 246v18M4 246H-8M296 246h12" stroke-width="1" opacity=".7"/>
+                  <circle cx="150" cy="14" r="3.2" fill="#F1ECEC" stroke-width="1.2"/>
+                  <circle cx="288" cy="246" r="3.2" fill="#F1ECEC" stroke-width="1.2"/>
+                  <circle cx="12" cy="246" r="3.2" fill="#F1ECEC" stroke-width="1.2"/>
+                </g>
+              </g>
+            </svg>
+          </div>
+        </div>
+        <div class="school__list">
+          <article class="entry" data-in>
+            <span class="hr a-rule entry__rule"></span>
+            <span class="entry__num a-rise"><span class="ln"><span class="ln__i">I</span></span></span>
+            <div class="entry__body">
+              <h3 class="entry__name a-fade" style="--d:140ms">Публичное слово</h3>
+              <p class="t entry__desc a-fade" style="--d:260ms">Фокус на&nbsp;физическом раскрепощении, постановке подлинного, глубокого тембра и&nbsp;работе со&nbsp;сложной сценической аудиторией.</p>
+              <ul class="entry__progs">
+                <li><span class="hr a-rule" style="--d:360ms"></span><span class="a-fade" style="--d:400ms">Перформанс.Акт</span><span class="small a-fade" style="--d:400ms">01</span></li>
+                <li><span class="hr a-rule" style="--d:440ms"></span><span class="a-fade" style="--d:480ms">Перформанс.Левитан</span><span class="small a-fade" style="--d:480ms">02</span></li>
+                <li class="entry__go"><span class="hr a-rule" style="--d:520ms"></span><a class="a-fade" style="--d:600ms" href="https://t.me/theperformance_assistant" target="_blank" rel="noopener"><span>Запросить участие</span><img src="figma-arrow.svg" alt=""></a><span class="hr a-rule" style="--d:560ms"></span></li>
+              </ul>
+            </div>
+          </article>
+          <article class="entry" data-in>
+            <span class="hr a-rule entry__rule"></span>
+            <span class="entry__num a-rise"><span class="ln"><span class="ln__i">II</span></span></span>
+            <div class="entry__body">
+              <h3 class="entry__name a-fade" style="--d:140ms">Личное влияние</h3>
+              <p class="t entry__desc a-fade" style="--d:260ms">Исследование невербальных сигналов, этических рамок высшего общества и&nbsp;создание магнетического персонального бренда.</p>
+              <ul class="entry__progs">
+                <li><span class="hr a-rule" style="--d:360ms"></span><span class="a-fade" style="--d:400ms">Перформанс.Психофизика</span><span class="small a-fade" style="--d:400ms">01</span></li>
+                <li><span class="hr a-rule" style="--d:440ms"></span><span class="a-fade" style="--d:480ms">Перформанс.Речь</span><span class="small a-fade" style="--d:480ms">02</span></li>
+                <li><span class="hr a-rule" style="--d:520ms"></span><span class="a-fade" style="--d:560ms">Перформанс.Присутствие</span><span class="small a-fade" style="--d:560ms">03</span></li>
+                <li><span class="hr a-rule" style="--d:600ms"></span><span class="a-fade" style="--d:640ms">Перформанс.Стиль &amp;&nbsp;Этикет</span><span class="small a-fade" style="--d:640ms">04</span></li>
+                <li class="entry__go"><span class="hr a-rule" style="--d:680ms"></span><a class="a-fade" style="--d:760ms" href="https://t.me/theperformance_assistant" target="_blank" rel="noopener"><span>Запросить участие</span><img src="figma-arrow.svg" alt=""></a><span class="hr a-rule" style="--d:720ms"></span></li>
+              </ul>
+            </div>
+          </article>
+          <article class="entry" data-in>
+            <span class="hr a-rule entry__rule"></span>
+            <span class="entry__num a-rise"><span class="ln"><span class="ln__i">III</span></span></span>
+            <div class="entry__body">
+              <h3 class="entry__name a-fade" style="--d:140ms">Культурное лидерство</h3>
+              <p class="t entry__desc a-fade" style="--d:260ms">Интеграция гуманитарных знаний, философии искусства и&nbsp;политологии в&nbsp;личные выступления для создания долгосрочных смысловых изменений.</p>
+              <ul class="entry__progs">
+                <li><span class="hr a-rule" style="--d:360ms"></span><span class="a-fade" style="--d:400ms">Перформанс.Влияние</span><span class="small a-fade" style="--d:400ms">01</span></li>
+                <li class="entry__go"><span class="hr a-rule" style="--d:440ms"></span><a class="a-fade" style="--d:520ms" href="https://t.me/theperformance_assistant" target="_blank" rel="noopener"><span>Запросить участие</span><img src="figma-arrow.svg" alt=""></a><span class="hr a-rule" style="--d:480ms"></span></li>
+              </ul>
+            </div>
+          </article>
+        </div>
+      </div>
+      <p class="small plate" data-in><span class="a-fade" style="--d:300ms">Лист&nbsp;III&nbsp;/&nbsp;VII</span></p>
+    </section>
+
+    <!-- 4. Философский клуб.
+         Небо — отдельный слой под содержимым: купол обрезает только его,
+         поэтому фотография может свисать ниже границы блока. -->
+    <section class="club dark" id="club" data-theme="dark" aria-labelledby="club-title">
+      <div class="club__night" id="club-night" aria-hidden="true">
+        <svg class="club__grid" id="club-grid"></svg>
+        <svg class="club__sky" id="club-sky">
+          <defs>
+            <radialGradient id="halo"><stop offset="0" stop-color="#A71F1F" stop-opacity=".95"/><stop offset=".4" stop-color="#6E1B1B" stop-opacity=".5"/><stop offset="1" stop-color="#6E1B1B" stop-opacity="0"/></radialGradient>
+          </defs>
+        </svg>
+        <div class="club__names" id="club-names"></div>
+      </div>
+      <div class="g club__body">
+        <h2 class="h-sec a-rise" id="club-title" data-in><span class="ln"><span class="ln__i">Философский</span></span><span class="ln"><span class="ln__i">клуб</span></span></h2>
+        <p class="small club__tag" data-in><span class="a-fade" style="--d:400ms">Закрытое сообщество</span></p>
+        <div class="club__field" id="club-field" data-in></div>
+        <div class="club__copy" data-in>
+          <p class="club__lead a-rise"><span class="ln"><span class="ln__i">Пространство для&nbsp;тех,</span></span><span class="ln"><span class="ln__i">кто не&nbsp;ищет лёгких тем</span></span></p>
+          <p class="t a-fade" style="--d:420ms">Закрытые встречи, ужины, дискуссии, лекции, интеллектуальные путешествия. То, что помогает развиваться в&nbsp;сильном окружении.</p>
+          <p class="small club__ctx a-fade" style="--d:520ms">философия / культура / бизнес / наука / общество / лидерство</p>
+        </div>
+        <!-- Фото делает заказчица: вертикаль 4:5, не меньше 1600×2000.
+             Стол после ужина — руки, бокалы, свечи; без лиц; тёплый красный свет. -->
+        <div class="club__photo" id="club-photo" data-in><div class="shot a-clip">
+          <div class="ph"></div><span class="small ph__note">Фото · 4:5 · 1600×2000<br>стол после ужина, без&nbsp;лиц</span>
+        </div></div>
+      </div>
+      <p class="small plate" data-in><span class="a-fade" style="--d:300ms">Лист&nbsp;IV&nbsp;/&nbsp;VII</span></p>
+    </section>
+
+    <!-- 5. Манифест. Четыре строки лесенкой; первая фраза — строки 1–2,
+         вторая — строки 3–4. -->
+    <div class="manifest-track" id="manifest-track" data-theme="light">
+      <section class="manifest" id="manifest" aria-label="Манифест">
+        <div class="manifest__stack">
+        <p class="manifest__q" id="manifest-q"><span class="manifest__line" data-letters data-phrase="0"><span class="lq" data-keep>«</span>Мы собираем</span> <span class="manifest__line" data-letters data-phrase="0">не&nbsp;клиентов.</span> <span class="manifest__line" data-letters data-phrase="1">Мы формируем</span> <span class="manifest__line" data-letters data-phrase="1">среду.»</span></p>
+        <div class="manifest__side" id="manifest-side">
+          <p class="t a-fade">Большинство программ доступны после знакомства с&nbsp;кандидатом и&nbsp;собеседования. Это помогает сохранять качество образовательного пространства и&nbsp;высокий уровень участников.</p>
+          <a class="btn a-fade" style="--d:200ms" href="https://t.me/theperformance_assistant" target="_blank" rel="noopener">Запросить интервью <img src="figma-arrow.svg" alt=""></a>
+        </div>
+        </div>
+        <p class="small plate"><span>Лист&nbsp;V&nbsp;/&nbsp;VII</span></p>
+      </section>
+    </div>
+
+    <!-- 6. Основатель. Заголовок и девиз — над портретом; записи справа
+         начинаются от верха блока. -->
+    <section class="founder" id="founder" data-theme="light" aria-labelledby="founder-title">
+      <div class="founder__left">
+        <h2 class="h-sec a-rise" id="founder-title" data-in><span class="ln"><span class="ln__i">Основатель</span></span></h2>
+        <p class="founder__lead a-fade" data-in style="--d:220ms">Слово как манифест личности</p>
+        <!-- Портрет делает заказчица: вертикаль 4:5, не меньше 1600×2000,
+             тёмный фон, взгляд мимо камеры. -->
+        <div class="founder__photo" id="founder-photo">
+          <div class="shot" id="founder-shot"><div class="ph" id="founder-ph"></div><span class="small ph__note">Портрет · 4:5 · 1600×2000<br>тёмный фон, взгляд мимо камеры</span></div>
+          <i class="crop crop--tr" aria-hidden="true"></i>
+          <p class="small founder__cap" id="founder-cap" data-letters>Натали Дюваль&nbsp;&nbsp;—&nbsp;&nbsp;основатель института</p>
+        </div>
+      </div>
+      <dl class="founder__rows" id="founder-rows">
+        <div class="founder__row" data-in><span class="hr a-rule"></span><span class="small founder__n a-fade" style="--d:120ms">1</span><dt class="a-rise" style="--d:160ms"><span class="ln"><span class="ln__i">История создания школы</span></span></dt><dd class="t a-fade" style="--d:340ms">ПЕРФОРМАНС вырос из&nbsp;идеи, что технические навыки ораторского искусства мертвы без&nbsp;внутреннего интеллектуального масштаба говорящего.</dd></div>
+        <div class="founder__row" data-in><span class="hr a-rule"></span><span class="small founder__n a-fade" style="--d:120ms">2</span><dt class="a-rise" style="--d:160ms"><span class="ln"><span class="ln__i">Почему появилась идея</span></span></dt><dd class="t a-fade" style="--d:340ms">Современный мир переполнен шумом. Мы хотели вернуть ценность взвешенному, глубокому высказыванию, которое меняет реальность вокруг себя.</dd></div>
+        <div class="founder__row" data-in><span class="hr a-rule"></span><span class="small founder__n a-fade" style="--d:120ms">3</span><dt class="a-rise" style="--d:160ms"><span class="ln"><span class="ln__i">Во что я верю</span></span></dt><dd class="t a-fade" style="--d:340ms">Я верю в&nbsp;силу культурных ассоциаций, безупречный вкус и&nbsp;в&nbsp;то, что великие лидеры всегда говорят на&nbsp;собственном, аутентичном языке.</dd></div>
+        <div class="founder__end" data-in><span class="hr a-rule" style="--d:200ms"></span><p class="small plate plate--flow"><span class="a-fade" style="--d:400ms">Лист&nbsp;VI&nbsp;/&nbsp;VII</span></p></div>
+      </dl>
+    </section>
+
+    <!-- 7. Контакт и подвал. Компас — во весь экран, текст стоит поверх колец. -->
+    <section class="contact dark" id="contact" data-theme="dark" aria-label="Запрос на участие">
+      <div class="contact__stage" id="contact-stage">
+        <div class="contact__compass" id="contact-compass" aria-hidden="true">
+          <svg viewBox="0 0 600 600" id="contact-base">
+            <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <g data-ring="6" stroke-width="1" opacity=".5">
+                <path d="M34 300H566M300 34V566"/>
+                <path d="M150 150L450 450M450 150L150 450" opacity=".54"/>
+                <path d="M47 292h18M47 308h18M535 292h18M535 308h18M292 47v18M308 47v18"/>
+              </g>
+              <g id="contact-bezel" data-ring="7" stroke-width="1" opacity=".5"></g>
+              <g opacity=".6">
+                <circle data-ring="5" cx="300" cy="300" r="206" stroke-width="1" stroke-dasharray="1 9"/>
+                <circle data-ring="5" cx="300" cy="300" r="190" stroke-width="1"/>
+                <circle data-ring="4" cx="300" cy="300" r="178" stroke-width="1" stroke-dasharray="1 4"/>
+                <circle data-ring="4" cx="300" cy="300" r="165" stroke-width="1"/>
+                <circle data-ring="3" cx="300" cy="300" r="155" stroke-width="1" stroke-dasharray=".5 4"/>
+                <circle data-ring="3" cx="300" cy="300" r="143" stroke-width="1"/>
+                <circle data-ring="2" cx="300" cy="300" r="127" stroke-width="1" stroke-dasharray="1 5"/>
+                <circle data-ring="2" cx="300" cy="300" r="115" stroke-width="1"/>
+                <circle data-ring="1" cx="300" cy="300" r="101" stroke-width="1" stroke-dasharray="1.2 3.5"/>
+              </g>
+              <g data-ring="6" stroke-width="1" opacity=".8">
+                <path d="M300 88v40M88 300h40M472 300h40"/>
+                <path d="M300 120l-7 9h14zM120 300l9-7v14zM480 300l-9-7v14z" fill="currentColor"/>
+              </g>
+              <g data-ring="6" stroke-width="1" opacity=".7">
+                <path d="M300 94A206 206 0 0 1 506 300M300 94A206 206 0 0 0 94 300" stroke-dasharray="3 6"/>
+              </g>
+              <g data-ring="0">
+                <circle cx="300" cy="300" r="88" fill="#111111" stroke-width="1"/>
+                <circle cx="300" cy="300" r="81" stroke-width="1" stroke-dasharray="1 3"/>
+                <circle cx="300" cy="300" r="61" stroke-width="1"/>
+              </g>
+            </g>
+          </svg>
+          <svg class="contact__needle" id="contact-needle" viewBox="0 0 600 600">
+            <defs>
+              <!-- Кончик стрелки: красный приходит градиентом и уходит в тёмное. -->
+              <linearGradient id="tip" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#A71F1F"/><stop offset=".7" stop-color="#6E1B1B"/><stop offset="1" stop-color="#2A2724"/></linearGradient>
+            </defs>
+            <g transform="translate(300 300)">
+              <path d="M-10 10L-206 206L-45 24Z" fill="#2A2724" stroke="#EFEAE4" stroke-width="1.2" stroke-linejoin="round"/>
+              <path d="M-14-14L202-202L30-8Z" fill="#2A2724" stroke="#EFEAE4" stroke-width="1.2" stroke-linejoin="round"/>
+              <path d="M-7-30L202-202L14-14Z" fill="#EFEAE4" opacity=".92"/>
+              <path d="M178-186L221-222L190-172Z" fill="url(#tip)"/>
+              <circle r="19" fill="#111111" stroke="#EFEAE4" stroke-width="1.2"/>
+              <circle r="11" fill="#EFEAE4"/>
+              <circle r="4" fill="#111111"/>
+            </g>
+          </svg>
+        </div>
+        <div class="g contact__grid">
+          <p class="contact__phrase" id="contact-phrase" data-in data-words>Если вам близка философия ПЕРФОРМАНС, напишите нам.</p>
+          <div class="contact__ask" data-in>
+            <p class="t a-fade" style="--d:300ms">Расскажите о&nbsp;себе и&nbsp;сформулируйте свой запрос.</p>
+            <a class="btn a-fade" style="--d:450ms" href="https://t.me/theperformance_assistant" target="_blank" rel="noopener" data-aim>Запросить участие <img src="figma-arrow.svg" alt=""></a>
+          </div>
+          <div class="contact__links" data-in>
+            <span class="hr a-rule" style="--d:300ms"></span>
+            <a href="mailto:welcome@theperformance.club" data-aim><span class="small a-fade" style="--d:360ms">Почта</span><span class="a-fade" style="--d:360ms">welcome@theperformance.club</span><span class="hr a-rule" style="--d:390ms"></span></a>
+            <a href="https://t.me/theperformance_assistant" target="_blank" rel="noopener" data-aim><span class="small a-fade" style="--d:450ms">Telegram</span><span class="a-fade" style="--d:450ms">@theperformance_assistant</span><span class="hr a-rule" style="--d:480ms"></span></a>
+          </div>
+        </div>
+        <p class="small plate" data-in><span class="a-fade" style="--d:300ms">Лист&nbsp;VII&nbsp;/&nbsp;VII</span></p>
+      </div>
+      <footer class="g foot small">
+        <div class="foot__brand"><img src="HERO/10%20%E2%80%94%20EYE/%D0%9B%D0%9E%D0%93%D0%9E%D0%9B%D0%9E%D0%93%D0%9E.svg" alt="The Performance"></div>
+        <div class="foot__col"><b>Институт</b><a href="#">Манифест</a><a href="#">Методология</a></div>
+        <div class="foot__col"><b>Развитие</b><a href="#">Направления</a><a href="#">Пути</a></div>
+        <div class="foot__col"><b>Пространство</b><a href="#">События</a><a href="#">Истории</a></div>
+        <div class="foot__col"><b>Медиа</b><a href="#">Публикации</a><a href="#">FAQ</a></div>
+        <p class="foot__legal"><span>© The Performance, 2016–2026</span><span>Москва&nbsp; /&nbsp; Online</span></p>
+      </footer>
+    </section>
+  </div>
+
+  <!-- Та же обвязка, что на первом экране: не двигается, только цвет. -->
+  <div class="chrome" id="chrome" aria-hidden="true">
+    <span class="chrome__toggle" aria-hidden="true"><i></i><i></i><i></i></span><span class="chrome__brand"><img src="HERO/10%20%E2%80%94%20EYE/%D0%9B%D0%9E%D0%93%D0%9E%D0%9B%D0%9E%D0%93%D0%9E.svg" alt=""></span>
+    <span class="chrome__cta"><span class="chrome__cta-label chrome__cta-label--desktop">Запросить участие</span><span class="chrome__cta-label chrome__cta-label--mobile">Участие</span><img src="figma-arrow.svg" alt=""></span>
+    <p class="chrome__meta chrome__meta--left"><span>＋&nbsp; Листайте и&nbsp;исследуйте</span><span>&nbsp;&nbsp;&nbsp;&nbsp;пространство института</span></p>
+    <p class="chrome__meta chrome__meta--right"><span>Москва&nbsp; /&nbsp; Online</span><span>Приём заявок открыт</span></p>
+  </div>
+
+  <i class="cursor-mark" aria-hidden="true"></i>
+  <script>
+    // Страховка: если заставка не довела себя до конца за 9 секунд (нет
+    // WebGL, ошибка внутри, свёрнутая вкладка), сайт открывается сам.
+    setTimeout(() => {
+      const preloader = document.querySelector('.preloader');
+      if (!preloader || preloader.classList.contains('is-complete')) return;
+      const hero = document.querySelector('.hero');
+      const compass = document.querySelector('.compass');
+      const needle = document.querySelector('.compass__needle');
+      document.documentElement.classList.remove('is-preloading');
+      document.documentElement.style.setProperty('--handoff','1');
+      const veil = document.querySelector('.veil');
+      if (veil) { veil.style.setProperty('--veil','1'); veil.style.setProperty('--handoff','1'); }
+      if (compass) { compass.style.opacity='1'; compass.classList.add('is-idle'); }
+      if (needle) needle.style.opacity='1';
+      if (hero) { hero.classList.remove('is-assembly'); hero.classList.add('is-revealing'); hero.classList.add('is-revealed'); }
+      preloader.classList.add('is-transitioning');
+      preloader.classList.add('is-complete');
+      document.querySelectorAll('#three-canvas,#preloader-particles').forEach(c => { c.width=c.height=0; c.style.display='none'; });
+      dispatchEvent(new Event('compass:interaction-ready'));
+    }, 9000);
+
+    // Библиотека грузится параллельно — ждём её появления, но не дольше
+    // шести секунд: дальше вступает страховка и открывает сайт.
+    const whenThree = (timeout = 6000) => new Promise(resolve => {
+      if (window.THREE) return resolve(true);
+      const started = Date.now();
+      const tick = () => {
+        if (window.THREE) return resolve(true);
+        if (Date.now() - started > timeout) return resolve(false);
+        setTimeout(tick, 40);
+      };
+      tick();
+    });
+
+    whenThree().then(ready => { if (ready) startGlobe(); });
+
+    function startGlobe() {
+    try {
+    (() => {
+      // Заставка укорочена: на медленном канале клиентка видела 8-14 секунд
+      // белого экрана и решила, что сайт не открылся. Сфера держится ровно
+      // столько, чтобы прочитать логотип, переход — вдвое быстрее прежнего.
+      // Сфера держится минимум столько — за это время догружается всё
+      // нужное для первого экрана и для ближайших блоков.
+      const HOLD_GLOBE = 1500;
+      // Верхний потолок ожидания: на плохой связи сайт не должен висеть
+      // белым бесконечно — показываем как есть, остальное дойдёт следом.
+      const ASSET_CEILING = 4000;
+      // Перетекание сферы в компас идёт в прежнем темпе: ускорение вдвое
+      // спасало не время загрузки (его держали ассеты), а только красоту —
+      // и читалось как дёрганое.
+      const TRANSITION = 4500;
+      const BG = 0xF1ECEC;
+      const INK = '#2B2B29';
+      const preloader = document.querySelector('.preloader');
+      const hero = document.querySelector('.hero');
+      const globeCanvas = document.querySelector('#three-canvas');
+      const particlesCanvas = document.querySelector('#preloader-particles');
+      const counter = document.querySelector('#counter');
+      const compass = document.querySelector('.compass');
+      const compassNeedle = document.querySelector('.compass__needle');
+      const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+      const startedAt = performance.now();
+      const renderer = new THREE.WebGLRenderer({ canvas:globeCanvas, antialias:true, alpha:true });
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(46, innerWidth / innerHeight, .1, 100);
+      const stage = new THREE.Group();
+      const material = new THREE.ShaderMaterial({
+        uniforms:{ map:{ value:null }, dissolve:{ value:0 } },
+        vertexShader:'varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }',
+        fragmentShader:'uniform sampler2D map; uniform float dissolve; varying vec2 vUv; float hash(vec2 p){ return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453123); } void main(){ vec4 c=texture2D(map,vUv); if(c.a<.04) discard; float cell=hash(floor(vUv*vec2(256.,144.))); float threshold=cell*.20+(1.-vUv.y)*.58; if(threshold<dissolve) discard; float a=smoothstep(.04,.11,c.a); if(gl_FrontFacing){gl_FragColor=vec4(c.rgb*a,a);}else{gl_FragColor=vec4(mix(c.rgb,vec3(.68),.72)*a,a*.42);}}',
+        transparent:true, side:THREE.DoubleSide, depthWrite:false
+      });
+      const globe = new THREE.Mesh(new THREE.SphereGeometry(.98, 96, 64), material);
+      let pointerX = 0;
+      let pointerY = 0;
+      let frame;
+      let transitionStarted = false;
+      let contentRevealStarted = false;
+      let needleArrivalStarted = false;
+      renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+      renderer.setClearColor(BG, 0);
+      scene.add(stage);
+      stage.add(globe);
+      globe.rotation.x = -.56;
+
+      const fitCamera = () => {
+        camera.fov = innerWidth < 768 ? 54 : 46;
+        camera.aspect = innerWidth / innerHeight;
+        camera.position.z = innerWidth < 768 ? 6.2 : 6;
+        camera.updateProjectionMatrix();
+        renderer.setSize(innerWidth, innerHeight);
+      };
+      let globeTextureCanvas;
+      const createTexture = () => {
+        const canvas = document.createElement('canvas');
+        const resolution = 2;
+        canvas.width = 2048 * resolution;
+        canvas.height = 1024 * resolution;
+        const context = canvas.getContext('2d');
+        context.setTransform(resolution, 0, 0, resolution, 0, 0);
+        context.textAlign = 'center';
+        context.textBaseline = 'middle';
+        context.fontKerning = 'normal';
+        const bands = [{ y:115,title:45,sub:20 },{ y:340,title:62,sub:25 },{ y:595,title:75,sub:29 },{ y:840,title:52,sub:22 }];
+        bands.forEach(({ y,title,sub }) => {
+          context.font = `400 ${title}px "Cormorant Garamond"`;
+          context.fillStyle = INK;
+          [340,1024,1708].forEach(x => context.fillText('PERFORMANCE', x, y));
+          context.font = `300 ${sub}px "Onest", sans-serif`;
+          context.fillStyle = 'rgba(43,43,41,.64)';
+          [341,1024,1707].forEach(x => context.fillText('ИНСТИТУТ КУЛЬТУРЫ ВЛИЯНИЯ', x, y + 61));
+        });
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.ClampToEdgeWrapping;
+        texture.minFilter = texture.magFilter = THREE.LinearFilter;
+        texture.generateMipmaps = false;
+        globeTextureCanvas = canvas;
+        return texture;
+      };
+      material.uniforms.map.value = createTexture();
+      fitCamera();
+      // Именованные обработчики: безымянные стрелки потом не снять, а они
+      // держат замыканием весь граф three.js и дёргают setSize на каждый
+      // resize уже невидимого канваса.
+      const trackPointer = event => {
+        pointerX = (event.clientX / innerWidth - .5) * 2;
+        pointerY = (event.clientY / innerHeight - .5) * 2;
+      };
+      addEventListener('pointermove', trackPointer, { passive:true });
+      addEventListener('resize', fitCamera, { passive:true });
+
+      const render = (now) => {
+        globe.rotation.y = now * .00019;
+        globe.rotation.z = .12 + Math.sin(now * .00022) * .018;
+        globe.position.y = .05 * Math.sin(now * .00031);
+        stage.rotation.y += (pointerX * .18 - stage.rotation.y) * .045;
+        stage.rotation.x += (-pointerY * .10 - stage.rotation.x) * .045;
+        renderer.render(scene, camera);
+        frame = requestAnimationFrame(render);
+      };
+      render(performance.now());
+      // Первая текстура 4096x2048 освобождается перед подменой, иначе она
+      // остаётся в видеопамяти рядом со второй.
+      const textureReady = Promise.all([document.fonts.load('400 80px "Cormorant Garamond"'), document.fonts.load('300 24px "Onest"')]).then(() => {
+        const previous = material.uniforms.map.value;
+        material.uniforms.map.value = createTexture();
+        previous?.dispose();
+      });
+      // Ждём не только шрифты и компас, но и фотографии первых блоков:
+      // без этого заставка уходила раньше картинок, и человек попадал на
+      // пустые тёмные карточки — «половина блоков не открылась».
+      const decodeAll = (nodes) => [...nodes].map(image => {
+        if (image.decode) return image.decode().catch(() => undefined);
+        if (image.complete) return Promise.resolve();
+        return new Promise(done => {
+          image.addEventListener('load', done, { once:true });
+          image.addEventListener('error', done, { once:true });
+        });
+      });
+      const criticalAssets = Promise.all([
+        textureReady,
+        document.fonts.ready,
+        // Ждём только то, что видно на первом экране. Фото «Философии»
+        // теперь грузятся отложенно — ждать их здесь значило бы держать
+        // заставку до конца их загрузки, а человек их ещё не скоро увидит.
+        ...decodeAll(document.querySelectorAll('.compass img'))
+      ]);
+
+      let pixelScale = 1;
+      const sizeParticles = () => {
+        const ratio = Math.min(devicePixelRatio || 1, 2);
+        // Размер берём у самого канваса, а не у окна: innerWidth включает
+        // полосу прокрутки, а канвас — нет. Из-за этих ~15px рисунок частиц
+        // сжимался по горизонтали и облако собиралось левее вектора.
+        const box = particlesCanvas.getBoundingClientRect();
+        const cssW = box.width || innerWidth;
+        const cssH = box.height || innerHeight;
+        particlesCanvas.width = Math.round(cssW * ratio);
+        particlesCanvas.height = Math.round(cssH * ratio);
+        const context = particlesCanvas.getContext('2d');
+        // Масштаб считаем из фактических размеров — тогда одна единица
+        // контекста равна ровно одному CSS-пикселю страницы.
+        pixelScale = particlesCanvas.width / cssW;
+        context.setTransform(pixelScale, 0, 0,
+                             particlesCanvas.height / cssH, 0, 0);
+        return context;
+      };
+      const ease = value => value * value * (3 - 2 * value);
+      const clamp01 = value => Math.min(1, Math.max(0, value));
+      const toWorld = (x, y) => {
+        const point = new THREE.Vector3(x / innerWidth * 2 - 1, -(y / innerHeight * 2 - 1), 0).unproject(camera);
+        const ray = point.sub(camera.position).normalize();
+        return camera.position.clone().add(ray.multiplyScalar(-camera.position.z / ray.z));
+      };
+      const updateCounter = () => {
+        if (transitionStarted) return;
+        const elapsed = performance.now() - startedAt;
+        counter.textContent = `${Math.min(94, Math.floor(elapsed / HOLD_GLOBE * 94))}%`;
+        requestAnimationFrame(updateCounter);
+      };
+      updateCounter();
+
+      const mix = (from, to, progress) => from + (to - from) * progress;
+      const shuffle = values => {
+        for (let index = values.length - 1; index > 0; index--) {
+          const swap = Math.floor(Math.random() * (index + 1));
+          [values[index], values[swap]] = [values[swap], values[index]];
+        }
+        return values;
+      };
+      const cellHash = (u, v) => {
+        const x = Math.floor(u * 256);
+        const y = Math.floor(v * 144);
+        const value = Math.sin(x * 127.1 + y * 311.7) * 43758.5453123;
+        return (value - Math.floor(value)) * .20 + (1 - v) * .58;
+      };
+      // The source points are sampled only from the dark pixels of the actual
+      // globe typography. Their UV cell is the same cell that dissolves in the
+      // globe shader, so letters visibly break into the very points that leave.
+      const sampleGlobeTypography = count => {
+        const context = globeTextureCanvas.getContext('2d', { willReadFrequently:true });
+        const { width, height } = globeTextureCanvas;
+        const pixels = context.getImageData(0, 0, width, height).data;
+        const candidates = [];
+        const occupied = new Set();
+        for (let y = 3; y < height; y += 4) {
+          for (let x = 3; x < width; x += 4) {
+            const offset = (y * width + x) * 4;
+            if (pixels[offset + 3] < 60 || pixels[offset] > 186) continue;
+            const u = x / width;
+            const v = y / height;
+            const key = `${Math.floor(u * 256)}:${Math.floor(v * 144)}`;
+            if (occupied.has(key)) continue;
+            occupied.add(key);
+            candidates.push({ u, v, dissolve:cellHash(u, v) });
+          }
+        }
+        const picked = shuffle(candidates).slice(0, count);
+        return Array.from({ length:count }, (_, index) => picked[index % picked.length]);
+      };
+      // Final coordinates are sampled from compass-base.svg itself. A small
+      // grid guard prevents a pile of fat dots on dark, thicker SVG strokes.
+      const sampleCompassBase = count => {
+        const base = compass.querySelector('.compass__base');
+        const map = document.createElement('canvas');
+        map.width = map.height = 600;
+        const mapContext = map.getContext('2d', { willReadFrequently:true });
+        // Только чистый вектор. Патина — это фактически второй компас со
+        // смещёнными кольцами: подмешанная в цели, она собирала частицы в
+        // два несовпадающих рисунка, и это читалось как раздвоение.
+        mapContext.drawImage(base, 0, 0, 600, 600);
+        const points = [];
+        const grid = new Set();
+        try {
+          const pixels = mapContext.getImageData(0, 0, 600, 600).data;
+          for (let y = 1; y < 599; y += 2) {
+            for (let x = 1; x < 599; x += 2) {
+              const offset = (y * 600 + x) * 4;
+              const alpha = pixels[offset + 3];
+              const brightness = (pixels[offset] + pixels[offset + 1] + pixels[offset + 2]) / 3;
+              const key = `${Math.floor(x / 3)}:${Math.floor(y / 3)}`;
+              if (alpha < 22 || brightness > 210 || grid.has(key) || Math.random() > .86) continue;
+              grid.add(key);
+              points.push({ x, y });
+            }
+          }
+        } catch (error) { /* the asset remains visible even if a file preview blocks pixel reads */ }
+        const fallback = Array.from({ length:count }, (_, index) => {
+          const angle = index * 2.399963;
+          const radius = 60 + (index % 310);
+          return { x:300 + Math.cos(angle) * radius, y:300 + Math.sin(angle) * radius };
+        });
+        const picked = shuffle(points);
+        return Array.from({ length:count }, (_, index) => picked[index % picked.length] || fallback[index]);
+      };
+      const projectGlobePoint = (u, v, output) => {
+        const phi = u * Math.PI * 2;
+        const theta = v * Math.PI;
+        output.set(-Math.cos(phi) * Math.sin(theta), Math.cos(theta), Math.sin(phi) * Math.sin(theta));
+        globe.localToWorld(output);
+        output.project(camera);
+        return { x:(output.x + 1) * innerWidth * .5, y:(1 - output.y) * innerHeight * .5 };
+      };
+      const animateTransition = () => new Promise(resolve => {
+        const context = sizeParticles();
+        const rect = compass.getBoundingClientRect();
+        const source = { x:innerWidth / 2, y:innerHeight / 2 };
+        const target = { x:rect.left + rect.width / 2, y:rect.top + rect.height / 2 };
+        const originWorld = new THREE.Vector3();
+        const targetWorld = toWorld(target.x, target.y);
+        const particleCount = innerWidth < 768 ? 3050 : 5600;
+        const sourcePoints = sampleGlobeTypography(particleCount);
+        const targetPoints = sampleCompassBase(particleCount);
+        const particles = sourcePoints.map((sourcePoint, index) => {
+          const point = targetPoints[index];
+          const dx = point.x - 300;
+          const dy = point.y - 300;
+          const radius = Math.hypot(dx, dy);
+          const angle = Math.atan2(dy, dx);
+          // Облако держится у будущего контура: точка разлетается недалеко
+          // от собственного места на компасе, а не в общее широкое поле.
+          // Иначе перед сборкой видно россыпь далеко за контуром.
+          // Разлёт как в версии, которая нравилась: широкое общее поле,
+          // большой угловой разброс — движение читается размашисто.
+          const fieldRadius = Math.min(rect.width * .40, Math.max(radius / 600 * rect.width, rect.width * (.07 + Math.random() * .34)));
+          const fieldAngle = angle + (Math.random() - .5) * 1.45;
+          return {
+            ...sourcePoint,
+            targetX:target.x + dx / 600 * rect.width,
+            targetY:target.y + dy / 600 * rect.height,
+            fieldX:target.x + Math.cos(fieldAngle) * fieldRadius,
+            fieldY:target.y + Math.sin(fieldAngle) * fieldRadius,
+            releaseJitter:Math.random() * .055,
+            buildDelay:radius / 300 * .07 + Math.random() * .09,
+            bend:(Math.random() - .5) * rect.width * .045,
+            size:.40 + Math.random() * .31,
+            ink:.94 + Math.random() * .18
+          };
+        });
+        const projector = new THREE.Vector3();
+        const transitionStart = performance.now();
+        transitionStarted = true;
+        hero.classList.add('is-assembly');
+        document.documentElement.classList.remove('is-preloading');
+        preloader.classList.add('is-transitioning');
+        counter.textContent = '100%';
+        const tick = now => {
+          const t = Math.min(1, (now - transitionStart) / TRANSITION);
+          const e = reduceMotion ? 1 : ease(t);
+          const lowering = ease(clamp01(e / .54));
+          const finalGlobeScale = innerWidth < 768 ? .83 : .9;
+          stage.position.lerpVectors(originWorld, targetWorld, lowering);
+          stage.scale.setScalar(mix(1, finalGlobeScale, lowering));
+          stage.updateMatrixWorld(true);
+          // This is a stencil dissolve, never a global alpha fade: individual
+          // glyph cells disappear as their matching particles are released.
+          material.uniforms.dissolve.value = clamp01(e / .257);
+          // Begin the permanent vector contour the moment the last particles
+          // reach their mapped SVG positions. This overlaps the two layers,
+          // rather than leaving a static particle-only hold before the compass.
+          // Один множитель на передачу: контур растёт как handoff, частицы
+          // гаснут как (1 - handoff). Сумма плотностей держится около
+          // единицы — нет ни наложения двух картинок, ни белого провала.
+          const handoff = ease(clamp01((e - .70) / .14));
+          compass.style.opacity = String(handoff);
+          compassNeedle.style.opacity = String(ease(clamp01((e - .80) / .12)));
+          if (!contentRevealStarted && e >= .32) {
+            contentRevealStarted = true;
+            hero.classList.add('is-revealing');
+            requestAnimationFrame(() => hero.classList.add('is-revealed'));
+          }
+          // Чистим по фактическому боксу канваса: по innerWidth правая
+          // полоса шириной со скроллбар оставалась бы неочищенной.
+          context.clearRect(0, 0, particlesCanvas.width / pixelScale, particlesCanvas.height / pixelScale);
+          if (!reduceMotion) {
+            particles.forEach(particle => {
+              const released = ease(clamp01((material.uniforms.dissolve.value - particle.dissolve - particle.releaseJitter) / .171));
+              if (released <= .001) return;
+              const sourcePoint = projectGlobePoint(particle.u, particle.v, projector);
+              const spread = ease(clamp01((e - .05 - particle.releaseJitter) / .190));
+          const assembly = ease(clamp01((e - .31 - particle.buildDelay) / .225));
+              const driftX = Math.cos((particle.u + e * .28) * 17) * particle.bend * (1 - assembly);
+              const driftY = Math.sin((particle.v - e * .22) * 19) * particle.bend * .55 * (1 - assembly);
+              const fieldX = mix(sourcePoint.x, particle.fieldX + driftX, spread);
+              const fieldY = mix(sourcePoint.y, particle.fieldY + driftY, spread);
+              const x = mix(fieldX, particle.targetX, assembly);
+              const y = mix(fieldY, particle.targetY, assembly);
+              // Keep the particles fine, but give a small portion more ink so
+              // the eye reads an actual material breakup rather than a fade.
+              const alpha = Math.min(.93, (.70 + assembly * .21) * released * particle.ink) * (1 - handoff);
+              context.globalAlpha = alpha;
+              context.fillStyle = INK;
+              context.fillRect(x - particle.size * .5, y - particle.size * .5, particle.size, particle.size);
+            });
+          }
+          if (t < 1) requestAnimationFrame(tick); else {
+            cancelAnimationFrame(frame);
+            compass.style.opacity = '1';
+            compassNeedle.style.opacity = '1';
+            hero.classList.remove('is-assembly');
+            if (!contentRevealStarted) {
+              hero.classList.add('is-revealing');
+              requestAnimationFrame(() => hero.classList.add('is-revealed'));
+            }
+            setTimeout(() => preloader.classList.add('is-complete'), 410);
+            // The needle settles only after the base has fully assembled. As
+            // soon as that tiny motion ends, desktop pointer control (or the
+            // mobile idle drift) is enabled — there is no invisible 3 s hold.
+            if (!needleArrivalStarted) {
+              needleArrivalStarted = true;
+              compass.classList.add('is-arriving');
+              setTimeout(() => {
+                compass.classList.remove('is-arriving');
+                compass.classList.add('is-idle');
+                window.dispatchEvent(new Event('compass:interaction-ready'));
+              }, 650);
+            }
+            // Видеопамять возвращаем ПОСЛЕ того, как прелоадер полностью
+            // исчез: раньше канвас стирался мгновенно, а белый слой гас ещё
+            // секунду — экран успевал «побелеть» поверх собранного компаса.
+            removeEventListener('pointermove', trackPointer);
+            removeEventListener('resize', fitCamera);
+            setTimeout(() => {
+              material.uniforms.map.value?.dispose();
+              material.dispose();
+              globe.geometry.dispose();
+              renderer.dispose();
+              renderer.forceContextLoss?.();
+              globeCanvas.width = globeCanvas.height = 0;
+              // Канвас частиц тоже освобождаем: это ещё ~33 МБ.
+              particlesCanvas.width = particlesCanvas.height = 0;
+            }, 1200);
+            resolve();
+          }
+        };
+        requestAnimationFrame(tick);
+      });
+
+      (async () => {
+        // Сначала ждём сами ресурсы (с потолком), и только потом добираем
+        // остаток минимального показа сферы. Прежний порядок обрывал
+        // ожидание по таймеру и выпускал страницу с недогруженными фото.
+        await Promise.race([criticalAssets, wait(ASSET_CEILING)]);
+        await wait(Math.max(0, HOLD_GLOBE - (performance.now() - startedAt)));
+        animateTransition();
+      })();
+    })();
+    } catch (error) {
+      // Любой сбой в заставке (нет WebGL, заблокированный canvas) раньше
+      // обрывал весь скрипт: блоки с фразами и «Философией» оставались
+      // скрытыми навсегда. Теперь сайт просто открывается без заставки.
+      console.warn('Заставка не запустилась:', error);
+    }
+    }
+
+    // ───────── Шторка + фразы ─────────
+    // Единственный источник истины — позиция прокрутки. Никаких «сработало
+    // один раз» флагов: любое состояние вычисляется заново на каждом кадре,
+    // поэтому скролл вверх отматывает всё симметрично и ничего не залипает.
+    (() => {
+      const track = document.querySelector('#veil-track');
+      const veil = document.querySelector('#veil');
+      const chrome = document.querySelector('#chrome');
+      if (!track || !veil) return;
+
+      // 12, а не 26: размытие — самая дорогая операция для видеокарты, а на
+      // пике его несут 26 букв разом. При 26px суммарный радиус доходил до
+      // 503 пикселей на кадр, и на слабых машинах прокрутка дёргалась.
+      // Медиазапрос считаем один раз, а не на каждом кадре прокрутки.
+      const NARROW_CHROME_MQ = matchMedia('(max-width:780px)');
+      const BLUR = 12;    // расфокус буквы в момент рождения
+      const WAVE = 0.14;  // разбег между первой и последней буквой
+      const RAMP = 0.19;  // проявление одной буквы
+      const HOLD = 0.18;  // пауза, когда фраза стоит резкой
+      // Доли всей прокрутки блока. Шторка поднимается примерно за два
+      // движения колеса — не рывком, но и без прокрутки вхолостую.
+      // Шторка и фразы разведены: шторка занимает короткий отрезок в начале
+      // (~2 движения трекпада), всё остальное отдано фразам, чтобы каждую
+      // успевали прочитать. Одним числом их регулировать нельзя — короткий
+      // трек ускоряет шторку и заодно съедает время на чтение.
+      // Трек длинный (460svh), поэтому доля шторки мала: 0.022 — это ~2
+      // движения трекпада, как и просили. Фразы получают весь остаток.
+      const VEIL_END = 0.022;
+      const CHROME_IN = 0.03; // обвязка перекрашивается ПОСЛЕ шторки
+      const PHRASES_FROM = 0.035; // и только потом начинаются фразы
+
+      const clamp01 = v => Math.min(1, Math.max(0, v));
+      const ease = v => v * v * (3 - 2 * v);
+
+      const lines = [...veil.querySelectorAll('[data-line]')].map(line => {
+        const words = line.textContent.trim().split(/ +/);
+        line.textContent = '';
+        const letters = [];
+        words.forEach((word, wordIndex) => {
+          const wordEl = document.createElement('span');
+          wordEl.className = 'w';
+          [...word].forEach(char => {
+            const letter = document.createElement('span');
+            letter.className = 'l';
+            letter.textContent = char;
+            wordEl.appendChild(letter);
+            letters.push(letter);
+          });
+          line.appendChild(wordEl);
+          if (wordIndex < words.length - 1) line.appendChild(document.createTextNode(' '));
+        });
+        line.style.gridArea = '1/1';
+        return { line, letters };
+      });
+      // Все фразы в одной точке: сменяются на месте, экран не двигается.
+      const holder = veil.querySelector('.veil__phrases');
+      holder.style.display = 'grid';
+      holder.style.placeItems = 'center';
+
+      // Никакого сглаживания: картинка рисуется прямо от позиции прокрутки.
+      // Догоняющий прогресс всегда отстаёт от пальца, и это отставание и
+      // читается как лаг — особенно на обратном скролле. Темп чтения фраз
+      // задаётся длиной трека, а не торможением анимации.
+      const render = () => {
+        const rect = track.getBoundingClientRect();
+        const travel = rect.height - innerHeight;
+        paint(travel > 0 ? clamp01(-rect.top / travel) : 0);
+      };
+
+      const paint = (progress) => {
+
+        // Кривая мягче стандартной smoothstep: медленный старт и долгий
+        // выкат, поэтому подъём читается спокойнее при том же скролле.
+        const raw = clamp01(progress / VEIL_END);
+        veil.style.setProperty('--veil', (1 - Math.pow(1 - raw, 3)).toFixed(4));
+
+        // Обвязка приходит после шторки и уходит вместе с последней фразой:
+        // к концу блока мелкие подписи растворяются, а не обрываются.
+        // Шторка следующего блока начинает подниматься ещё на исчезновении
+        // последней фразы: иначе между ними пустое ожидание.
+        const handoff = ease(clamp01((progress - .62) / .30));
+        veil.style.setProperty('--handoff', handoff.toFixed(4));
+        // Подъём светлого блока живёт на :root — его читает «Философия»,
+        // которая лежит в другом поддереве и до veil не достаёт.
+        document.documentElement.style.setProperty('--handoff', handoff.toFixed(4));
+
+        const chromeIn = ease(clamp01((progress - CHROME_IN) / 0.10));
+        // Уводим обвязку тем же движением, что поднимает следующий блок.
+        const chromeOut = Math.max(handoff, ease(clamp01((progress - .88) / .10)));
+        const chromeVisible = chromeIn * (1 - chromeOut);
+        // На мобиле шапка закреплена и не гаснет между блоками: иначе
+        // меню видно только когда прокрутка остановилась.
+        // Ступенькой, а не плавно: на мобиле переход .5s читался как
+        // «шапка появляется только когда прокрутка остановилась».
+        chrome.style.opacity = NARROW_CHROME_MQ.matches
+          ? (chromeVisible > .35 ? '1' : '0')
+          : chromeVisible.toFixed(3);
+        chrome.classList.toggle('is-on', chromeVisible > .5);
+
+        // Фразы занимают не весь остаток, а до .88: у последней остаётся
+        // запас на спокойное растворение внутри трека, без обрыва на краю.
+        const span = Math.max(.0001, .88 - PHRASES_FROM);
+        const slot = span / lines.length;
+        const arrived = WAVE + RAMP;
+
+        lines.forEach((item, index) => {
+          const local = (progress - PHRASES_FROM - index * slot) / slot;
+          const n = Math.max(1, item.letters.length - 1);
+          item.letters.forEach((letter, letterIndex) => {
+            const offset = (letterIndex / n) * WAVE;
+            const appear = ease(clamp01((local - offset) / RAMP));
+            const vanish = ease(clamp01((local - arrived - HOLD - offset) / RAMP));
+            const visible = appear * (1 - vanish);
+            // Пишем стиль только когда значение реально изменилось: иначе на
+            // каждом кадре уходит 178 записей в CSSOM, большинство — те же
+            // самые значения уже отыгравших строк.
+            if (letter._v === visible) return;
+            letter._v = visible;
+            const blur = (1 - visible) * BLUR;
+            const moving = visible > .001 && visible < .999;
+            if (letter._m !== moving) {
+              letter._m = moving;
+              letter.classList.toggle('is-moving', moving);
+            }
+            // Невидимая буква не должна держать filter: иначе все 68 букв
+            // висят слоями blur(26px), даже когда шторка далеко за экраном.
+            // Порог выше прежних .05: размытие меньше половины пикселя
+            // глазом не видно, а слой под него видеокарта всё равно заводит.
+            letter.style.filter = (visible > .001 && blur > .5) ? `blur(${blur.toFixed(1)}px)` : 'none';
+            letter.style.opacity = visible.toFixed(3);
+          });
+
+        });
+      };
+
+      let ticking = false;
+      const request = () => { if (!ticking) { ticking = true; requestAnimationFrame(() => { ticking = false; render(); }); } };
+      addEventListener('scroll', request, { passive:true });
+      addEventListener('resize', request, { passive:true });
+      document.fonts.ready.then(render);
+      render();
+    })();
+
+    // Шапка секции появляется, когда блок занял экран, и гаснет при уходе.
+    (() => {
+      const shells = [...document.querySelectorAll('.chrome--section')];
+      if (!shells.length) return;
+      // Пары «шапка — её блок». На границе двух блоков экран пересекают оба,
+      // и по одному лишь isIntersecting зажигались обе разом: тёмная от
+      // «Философии» и светлая от карусели накладывались друг на друга.
+      // Поэтому горит ровно одна — та, чей блок ближе к центру экрана.
+      const pairs = shells
+        .map(shell => ({ shell, host: shell.closest('.philosophy, .circle-section') }))
+        .filter(pair => pair.host);
+      if (!pairs.length) return;
+
+      // На телефоне секционных шапок нет вовсе (display:none), поэтому и
+      // считать их выбор на каждом кадре прокрутки не нужно.
+      const NARROW_CHROME = matchMedia('(max-width:780px)');
+
+      const pick = () => {
+        if (NARROW_CHROME.matches) return;
+        const middle = innerHeight / 2;
+        let winner = null, best = Infinity;
+        pairs.forEach(({ host }) => {
+          const box = host.getBoundingClientRect();
+          // Блок вне экрана в выборе не участвует: иначе у самого верха
+          // страницы «ближайшим» оказывался блок, которого ещё не видно.
+          if (box.bottom <= 0 || box.top >= innerHeight) return;
+          const distance = Math.abs((box.top + box.bottom) / 2 - middle);
+          if (distance < best) { best = distance; winner = host; }
+        });
+        pairs.forEach(({ shell, host }) => shell.classList.toggle('is-in', host === winner));
+      };
+
+      let pending = false;
+      const schedule = () => {
+        if (pending) return;
+        pending = true;
+        requestAnimationFrame(() => { pending = false; pick(); });
+      };
+      addEventListener('scroll', schedule, { passive:true });
+      addEventListener('resize', schedule, { passive:true });
+      // В фоновой вкладке requestAnimationFrame не тикает, и уже поставленный
+      // флаг завис бы вместе с ним: вернувшись на вкладку, страница осталась
+      // бы с шапкой от того блока, на котором её свернули. Поэтому на возврате
+      // флаг сбрасывается и выбор считается заново.
+      addEventListener('visibilitychange', () => {
+        if (document.visibilityState !== 'visible') return;
+        pending = false;
+        pick();
+      });
+      pick();
+    })();
+
+    // ───────── «Философия»: блок прилипает, лента едет вбок ─────────
+    // Как в Кэмпе: доехали до блока — он фиксируется, следующая прокрутка
+    // долистывает карточки, и только потом страница идёт дальше.
+    (() => {
+      const tracks = [...document.querySelectorAll('.philosophy-track')];
+      if (!tracks.length) return;
+      // На узких экранах лента живёт нативным горизонтальным скроллом:
+      // пин и пересчёт на каждом кадре там только мешают и дают лаги.
+      const MOBILE_RAIL = matchMedia('(max-width:780px)');
+      tracks.forEach(setupRail);
+      // Ширина может смениться уже после загрузки (поворот экрана, ресайз
+      // окна): пересобираем поведение ленты, иначе она остаётся в режиме,
+      // выбранном на старте, и на десктопе не едет вовсе.
+      MOBILE_RAIL.addEventListener('change', () => tracks.forEach(setupRail));
+      function setupRail(track) {
+      const rail = track.querySelector('.philosophy__rail');
+      if (!rail) return;
+      if (MOBILE_RAIL.matches) {
+        track.style.height = '';
+        rail.style.removeProperty('--rail-x');
+        return;
+      }
+
+      const clamp01 = v => Math.min(1, Math.max(0, v));
+      // Вынос храним на треке: setupRail может вызваться повторно
+      // (смена брейкпоинта), и второй экземпляр не должен начинать
+      // с нулём, пока живы слушатели от первого.
+      if (typeof track._railOverflow !== 'number') track._railOverflow = 0;
+
+      const measure = () => {
+        // Реальный вынос ленты за правый край экрана.
+        const last = rail.lastElementChild;
+        if (!last) return;
+        // Вынос = сколько правый край последней карточки выступает за экран
+        // в НЕсдвинутом состоянии. Текущий сдвиг надо прибавить обратно,
+        // иначе замер зависит от того, где лента стоит в момент измерения.
+        const shift = parseFloat(rail.style.getPropertyValue('--rail-x')) || 0;
+        const right = last.getBoundingClientRect().right + shift;
+        track._railOverflow = Math.max(0, Math.round(right - innerWidth));
+        // Прокрутка на фиксации: вынос плюс запас, чтобы последняя карточка
+        // доезжала спокойным движением, а не мгновенно.
+        // Трек длиннее на долю холостого хода, иначе мёртвая зона в начале
+        // съела бы ход ленты и последняя карточка перестала бы доезжать.
+        const scroll = (track._railOverflow * 2.2 + innerHeight * .45) / (1 - LEAD_IN);
+        track.style.height = `calc(100svh + ${Math.round(scroll)}px)`;
+      };
+
+      // Первое движение после фиксации блок стоит: сначала человек видит,
+      // что попал на «Философию», и только вторым скроллом лента едет вбок.
+      const LEAD_IN = 0.22;
+
+      const paint = () => {
+        const rect = track.getBoundingClientRect();
+        const travel = track.offsetHeight - innerHeight;
+        const progress = travel > 0 ? clamp01(-rect.top / travel) : 0;
+        // Лента укладывается в окно LEAD_IN…RAIL_END, дальше блок просто
+        // стоит: последняя карточка успевает доехать и «отдышаться»
+        // до того, как следующая секция начнёт наезжать.
+        const RAIL_END = 0.78;
+        const moved = clamp01((progress - LEAD_IN) / (RAIL_END - LEAD_IN));
+        rail.style.setProperty('--rail-x', (moved * track._railOverflow).toFixed(1));
+      };
+
+      let ticking = false;
+      const request = () => { if (!ticking) { ticking = true; requestAnimationFrame(() => { ticking = false; paint(); }); } };
+      if (!track._railBound) {
+        track._railBound = true;
+        addEventListener('scroll', () => { if (!MOBILE_RAIL.matches) request(); }, { passive:true });
+        addEventListener('resize', () => { if (!MOBILE_RAIL.matches) { measure(); paint(); } }, { passive:true });
+        document.fonts.ready.then(() => { if (!MOBILE_RAIL.matches) { measure(); paint(); } });
+      }
+      // Первый measure() успевает отработать раньше, чем карточки получат
+      // финальную ширину (фото грузятся отдельно), и запоминает нулевой
+      // вынос — лента потом не едет вовсе. Пересчитываем, когда лента
+      // реально меняет размеры.
+      if (!track._railObserved && typeof ResizeObserver === 'function') {
+        track._railObserved = true;
+        new ResizeObserver(() => { measure(); paint(); }).observe(rail);
+      }
+      measure();
+      paint();
+      }
+    })();
+
+    (() => {
+      const hero = document.querySelector('.hero');
+      const needle = document.querySelector('.compass__needle');
+      const menuToggle = document.querySelector('.menu-toggle');
+      const cursorMark = document.querySelector('.cursor-mark');
+      menuToggle?.addEventListener('click', () => {
+        const isOpen = hero.classList.toggle('menu-open');
+        menuToggle.setAttribute('aria-expanded', String(isOpen));
+        menuToggle.setAttribute('aria-label', isOpen ? 'Закрыть меню' : 'Открыть меню');
+      });
+      if (cursorMark && window.matchMedia('(hover:hover) and (pointer:fine)').matches) {
+        document.body.classList.add('has-cursor-mark');
+        let nextX = -20;
+        let nextY = -20;
+        let cursorFrame;
+        const renderCursor = () => {
+          cursorMark.style.setProperty('--cursor-x', `${nextX}px`);
+          cursorMark.style.setProperty('--cursor-y', `${nextY}px`);
+          cursorFrame = undefined;
+        };
+        document.addEventListener('pointermove', (event) => {
+          nextX = event.clientX;
+          nextY = event.clientY;
+          // .menu b — заголовки колонок: они не ссылки, но ведут себя как
+          // интерактивные, значит и курсор-маркер должен на них появляться.
+          const interactive = event.target.closest('a,button,.menu b');
+          cursorMark.classList.toggle('is-active', Boolean(interactive && !interactive.matches('.brand')));
+          if (!cursorFrame) cursorFrame = requestAnimationFrame(renderCursor);
+        }, { passive:true });
+        window.addEventListener('blur', () => cursorMark.classList.remove('is-active'));
+      }
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || window.matchMedia('(hover: none), (pointer: coarse)').matches) return;
+      let current = 0;
+      let target = 0;
+      let frame;
+      let interactionReady = false;
+
+      const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+      const normalizeAngle = (angle) => ((angle + 180) % 360 + 360) % 360 - 180;
+      const render = () => {
+        current += (target - current) * .045;
+        needle.style.transform = `rotate(${current.toFixed(3)}deg)`;
+        frame = requestAnimationFrame(render);
+      };
+      // Центр иглы кэшируется: чтение getBoundingClientRect в обработчике
+      // движения мыши — принудительный layout на каждое событие.
+      let needleCenter = null;
+      const measureNeedle = () => {
+        const rect = needle.getBoundingClientRect();
+        needleCenter = { x:rect.left + rect.width / 2, y:rect.top + rect.height / 2 };
+      };
+      addEventListener('resize', () => { needleCenter = null; }, { passive:true });
+      addEventListener('scroll', () => { needleCenter = null; }, { passive:true });
+
+      const followPointer = (event) => {
+        if (!interactionReady) return;
+        if (!needleCenter) measureNeedle();
+        const x = event.clientX - needleCenter.x;
+        const y = event.clientY - needleCenter.y;
+        const pointerAngle = Math.atan2(y, x) * 180 / Math.PI;
+        // The arrow's resting direction is north-east (-45°). Normalize before
+        // clamping so a cursor on the left of the compass correctly turns it left.
+        target = clamp(normalizeAngle(pointerAngle + 45), -68, 68);
+      };
+      // Только pointermove: mousemove дублировал его в десктопных браузерах,
+      // и обработчик срабатывал дважды на каждое движение мыши.
+      hero.addEventListener('pointermove', followPointer, { passive:true });
+      hero.addEventListener('pointerleave', () => { if (interactionReady) target = 0; });
+      window.addEventListener('compass:interaction-ready', () => {
+        interactionReady = true;
+        render();
+      }, { once:true });
+      window.addEventListener('pagehide', () => cancelAnimationFrame(frame), { once:true });
+    })();
+  </script>
+  <script id="zone-script">
+    // ═════════ ЗОНА НИЖЕ ГРАНИЦЫ · v4 ═════════
+    // Три рода движения. По прокрутке — крупное: значение считается от
+    // позиции каждый кадр, поэтому назад отыгрывает само. По порогу — текст:
+    // состояние тоже выводится из позиции, а не из флага «сработало один раз».
+    // Само по себе — жизнь приборов, только пока блок на экране.
+    (() => {
+      const zone = document.querySelector('#zone');
+      if (!zone) return;
+      const root = document.documentElement;
+      // Метка «скрипт жив»: под ней живут приглушённые состояния и место под приборы.
+      zone.classList.add('is-live');
+      const NS = 'http://www.w3.org/2000/svg';
+      const D = Math.PI / 180;
+      const TAU = Math.PI * 2;
+      // Медиазапросы считаются один раз, а не на каждом кадре.
+      const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const NARROW = matchMedia('(max-width:780px)');
+      const HOVER = matchMedia('(hover:hover) and (pointer:fine)').matches;
+      const $ = (selector, scope = document) => scope.querySelector(selector);
+      const $$ = (selector, scope = document) => [...scope.querySelectorAll(selector)];
+      const clamp01 = v => Math.min(1, Math.max(0, v));
+      const span = (p, a, b) => clamp01((p - a) / (b - a));
+      const easeOut = t => 1 - Math.pow(1 - t, 3);
+      const easeInOut = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      const svgEl = (name, attrs = {}, parent) => {
+        const node = document.createElementNS(NS, name);
+        Object.entries(attrs).forEach(([k, v]) => node.setAttribute(k, v));
+        if (parent) parent.appendChild(node);
+        return node;
+      };
+      // Сбой одного прибора не должен уносить остальные блоки.
+      const safe = (name, fn) => { try { fn(); } catch (error) { console.warn(`[zone] ${name}`, error); } };
+
+      // Один обработчик прокрутки на всю зону.
+      const jobs = [];
+      let ticking = false;
+      const flush = () => { ticking = false; jobs.forEach(job => { try { job(); } catch (error) { console.warn('[zone] job', error); } }); };
+      const request = () => { if (!ticking) { ticking = true; requestAnimationFrame(flush); } };
+      addEventListener('scroll', request, { passive:true });
+      addEventListener('resize', request, { passive:true });
+      // В фоновой вкладке кадр не приходит, и флаг залип бы навсегда.
+      addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { ticking = false; flush(); } });
+
+      // Путь верхней кромки блока между двумя высотами экрана: 0 → 1.
+      const travel = (node, from, to) => clamp01((from - node.getBoundingClientRect().top / innerHeight) / (from - to));
+      // Блок рядом с экраном? Вне экрана работа по прокрутке пропускается.
+      // Запас большой намеренно: наблюдатель учитывает clip-path самого блока,
+      // и шторка высотой в треть экрана отодвигает момент «вижу» на свою высоту.
+      const watch = (node, margin = '700px') => {
+        const state = { on:true };
+        new IntersectionObserver(([entry]) => { state.on = entry.isIntersecting; if (state.on) request(); }, { rootMargin:margin }).observe(node);
+        return state;
+      };
+      // Собственный цикл прибора: тикает только пока блок виден.
+      const loop = (target, tick) => {
+        let frame = 0, last = 0;
+        const step = (now) => {
+          const dt = last ? Math.min((now - last) / 1000, .1) : 0;
+          last = now;
+          tick(now / 1000, dt);
+          frame = requestAnimationFrame(step);
+        };
+        new IntersectionObserver(([entry]) => {
+          if (entry.isIntersecting) { if (!frame) { last = 0; frame = requestAnimationFrame(step); } }
+          else if (frame) { cancelAnimationFrame(frame); frame = 0; }
+        }, { rootMargin:'120px' }).observe(target);
+      };
+      // Пересчёт геометрии: ширина окна, загрузка шрифтов, смена раскладки.
+      const onLayout = (fn, observed) => {
+        addEventListener('resize', fn, { passive:true });
+        if (document.fonts && document.fonts.ready) document.fonts.ready.then(fn);
+        NARROW.addEventListener('change', fn);
+        // Высота блока меняется и без ресайза окна — когда доезжает шрифт.
+        if (observed && typeof ResizeObserver === 'function') new ResizeObserver(fn).observe(observed);
+        fn();
+      };
+      // Порог появления — один на всю зону.
+      const THRESHOLD = '0px 0px -12% 0px';
+
+      // ───────── Появление по порогу ─────────
+      let reveal = null;
+      try {
+        if (!REDUCE) {
+          reveal = new IntersectionObserver(entries => entries.forEach(entry => {
+            if (entry.isIntersecting) entry.target.classList.add('is-in');
+            // Ушёл вниз за порог — отыгрываем назад. Ушёл вверх — остаётся открытым.
+            else if (entry.boundingClientRect.top > 0) entry.target.classList.remove('is-in');
+          }), { rootMargin:THRESHOLD });
+          // Фраза контакта режется на слова до того, как станет скрытой.
+          $$('[data-words]', zone).forEach(node => {
+            const words = node.textContent.trim().split(/\s+/);
+            node.textContent = '';
+            words.forEach((word, i) => {
+              const w = document.createElement('span'); w.className = 'w';
+              const inner = document.createElement('i'); inner.textContent = word; inner.style.setProperty('--d', `${i * 60}ms`);
+              w.appendChild(inner); node.append(w, ' ');
+            });
+          });
+          $$('[data-in]', zone).forEach(node => reveal.observe(node));
+          root.classList.add('motion');
+        }
+      } catch (error) {
+        root.classList.remove('motion');
+        console.warn('[zone] reveal', error);
+      }
+
+      // ───────── Шапка зоны: цвет по блоку под ней ─────────
+      safe('chrome', () => {
+        const shell = $('#zone-chrome');
+        const blocks = $$('[data-theme]', zone);
+        if (!shell) return;
+        let onDark = null, lastY = scrollY, down = null;
+        jobs.push(() => {
+          if (NARROW.matches) return;
+          // Направление с порогом: дрожание трекпада не должно мигать шапкой.
+          const y = scrollY;
+          if (Math.abs(y - lastY) > 6) {
+            const goingDown = y > lastY;
+            lastY = y;
+            if (goingDown !== down) { down = goingDown; shell.classList.toggle('is-down', goingDown); }
+          }
+          let theme = 'light';
+          for (const block of blocks) {
+            const box = block.getBoundingClientRect();
+            if (box.top <= 56 && box.bottom > 56) { theme = block.dataset.theme; break; }
+          }
+          const dark = theme === 'dark';
+          if (dark !== onDark) { onDark = dark; shell.classList.toggle('chrome--dark', !dark); }
+        });
+      });
+
+      // ───────── 1. Армиллярная сфера ─────────
+      // Строка и кольцо связаны проводом: линия строки обрывается на круге
+      // сферы, дальше идёт выноска к узлу на кольце этой роли.
+      safe('sphere', () => {
+        const host = $('#env');
+        const body = $('#env-body');
+        const svg = $('#env-sphere');
+        const wires = $('#env-wires');
+        const rows = $$('#env-list .env__row');
+        const rules = rows.map(row => $('.env__rule', row));
+        const cap = $('#env-list .env__cap .env__rule');
+        const indexNode = $('#env-index');
+        if (!host || !body || !svg || !wires || !rows.length) return;
+        const R = 250, OUT = 286, INK = '#161514', PAPER = '#F1ECEC';
+        // Пунктиры колец — те же, что у шкал компаса.
+        const DASH = ['1 9', '1 4', '.5 4', '1 5', '1.2 3.5'];
+        const REST = [{ k:.28, rot:-24 }, { k:.5, rot:38 }, { k:.16, rot:82 }, { k:.72, rot:-62 }, { k:.4, rot:14 }];
+
+        const rig = svgEl('g', {}, svg);
+        const meridian = svgEl('g', { fill:'none', stroke:INK }, rig);
+        svgEl('circle', { r:276, 'stroke-width':1, 'stroke-dasharray':'1 9', opacity:.55 }, meridian);
+        svgEl('circle', { r:OUT, 'stroke-width':1, opacity:.32 }, meridian);
+        svgEl('path', { d:'M0 -296v20M0 276v20M-296 0h20M276 0h20', 'stroke-width':1.2, opacity:.7 }, meridian);
+        const axis = svgEl('g', { fill:'none', stroke:INK, 'stroke-width':1, opacity:.6, transform:'rotate(24)' }, rig);
+        const axisLine = svgEl('path', { d:'M0 -292V292', pathLength:1, 'stroke-dasharray':1 }, axis);
+        const axisCaps = svgEl('path', { d:'M-9 -292h18M-9 292h18M-5 -282h10M-5 282h10' }, axis);
+
+        const rings = REST.map((rest, i) => {
+          const g = svgEl('g', {}, rig);
+          return {
+            g, rest, k:rest.k, rot:rest.rot, speed:.11 + i * .037, e:0,
+            main:svgEl('ellipse', { rx:R, fill:'none', stroke:INK }, g),
+            ticks:svgEl('ellipse', { rx:R - 11, fill:'none', stroke:INK, 'stroke-dasharray':DASH[i] }, g)
+          };
+        });
+        const beadOrbit = svgEl('g', {}, rig);
+        const bead = svgEl('circle', { cx:R, cy:0, r:8, fill:'url(#bead)' }, beadOrbit);
+        const core = svgEl('g', {}, rig);
+        svgEl('circle', { r:30, fill:PAPER, stroke:INK, 'stroke-width':1.3 }, core);
+        svgEl('circle', { r:22, fill:'none', stroke:INK, 'stroke-width':.9, 'stroke-dasharray':'1 3' }, core);
+        svgEl('circle', { r:4, fill:INK }, core);
+        // Узлы лежат вне поворотной группы: их место считается в экранных
+        // осях, чтобы провод приходил ровно в точку.
+        const nodes = rings.map((ring, i) => {
+          const g = svgEl('g', {}, svg);
+          svgEl('circle', { r:5, fill:PAPER, stroke:INK, 'stroke-width':1.1 }, g);
+          const label = svgEl('text', { y:-15, fill:INK, 'text-anchor':'middle', 'font-family':'Onest,Manrope,sans-serif', 'font-weight':300, 'letter-spacing':'.06em' }, g);
+          label.textContent = String(i + 1).padStart(2, '0');
+          const wire = svgEl('path', { fill:'none', stroke:INK, 'stroke-width':1 }, wires);
+          return { g, label, wire };
+        });
+
+        let geo = null, ends = [];
+        const layout = () => {
+          const b = body.getBoundingClientRect(), s = svg.getBoundingClientRect();
+          if (!b.width || !s.width) return;
+          const narrow = NARROW.matches;
+          geo = { cx:s.left - b.left + s.width / 2, cy:s.top - b.top + s.height / 2, k:s.width / 600, narrow };
+          wires.setAttribute('viewBox', `0 0 ${b.width.toFixed(0)} ${b.height.toFixed(0)}`);
+          // Линия не доходит до круга: зазор оставлен под выноску.
+          const reach = OUT * geo.k + 46;
+          const fit = (rule) => {
+            if (!rule) return null;
+            if (narrow) { rule.style.removeProperty('--w'); return null; }
+            const box = rule.getBoundingClientRect();
+            const full = rule.parentElement.getBoundingClientRect().width;
+            const x0 = box.left - b.left, y = box.top - b.top + .5, dy = y - geo.cy;
+            let w = full;
+            if (Math.abs(dy) < reach) w = Math.min(full, Math.max(60, geo.cx - Math.sqrt(reach * reach - dy * dy) - x0));
+            rule.style.setProperty('--w', `${w.toFixed(1)}px`);
+            return { x:x0 + w, y, cut:w < full - 1 };
+          };
+          fit(cap);
+          ends = rules.map(fit);
+          // Подпись узла — 12,5px на экране при любом размере сферы.
+          const size = (12.5 / geo.k).toFixed(2), lift = (-16 / geo.k).toFixed(2);
+          nodes.forEach(({ label }) => { label.setAttribute('font-size', size); label.setAttribute('y', lift); });
+        };
+
+        let active = 0, hovered = -1, drawn = REDUCE ? 1 : 0, tilt = 0, tiltTo = 0, beadAngle = -38, beadAlpha = 0;
+        const near = watch(host);
+        const setActive = (index) => {
+          if (index === active) return;
+          active = index;
+          rows.forEach((row, i) => row.classList.toggle('is-active', i === index));
+          if (indexNode) indexNode.textContent = String(index + 1).padStart(2, '0');
+        };
+        rows[0].classList.add('is-active');
+
+        jobs.push(() => {
+          if (!near.on) return;
+          drawn = REDUCE ? 1 : travel(body, .92, .2);
+          if (hovered >= 0) return;
+          // Активная строка — ближайшая к центру экрана.
+          const middle = innerHeight * .5;
+          let best = 0, gap = Infinity;
+          rows.forEach((row, i) => {
+            const box = row.getBoundingClientRect();
+            const d = Math.abs((box.top + box.bottom) / 2 - middle);
+            if (d < gap) { gap = d; best = i; }
+          });
+          setActive(best);
+        });
+        if (HOVER) {
+          rows.forEach((row, i) => row.addEventListener('pointerenter', () => { hovered = i; setActive(i); }));
+          $('#env-list').addEventListener('pointerleave', () => { hovered = -1; request(); });
+          host.addEventListener('pointermove', (event) => { tiltTo = (event.clientX / innerWidth - .5) * 12; }, { passive:true });
+          host.addEventListener('pointerleave', () => { tiltTo = 0; });
+        }
+
+        const paint = (t, dt) => {
+          const follow = Math.min(1, dt * 2.6) || 1;
+          tilt += (tiltTo - tilt) * Math.min(1, dt * 2.7);
+          rig.setAttribute('transform', `rotate(${tilt.toFixed(2)})`);
+          meridian.setAttribute('opacity', easeInOut(span(drawn, 0, .3)).toFixed(3));
+          rings.forEach((ring, i) => {
+            const on = i === active;
+            // Кольцо активной роли встаёт анфас; остальные медленно прецессируют.
+            const kTo = on ? 1 : ring.rest.k + (REDUCE ? 0 : .045 * Math.sin(t * ring.speed * 2 + i * 1.7));
+            const rotTo = on ? 0 : ring.rest.rot + (REDUCE ? 0 : 5 * Math.sin(t * ring.speed + i));
+            ring.k += (kTo - ring.k) * follow;
+            ring.rot += (rotTo - ring.rot) * follow;
+            const e = ring.e = easeInOut(span(drawn, .1 + i * .06, .34 + i * .06));
+            const a = R, b = R * ring.k;
+            // Длина эллипса по Рамануджану — под прорисовку дугой.
+            const length = Math.PI * (3 * (a + b) - Math.sqrt((3 * a + b) * (a + 3 * b)));
+            const glow = clamp01((ring.k - ring.rest.k) / (1 - ring.rest.k));
+            ring.g.setAttribute('transform', `rotate(${ring.rot.toFixed(2)})`);
+            ring.main.setAttribute('ry', b.toFixed(2));
+            ring.main.setAttribute('stroke-dasharray', `${(length * e).toFixed(1)} ${length.toFixed(1)}`);
+            ring.main.setAttribute('stroke-width', (1 + .5 * glow).toFixed(2));
+            ring.main.setAttribute('opacity', (.5 + .45 * glow).toFixed(3));
+            ring.ticks.setAttribute('ry', ((R - 11) * ring.k).toFixed(2));
+            ring.ticks.setAttribute('opacity', (e * (.42 + .43 * glow)).toFixed(3));
+
+            // Узел стоит там, где луч от центра к концу строки пересекает кольцо.
+            const node = nodes[i], end = ends[i];
+            const wired = geo && !geo.narrow && end && end.cut;
+            const phi = wired ? Math.atan2(end.y - geo.cy, end.x - geo.cx) : (152 + i * 14) * D;
+            const local = phi - (ring.rot + tilt) * D;
+            const rr = 1 / Math.sqrt(Math.pow(Math.cos(local) / a, 2) + Math.pow(Math.sin(local) / Math.max(1, b), 2));
+            const nx = rr * Math.cos(phi), ny = rr * Math.sin(phi);
+            const pop = easeOut(span(drawn, .3 + i * .07, .46 + i * .07));
+            node.g.setAttribute('transform', `translate(${nx.toFixed(2)} ${ny.toFixed(2)})`);
+            // На телефоне сфера лежит под текстом — узлы с номерами там только шум.
+            node.g.setAttribute('opacity', geo && geo.narrow ? 0 : (pop * (.5 + .5 * glow)).toFixed(3));
+            if (!wired) { node.wire.setAttribute('opacity', 0); return; }
+            // Провод растёт от строки к прибору — следом за её линией.
+            const grow = easeInOut(span(drawn, .36 + i * .07, .64 + i * .07));
+            // Провод кончается на кромке узла, а не в его центре.
+            const tx = geo.cx + (nx + Math.cos(phi) * 6) * geo.k, ty = geo.cy + (ny + Math.sin(phi) * 6) * geo.k;
+            node.wire.setAttribute('d', `M${end.x.toFixed(1)} ${end.y.toFixed(1)}L${(end.x + (tx - end.x) * grow).toFixed(1)} ${(end.y + (ty - end.y) * grow).toFixed(1)}`);
+            node.wire.setAttribute('stroke-dasharray', glow > .5 ? 'none' : '2 4');
+            node.wire.setAttribute('opacity', grow ? (.42 + .45 * glow).toFixed(3) : 0);
+          });
+          const axisE = easeInOut(span(drawn, .5, .62));
+          axisLine.setAttribute('stroke-dashoffset', (1 - axisE).toFixed(3));
+          axisCaps.setAttribute('opacity', axisE.toFixed(3));
+          core.setAttribute('opacity', easeOut(span(drawn, .05, .25)).toFixed(3));
+          beadAngle += 14 * dt;
+          const beadTo = rings[active].k > .965 && drawn > .6 ? 1 : 0;
+          beadAlpha += (beadTo - beadAlpha) * Math.min(1, dt * 4 || 1);
+          beadOrbit.setAttribute('transform', `rotate(${(beadAngle % 360).toFixed(2)})`);
+          bead.setAttribute('opacity', beadAlpha.toFixed(3));
+        };
+        onLayout(() => { layout(); paint(0, 0); }, body);
+        if (REDUCE) return;
+        loop(svg, paint);
+      });
+
+      // ───────── 2. Десятигранник ─────────
+      // Выноска одна: от активного названия к грани, обращённой к зрителю.
+      safe('solid', () => {
+        const host = $('#comp');
+        const shape = $('#comp-shape');
+        const svg = $('#comp-svg');
+        const items = $$('#comp-names .comp__name');
+        if (!host || !shape || !svg || items.length !== 10) return;
+        const LIGHT = '#EFEAE4';
+        const SHIFT = parseFloat(getComputedStyle(host).getPropertyValue('--shift')) || 0;
+
+        // Пятиугольный трапецоэдр. Отношение высот 1 : 9.472 делает грани плоскими.
+        const C = .1056, V = [[0, 1, 0], [0, -1, 0]];
+        for (let i = 0; i < 5; i++) V.push([Math.cos(i * 72 * D), C, Math.sin(i * 72 * D)]);
+        for (let i = 0; i < 5; i++) V.push([Math.cos((i * 72 + 36) * D), -C, Math.sin((i * 72 + 36) * D)]);
+        const F = [];
+        for (let i = 0; i < 5; i++) F.push([0, 2 + i, 7 + i, 2 + (i + 1) % 5]);
+        for (let i = 0; i < 5; i++) F.push([1, 7 + i, 2 + (i + 1) % 5, 7 + (i + 1) % 5]);
+        const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+        const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+        const NORMALS = F.map(face => {
+          const [a, b, c] = face.map(i => V[i]);
+          let n = cross(sub(b, a), sub(c, a));
+          const mid = face.reduce((m, i) => [m[0] + V[i][0], m[1] + V[i][1], m[2] + V[i][2]], [0, 0, 0]);
+          if (n[0] * mid[0] + n[1] * mid[1] + n[2] * mid[2] < 0) n = n.map(v => -v);
+          const len = Math.hypot(...n);
+          return n.map(v => v / len);
+        });
+        const edgeMap = new Map();
+        F.forEach((face, fi) => face.forEach((a, k) => {
+          const b = face[(k + 1) % face.length];
+          const key = a < b ? `${a}-${b}` : `${b}-${a}`;
+          if (!edgeMap.has(key)) edgeMap.set(key, { a, b, faces:[] });
+          edgeMap.get(key).faces.push(fi);
+        }));
+        const EDGES = [...edgeMap.values()];
+        const facing = (fi) => Math.atan2(-NORMALS[fi][0], NORMALS[fi][2]);
+        // Грани приходят к зрителю попеременно: верхняя, нижняя, верхняя…
+        const ORDER = F.map((_, fi) => fi).sort((a, b) => ((facing(a) + TAU) % TAU) - ((facing(b) + TAU) % TAU));
+        const PHI0 = facing(0), NOD = 16 * D, SQUASH = .82;
+
+        const orbit = $('#comp-orbit', svg);
+        const orbitA = svgEl('circle', { fill:'none', stroke:LIGHT, 'stroke-width':1, 'stroke-dasharray':'1 9', opacity:.5 }, orbit);
+        const orbitB = svgEl('circle', { fill:'none', stroke:LIGHT, 'stroke-width':1, 'stroke-dasharray':'1 4', opacity:.22 }, orbit);
+        const faceNodes = F.map(() => svgEl('path', { fill:'url(#facet)', opacity:0 }, $('#comp-faces', svg)));
+        const edgeNodes = EDGES.map(() => svgEl('path', { fill:'none', stroke:LIGHT, 'stroke-width':1, 'stroke-linecap':'round' }, $('#comp-edges', svg)));
+        const vertNodes = V.map(() => svgEl('circle', { r:2.4, fill:'#111111', stroke:LIGHT, 'stroke-width':1 }, $('#comp-verts', svg)));
+        const leadHost = $('#comp-lead', svg);
+        const lead = svgEl('path', { fill:'none', stroke:LIGHT, 'stroke-width':1, pathLength:1, 'stroke-dasharray':1, 'stroke-dashoffset':1, opacity:.8 }, leadHost);
+        const leadDot = svgEl('circle', { r:3, fill:LIGHT, opacity:0 }, leadHost);
+
+        let cx = 0, cy = 0, R = 0, RO = 0, narrow = false, anchor = null;
+        const anchorOf = (i) => {
+          if (i < 0 || narrow) return null;
+          const rects = items[i].getClientRects();
+          if (!rects.length) return null;
+          // Название может переноситься — выноска идёт от его последней строки.
+          const last = rects[rects.length - 1], box = shape.getBoundingClientRect();
+          return { x0:last.left - box.left, x1:last.right - box.left, y:last.bottom - box.top - 2 };
+        };
+        const layout = () => {
+          const box = shape.getBoundingClientRect();
+          if (!box.width) return;
+          narrow = NARROW.matches;
+          svg.setAttribute('viewBox', `0 0 ${box.width.toFixed(0)} ${box.height.toFixed(0)}`);
+          cx = narrow ? box.width / 2 : box.width * (.5 + SHIFT);
+          cy = box.height / 2;
+          RO = narrow ? box.height * .47 : box.width * .48;
+          R = RO / 1.16;
+          [orbitA, orbitB].forEach((node, i) => { node.setAttribute('cx', cx.toFixed(1)); node.setAttribute('cy', cy.toFixed(1)); node.setAttribute('r', (R * (i ? 1.16 : 1.08)).toFixed(1)); });
+          anchor = anchorOf(active);
+        };
+
+        let phi = PHI0, aim = null, aimTimer = 0, active = -1, drawn = REDUCE ? 1 : 0, leadT = REDUCE ? 1 : 0;
+        const paint = (dt = 0) => {
+          const nod = NOD * Math.cos(5 * (phi - PHI0));
+          const cp = Math.cos(phi), sp = Math.sin(phi), ct = Math.cos(nod), st = Math.sin(nod);
+          const turn = ([x, y, z]) => { const x1 = x * cp + z * sp, z1 = -x * sp + z * cp; return [x1, y * ct - z1 * st, y * st + z1 * ct]; };
+          const P = V.map(v => { const r = turn(v); return [cx + R * SQUASH * r[0], cy - R * r[1]]; });
+          const NZ = NORMALS.map(n => turn(n)[2]);
+          const top = Math.max(...NZ), best = NZ.indexOf(top);
+          const fill = easeOut(span(drawn, .7, 1));
+          faceNodes.forEach((node, fi) => {
+            const alpha = NZ[fi] > 0 ? Math.max(0, 1 - (top - NZ[fi]) / .1) * fill : 0;
+            node.setAttribute('opacity', alpha.toFixed(3));
+            if (alpha > 0) node.setAttribute('d', 'M' + F[fi].map(i => `${P[i][0].toFixed(1)} ${P[i][1].toFixed(1)}`).join('L') + 'Z');
+          });
+          edgeNodes.forEach((node, i) => {
+            const { a, b, faces } = EDGES[i];
+            const seen = faces.some(fi => NZ[fi] > 0);
+            // Видимые рёбра идут первыми, скрытые — следом, пунктиром.
+            const from = (seen ? 0 : .22) + (i / EDGES.length) * .34;
+            const e = easeInOut(span(drawn, from, from + .34));
+            const bx = P[a][0] + (P[b][0] - P[a][0]) * e, by = P[a][1] + (P[b][1] - P[a][1]) * e;
+            node.setAttribute('d', `M${P[a][0].toFixed(1)} ${P[a][1].toFixed(1)}L${bx.toFixed(1)} ${by.toFixed(1)}`);
+            node.setAttribute('stroke-dasharray', seen ? 'none' : '1.5 5');
+            node.setAttribute('opacity', e ? (seen ? .9 : .38) : 0);
+          });
+          vertNodes.forEach((node, i) => {
+            node.setAttribute('cx', P[i][0].toFixed(1)); node.setAttribute('cy', P[i][1].toFixed(1));
+            node.setAttribute('opacity', easeOut(span(drawn, .1 + i * .04, .3 + i * .04)).toFixed(3));
+          });
+          orbit.setAttribute('opacity', easeInOut(span(drawn, 0, .4)).toFixed(3));
+          const slot = ORDER.indexOf(best);
+          if (slot !== active) {
+            active = slot;
+            items.forEach((node, i) => node.classList.toggle('is-active', i === slot));
+            anchor = anchorOf(slot);
+            if (!REDUCE) leadT = 0;
+          }
+          if (!anchor || fill <= 0) { lead.setAttribute('opacity', 0); leadDot.setAttribute('opacity', 0); return; }
+          leadT = Math.min(1, leadT + dt * 1.7);
+          const face = F[best].map(i => P[i]);
+          const fx = face.reduce((s, p) => s + p[0], 0) / 4, fy = face.reduce((s, p) => s + p[1], 0) / 4;
+          const dy = anchor.y - cy, reach = R * 1.16;
+          // Линия идёт под строкой до орбиты, оттуда — прямо в центр грани.
+          const edge = Math.abs(dy) < reach ? cx - Math.sqrt(reach * reach - dy * dy) : cx - reach * .45;
+          const xe = Math.max(anchor.x1 + 8, edge);
+          lead.setAttribute('d', `M${anchor.x0.toFixed(1)} ${anchor.y.toFixed(1)}H${xe.toFixed(1)}L${fx.toFixed(1)} ${fy.toFixed(1)}`);
+          lead.setAttribute('stroke-dashoffset', (1 - easeInOut(leadT)).toFixed(3));
+          lead.setAttribute('opacity', (.8 * fill).toFixed(3));
+          leadDot.setAttribute('cx', fx.toFixed(1)); leadDot.setAttribute('cy', fy.toFixed(1));
+          leadDot.setAttribute('opacity', (span(leadT, .85, 1) * fill).toFixed(3));
+        };
+
+        const point = (i) => { aim = facing(ORDER[i]); };
+        items.forEach((node, i) => {
+          if (HOVER) {
+            node.addEventListener('pointerenter', () => { clearTimeout(aimTimer); point(i); });
+            node.addEventListener('pointerleave', () => { aim = null; });
+          } else {
+            // Касание доворачивает фигуру к грани и отпускает её через паузу.
+            node.addEventListener('click', () => { clearTimeout(aimTimer); point(i); aimTimer = setTimeout(() => { aim = null; }, 2600); });
+          }
+        });
+
+        const near = watch(host);
+        jobs.push(() => {
+          if (!near.on) return;
+          drawn = REDUCE ? 1 : travel(shape, .86, .2);
+          // Шторка догоняет прокрутку: тёмный край поднимается быстрее страницы.
+          const cut = REDUCE || NARROW.matches ? 0 : (1 - easeOut(travel(host, 1, .42))) * innerHeight * .34;
+          host.style.setProperty('--cut', `${cut.toFixed(1)}px`);
+          if (REDUCE) paint();
+        });
+        onLayout(() => { layout(); paint(); }, $('#comp-wall'));
+        if (REDUCE) return;
+        loop(host, (t, dt) => {
+          if (aim !== null) {
+            let diff = (aim - phi) % TAU;
+            if (diff > Math.PI) diff -= TAU;
+            if (diff < -Math.PI) diff += TAU;
+            phi += diff * Math.min(1, dt * 3.2);
+          } else phi += 6 * D * dt;
+          paint(dt);
+        });
+      });
+
+      // ───────── 3. Призма и лучи «Школы» ─────────
+      // Луч приходит в левый верхний угол записи и идёт дальше её линейкой.
+      safe('prism', () => {
+        const host = $('#school');
+        const svg = $('#school-rays');
+        const prismHost = $('#school-prism');
+        const prism = prismHost && $('svg', prismHost);
+        const entries = $$('#school .entry');
+        if (!host || !svg || !prism || !entries.length) return;
+        const INK = '#161514';
+        const outline = $('#prism-outline', prism);
+        const glass = $('#glass', prism);
+        const soft = ['#prism-glass', '#prism-hatch', '#prism-detail'].map(id => $(id, prism));
+        const softBase = [1, .5, 1];
+        // Точки на гранях призмы в её собственных координатах (300×260):
+        // вход слева, три выхода справа — дисперсия начинается внутри.
+        const IN = [71.7, 145.6];
+        const OUTS = [[219, 130], [228.3, 145.6], [237.6, 161.2]];
+        // Лучи различаются пунктиром, а не цветом.
+        const DASH = ['1 9', '1 4', '1.2 3.5'];
+        const beam = svgEl('path', { fill:'none', stroke:INK, 'stroke-width':1.2, 'stroke-dasharray':'10 6', opacity:.8 }, svg);
+        const inner = entries.map((_, i) => svgEl('path', { fill:'none', stroke:INK, 'stroke-width':1, 'stroke-dasharray':DASH[i % 3], opacity:.6 }, svg));
+        const rays = entries.map(() => svgEl('path', { fill:'none', stroke:INK, 'stroke-width':1, 'stroke-linejoin':'round' }, svg));
+        const knots = entries.map(() => svgEl('circle', { r:2.6, fill:INK }, svg));
+        outline.setAttribute('stroke-dasharray', 1);
+        host.classList.add('has-rays');
+
+        const near = watch(host);
+        let best = -1, tiltTo = 0, tiltNow = 0;
+        const paint = () => {
+          if (!near.on) return;
+          const p = REDUCE ? 1 : travel(prismHost, .9, .3);
+          outline.setAttribute('stroke-dashoffset', (1 - easeInOut(span(p, .2, .6))).toFixed(3));
+          const detail = easeOut(span(p, .45, .8));
+          soft.forEach((node, i) => node && node.setAttribute('opacity', (softBase[i] * detail).toFixed(3)));
+          if (NARROW.matches) {
+            svg.style.display = 'none';
+            if (best !== -2) { best = -2; entries.forEach(entry => entry.classList.add('is-active')); }
+            return;
+          }
+          svg.style.display = '';
+          const s = host.getBoundingClientRect(), box = prism.getBoundingClientRect();
+          svg.setAttribute('viewBox', `0 0 ${s.width.toFixed(0)} ${s.height.toFixed(0)}`);
+          const px = x => box.left - s.left + box.width * x / 300;
+          const py = y => box.top - s.top + box.height * y / 260;
+          const inX = px(IN[0]), inY = py(IN[1]);
+          const beamE = easeInOut(span(p, 0, .35));
+          beam.setAttribute('d', `M0 ${(inY + 46).toFixed(1)}L${(inX * beamE).toFixed(1)} ${(inY + 46 * (1 - beamE)).toFixed(1)}`);
+          const middle = innerHeight / 2;
+          let winner = 0, gap = Infinity;
+          const boxes = entries.map((entry, i) => {
+            const b = entry.getBoundingClientRect();
+            const d = Math.abs((b.top + b.bottom) / 2 - middle);
+            if (d < gap) { gap = d; winner = i; }
+            return b;
+          });
+          boxes.forEach((b, i) => {
+            const on = i === winner;
+            const out = OUTS[i % 3], ox = px(out[0]), oy = py(out[1]);
+            const innerE = easeInOut(span(p, .3 + i * .04, .52 + i * .04));
+            inner[i].setAttribute('d', `M${inX.toFixed(1)} ${inY.toFixed(1)}L${(inX + (ox - inX) * innerE).toFixed(1)} ${(inY + (oy - inY) * innerE).toFixed(1)}`);
+            inner[i].setAttribute('opacity', innerE ? (on ? .85 : .45) : 0);
+            // Сначала луч долетает до записи, потом разворачивается в линейку.
+            const fly = easeInOut(span(p, .5 + i * .08, .8 + i * .08));
+            const run = easeInOut(span(p, .74 + i * .08, 1));
+            const tx = b.left - s.left, ty = b.top - s.top + .5, end = b.right - s.left;
+            const x = ox + (tx - ox) * fly, y = oy + (ty - oy) * fly;
+            rays[i].setAttribute('d', `M${ox.toFixed(1)} ${oy.toFixed(1)}L${x.toFixed(1)} ${y.toFixed(1)}` + (run ? `H${(tx + (end - tx) * run).toFixed(1)}` : ''));
+            rays[i].setAttribute('stroke-dasharray', on ? 'none' : DASH[i % 3]);
+            rays[i].setAttribute('opacity', fly ? (on ? .9 : .42) : 0);
+            rays[i].setAttribute('stroke-width', on ? 1.2 : 1);
+            knots[i].setAttribute('cx', x.toFixed(1)); knots[i].setAttribute('cy', y.toFixed(1));
+            knots[i].setAttribute('opacity', fly ? (on ? 1 : .45) : 0);
+          });
+          if (winner !== best) {
+            best = winner;
+            entries.forEach((entry, i) => entry.classList.toggle('is-active', i === winner));
+            // Свечение внутри призмы поворачивается к активному выходу.
+            tiltTo = (winner - 1) * 16;
+            if (REDUCE) glass.setAttribute('gradientTransform', `rotate(${tiltTo} .5 .5)`);
+          }
+        };
+        jobs.push(paint);
+        onLayout(paint, host);
+        if (REDUCE) return;
+        loop(host, (t, dt) => {
+          // Штрихи бегут по входящему лучу к призме.
+          beam.setAttribute('stroke-dashoffset', (-(t * 16) % 16).toFixed(2));
+          if (Math.abs(tiltTo - tiltNow) > .05) {
+            tiltNow += (tiltTo - tiltNow) * Math.min(1, dt * 2.4);
+            glass.setAttribute('gradientTransform', `rotate(${tiltNow.toFixed(2)} .5 .5)`);
+          }
+        });
+      });
+
+      // ───────── 4. Звёздная карта клуба ─────────
+      // Небо строится по размеру блока: подписи — обычный текст, не мельче 12px.
+      safe('sky', () => {
+        const host = $('#club');
+        const night = $('#club-night');
+        const grid = $('#club-grid');
+        const sky = $('#club-sky');
+        const names = $('#club-names');
+        const field = $('#club-field');
+        if (!host || !night || !grid || !sky || !names || !field) return;
+        const LIGHT = '#EFEAE4';
+        // Место звезды — доля поля. wide — десктоп (правая треть занята фото),
+        // tight — телефон. side — с какой стороны подпись.
+        const STARS = [
+          { name:'философия', wide:[.06, .62], tight:[.17, .60], r:22, side:'b', sideTight:'b' },
+          { name:'культура', wide:[.21, .22], tight:[.30, .22], r:28, side:'t', sideTight:'t' },
+          { name:'бизнес', wide:[.35, .50], tight:[.54, .47], r:34, side:'r', sideTight:'t' },
+          { name:'наука', wide:[.47, .08], tight:[.76, .13], r:20, side:'r', sideTight:'b' },
+          { name:'общество', wide:[.50, .64], tight:[.84, .70], r:24, side:'r', sideTight:'l' },
+          { name:'лидерство', wide:[.26, .80], tight:[.40, .82], r:20, side:'b', sideTight:'b' }
+        ];
+        const LINKS = [[0, 1], [1, 2], [2, 3], [2, 4], [2, 5], [5, 0]];
+
+        const gridRings = svgEl('g', { fill:'none', stroke:LIGHT, 'stroke-width':1 }, grid);
+        const lines = svgEl('g', { fill:'none', stroke:LIGHT, 'stroke-width':1, opacity:.55 }, sky);
+        const starHost = svgEl('g', {}, sky);
+        const linkNodes = LINKS.map((_, i) => {
+          const node = svgEl('path', { class:'a-draw', pathLength:1 }, lines);
+          node.style.setProperty('--d', `${300 + i * 140}ms`);
+          return node;
+        });
+        const stars = STARS.map((star, i) => {
+          const g = svgEl('g', { class:'star a-pop' }, starHost);
+          g.style.setProperty('--d', `${i * 140}ms`);
+          const coreGroup = svgEl('g', { class:'star__core' }, g);
+          const halo = svgEl('circle', { r:star.r, fill:'url(#halo)' }, coreGroup);
+          const dot = svgEl('circle', { r:(star.r * .155).toFixed(1), fill:LIGHT }, coreGroup);
+          const label = document.createElement('span');
+          label.className = 'club__name';
+          label.textContent = star.name;
+          label.style.setProperty('--d', `${200 + i * 140}ms`);
+          names.appendChild(label);
+          return { ...star, halo, dot, label, x:0, y:0, glow:0 };
+        });
+        host.classList.add('has-sky');
+
+        let pole = { x:0, y:0 };
+        const layout = () => {
+          const n = night.getBoundingClientRect(), f = field.getBoundingClientRect();
+          if (!n.width) return;
+          const narrow = NARROW.matches;
+          const view = `0 0 ${n.width.toFixed(0)} ${n.height.toFixed(0)}`;
+          grid.setAttribute('viewBox', view); sky.setAttribute('viewBox', view);
+          // Полюс сетки — за правым верхним углом: дуги пересекают весь блок.
+          pole = { x:n.width * .78, y:-n.height * .12 };
+          const step = Math.max(110, n.width * .078), far = Math.hypot(n.width, n.height) * 1.15;
+          gridRings.textContent = '';
+          const DASHES = ['none', '1 5', 'none', '1 9', 'none', '1 4'];
+          for (let r = step * 2, i = 0; r < far; r += step, i++) {
+            svgEl('circle', { cx:pole.x.toFixed(1), cy:pole.y.toFixed(1), r:r.toFixed(1), 'stroke-dasharray':DASHES[i % 6], opacity:.17 }, gridRings);
+          }
+          // Лучи сетки — полным кругом, чтобы вращение не имело шва.
+          let d = '';
+          for (let i = 0; i < 24; i++) {
+            const a = i * 15 * D;
+            d += `M${(pole.x + Math.cos(a) * step * 2).toFixed(1)} ${(pole.y + Math.sin(a) * step * 2).toFixed(1)}L${(pole.x + Math.cos(a) * far).toFixed(1)} ${(pole.y + Math.sin(a) * far).toFixed(1)}`;
+          }
+          svgEl('path', { d, opacity:.12 }, gridRings);
+          const left = f.left - n.left, topY = f.top - n.top;
+          const scale = narrow ? Math.min(1, n.width / 520) : Math.min(1.25, Math.max(.8, n.width / 1300));
+          stars.forEach((star) => {
+            const [fx, fy] = narrow ? star.tight : star.wide;
+            star.x = left + f.width * fx; star.y = topY + f.height * fy;
+            star.size = star.r * scale;
+            star.halo.setAttribute('cx', star.x.toFixed(1)); star.halo.setAttribute('cy', star.y.toFixed(1));
+            star.halo.setAttribute('r', star.size.toFixed(1));
+            star.dot.setAttribute('cx', star.x.toFixed(1)); star.dot.setAttribute('cy', star.y.toFixed(1));
+            const side = narrow ? star.sideTight : star.side, gap = star.size * .6 + 10;
+            const place = {
+              r:[star.x + gap, star.y, 'translate(0,-50%)'],
+              l:[star.x - gap, star.y, 'translate(-100%,-50%)'],
+              t:[star.x, star.y - gap - 4, 'translate(-50%,-100%)'],
+              b:[star.x, star.y + gap + 4, 'translate(-50%,0)']
+            }[side];
+            star.label.style.left = `${place[0].toFixed(1)}px`;
+            star.label.style.top = `${place[1].toFixed(1)}px`;
+            star.label.style.transform = place[2];
+          });
+          LINKS.forEach(([a, b], i) => linkNodes[i].setAttribute('d', `M${stars[a].x.toFixed(1)} ${stars[a].y.toFixed(1)}L${stars[b].x.toFixed(1)} ${stars[b].y.toFixed(1)}`));
+        };
+        onLayout(layout, host);
+
+        // Созвездие зажигается, когда поле под него вошло в экран.
+        if (!REDUCE) {
+          new IntersectionObserver(([entry]) => {
+            const lit = entry.isIntersecting || entry.boundingClientRect.top <= 0;
+            sky.classList.toggle('is-in', lit);
+            host.classList.toggle('is-lit', lit);
+          }, { rootMargin:'0px 0px -22% 0px' }).observe(field);
+        }
+
+        const near = watch(host);
+        let flat = null;
+        jobs.push(() => {
+          if (!near.on || REDUCE) return;
+          if (NARROW.matches) {
+            host.style.setProperty('--cut', `${((1 - easeOut(travel(host, 1, .4))) * innerHeight * .3).toFixed(1)}px`);
+            return;
+          }
+          // Купол: круг касается верхней кромки блока, края отстают на стрелу
+          // прогиба. Стрела падает до нуля — дуга распрямляется в прямую.
+          const p = travel(host, 1, .5);
+          const done = p >= 1;
+          if (done !== flat) { flat = done; host.classList.toggle('is-flat', done); }
+          grid.style.opacity = easeInOut(span(p, .2, 1)).toFixed(3);
+          if (done) return;
+          const half = innerWidth / 2;
+          const sag = Math.max(1, innerWidth * .2 * (1 - easeInOut(p)));
+          const radius = (half * half + sag * sag) / (2 * sag);
+          host.style.setProperty('--dome-r', `${radius.toFixed(1)}px`);
+          host.style.setProperty('--dome-y', `${radius.toFixed(1)}px`);
+        });
+        if (REDUCE) return;
+        let sx = 0, sy = 0, tx = 0, ty = 0, pointer = null, turn = 0, since = 0;
+        if (HOVER) {
+          host.addEventListener('pointermove', (event) => {
+            tx = (event.clientX / innerWidth - .5) * -16; ty = (event.clientY / innerHeight - .5) * -10;
+            const box = night.getBoundingClientRect();
+            pointer = { x:event.clientX - box.left, y:event.clientY - box.top };
+          }, { passive:true });
+          host.addEventListener('pointerleave', () => { tx = 0; ty = 0; pointer = null; });
+        }
+        loop(host, (t, dt) => {
+          // Сетка вращается двадцать раз в секунду: на скорости 0,35°/с
+          // этого хватает, а перерисовка крупного рисунка втрое реже.
+          since += dt;
+          if (since > .05) {
+            turn = (turn + since * .35) % 360; since = 0;
+            gridRings.setAttribute('transform', `rotate(${turn.toFixed(3)} ${pole.x.toFixed(1)} ${pole.y.toFixed(1)})`);
+          }
+          sx += (tx - sx) * Math.min(1, dt * 2.7); sy += (ty - sy) * Math.min(1, dt * 2.7);
+          sky.style.transform = names.style.transform = `translate3d(${sx.toFixed(2)}px,${sy.toFixed(2)}px,0)`;
+          // Звезда рядом с курсором разгорается, соседние — слабее.
+          stars.forEach((star) => {
+            const d = pointer ? Math.hypot(pointer.x - star.x, pointer.y - star.y) : Infinity;
+            const to = clamp01(1 - d / 240);
+            if (Math.abs(to - star.glow) < .004) return;
+            star.glow += (to - star.glow) * Math.min(1, dt * 5);
+            star.halo.setAttribute('r', (star.size * (1 + star.glow * 1.1)).toFixed(1));
+            star.label.classList.toggle('is-near', star.glow > .35);
+          });
+        });
+      });
+
+      // ───────── 5. Манифест по буквам ─────────
+      // Первая фраза выходит строкой. Вторая собирается из рассыпанных букв:
+      // «формируем среду» — движение повторяет глагол.
+      safe('manifest', () => {
+        const track = $('#manifest-track');
+        const side = $('#manifest-side');
+        const lines = $$('#manifest-q [data-letters]');
+        if (!track || lines.length < 2) return;
+        if (REDUCE) return;
+        const BLUR = 8, SHARE = .3;
+        // Псевдослучайный, но постоянный разброс: у буквы всегда одно место.
+        const rnd = (i, salt) => { const v = Math.sin(i * 127.1 + salt * 311.7) * 43758.5453; return v - Math.floor(v); };
+        const phrases = [[], []];
+        lines.forEach(line => {
+          const set = phrases[+line.dataset.phrase || 0];
+          const from = set.length;
+          const quote = $('.lq', line);
+          if (quote) set.push({ node:quote, v:-1, f:-1, fixed:true });
+          [...line.childNodes].forEach(node => {
+            if (node.nodeType !== 3) return;
+            const frag = document.createDocumentFragment();
+            node.textContent.split(/(\s+)/).forEach(part => {
+              if (!part) return;
+              if (/^\s+$/.test(part)) { frag.append(part); return; }
+              const word = document.createElement('span'); word.className = 'w';
+              [...part].forEach(ch => {
+                const l = document.createElement('span'); l.className = 'l'; l.textContent = ch;
+                word.appendChild(l); set.push({ node:l, v:-1, f:-1 });
+              });
+              frag.append(word);
+            });
+            node.replaceWith(frag);
+          });
+          // Место буквы в своей строке: от него зависит, насколько она отойдёт.
+          const own = set.slice(from).filter(letter => !letter.fixed);
+          own.forEach((letter, i) => { letter.pos = i / Math.max(1, own.length - 1); });
+        });
+        phrases.forEach((set, pi) => set.forEach((letter, i) => {
+          letter.dx = (rnd(i, pi + 1) - .5) * 1.1;
+          letter.dy = (rnd(i, pi + 7) - .5) * .8;
+          letter.rot = (rnd(i, pi + 13) - .5) * 26;
+          // Строка расходится только вправо: левый край и кавычка стоят на месте,
+          // иначе первая буква уходит за поле.
+          letter.away = letter.fixed ? 0 : (letter.pos || 0) * .26;
+        }));
+        const first = lines.filter(line => line.dataset.phrase === '0');
+
+        const near = watch(track);
+        let dim = -1, open = null;
+        const paint = () => {
+          if (!near.on) return;
+          if (NARROW.matches) {
+            if (dim !== 1) { dim = 1; first.forEach(line => { line.style.opacity = ''; }); }
+            return;
+          }
+          const box = track.getBoundingClientRect();
+          const run = Math.max(1, box.height - innerHeight);
+          const q = -box.top / run;
+          const windows = [[-.72, -.08], [.06, .58]];
+          // Отложенная фраза: гаснет и слегка расходится.
+          const aside = easeInOut(span(q, .46, .74));
+          phrases.forEach((set, pi) => {
+            const t = span(q, windows[pi][0], windows[pi][1]);
+            const n = set.length;
+            set.forEach((letter, i) => {
+              const v = +clamp01((t - (i / n) * (1 - SHARE)) / SHARE).toFixed(3);
+              const f = pi === 0 ? +aside.toFixed(3) : 0;
+              // Пишем стиль, только когда значение изменилось.
+              if (v === letter.v && f === letter.f) return;
+              letter.v = v; letter.f = f;
+              const moving = v > .02 && v < .98;
+              letter.node.classList.toggle('is-moving', moving);
+              letter.node.style.opacity = v;
+              const e = easeOut(v);
+              if (pi === 0) {
+                letter.node.style.transform = v < .98 || f > 0 ? `translate3d(${(letter.away * f).toFixed(3)}em,${((1 - e) * .3).toFixed(3)}em,0)` : '';
+              } else {
+                letter.node.style.transform = v < .98 ? `translate3d(${(letter.dx * (1 - e)).toFixed(3)}em,${(letter.dy * (1 - e)).toFixed(3)}em,0) rotate(${(letter.rot * (1 - e)).toFixed(2)}deg)` : '';
+                // Размытие несёт только вторая фраза, и не больше восьми букв разом.
+                letter.node.style.filter = moving ? `blur(${((1 - v) * BLUR).toFixed(2)}px)` : '';
+              }
+            });
+          });
+          const fade = +(1 - .7 * aside).toFixed(3);
+          if (fade !== dim) { dim = fade; first.forEach(line => { line.style.opacity = fade; }); }
+          const show = q > .62;
+          if (show !== open) { open = show; side.classList.toggle('is-in', show); }
+        };
+        jobs.push(paint);
+        paint();
+        // На телефоне фиксации нет — подпись выходит по обычному порогу.
+        if (NARROW.matches && reveal) reveal.observe(side);
+      });
+
+      // ───────── 6. Основатель ─────────
+      // Портрет открывается от прокрутки, а не по порогу: назад — так же.
+      safe('founder', () => {
+        const host = $('#founder');
+        const photo = $('#founder-photo');
+        const cap = $('#founder-cap');
+        const rows = $$('#founder-rows .founder__row');
+        if (!host || !photo) return;
+        const letters = [];
+        if (cap && !REDUCE) {
+          const text = cap.textContent;
+          cap.textContent = '';
+          [...text].forEach(ch => {
+            if (/\s/.test(ch)) { cap.append(ch); return; }
+            const l = document.createElement('span'); l.className = 'l'; l.textContent = ch;
+            cap.appendChild(l); letters.push({ node:l, v:-1 });
+          });
+        }
+        const near = watch(host);
+        let best = -1;
+        jobs.push(() => {
+          if (!near.on) return;
+          if (rows.length) {
+            let winner = -2;
+            if (!NARROW.matches) {
+              const middle = innerHeight * .5;
+              let gap = Infinity;
+              rows.forEach((row, i) => {
+                const box = row.getBoundingClientRect();
+                const d = Math.abs((box.top + box.bottom) / 2 - middle);
+                if (d < gap) { gap = d; winner = i; }
+              });
+            }
+            // На телефоне все статьи в полную силу: читать удобнее подряд.
+            if (winner !== best) { best = winner; rows.forEach((row, i) => row.classList.toggle('is-active', winner === -2 || i === winner)); }
+          }
+          if (REDUCE) return;
+          const box = photo.getBoundingClientRect();
+          const p = clamp01((.96 - box.top / innerHeight) / .62);
+          photo.style.setProperty('--open', easeOut(span(p, 0, .85)).toFixed(3));
+          // Сдвиг ограничен: за экраном значение не должно копиться.
+          const mid = Math.max(-.6, Math.min(.6, (box.top + box.height / 2) / innerHeight - .5));
+          photo.style.setProperty('--drift', (mid * -5).toFixed(2));
+          const n = letters.length;
+          letters.forEach((letter, i) => {
+            const v = +clamp01((span(p, .45, 1) - (i / n) * .7) / .3).toFixed(2);
+            if (v === letter.v) return;
+            letter.v = v;
+            letter.node.style.opacity = v;
+          });
+        });
+      });
+
+      // ───────── 7. Компас в финале ─────────
+      safe('compass', () => {
+        const host = $('#contact');
+        const stage = $('#contact-stage');
+        const compass = $('#contact-compass');
+        const needle = $('#contact-needle');
+        const bezel = $('#contact-bezel');
+        if (!host || !compass || !needle) return;
+        // Внешняя шкала: деление каждые пять градусов, длинное — каждые сорок пять.
+        let spin = null;
+        if (bezel) {
+          spin = svgEl('g', {}, bezel);
+          let d = '';
+          for (let i = 0; i < 72; i++) {
+            const a = i * 5 * D, long = i % 9 === 0, r0 = 216, r1 = long ? 232 : 222;
+            d += `M${(300 + Math.cos(a) * r0).toFixed(1)} ${(300 + Math.sin(a) * r0).toFixed(1)}L${(300 + Math.cos(a) * r1).toFixed(1)} ${(300 + Math.sin(a) * r1).toFixed(1)}`;
+          }
+          svgEl('path', { d }, spin);
+          svgEl('circle', { cx:300, cy:300, r:238, 'stroke-dasharray':'1 9' }, spin);
+        }
+        const parts = $$('[data-ring]', compass).map(node => ({
+          node, ring:+node.dataset.ring, base:parseFloat(node.getAttribute('opacity') || 1), v:-1
+        }));
+        const near = watch(host);
+        let arrived = REDUCE, current = 0, target = 0, centre = null, aim = null, alpha = REDUCE ? 1 : 0;
+        const norm = (a) => ((a + 180) % 360 + 360) % 360 - 180;
+        jobs.push(() => {
+          centre = null;
+          if (!near.on || REDUCE) return;
+          const cut = NARROW.matches ? 0 : (1 - easeOut(travel(host, 1, .42))) * innerHeight * .34;
+          host.style.setProperty('--cut', `${cut.toFixed(1)}px`);
+          // Кольца расходятся от центра: внутренние первыми, шкала — последней.
+          const p = travel(stage, .9, .08);
+          parts.forEach((part) => {
+            const e = +easeInOut(span(p, part.ring * .085, part.ring * .085 + .36)).toFixed(3);
+            if (e === part.v) return;
+            part.v = e;
+            part.node.style.opacity = (part.base * e).toFixed(3);
+            part.node.style.transform = e < 1 ? `scale(${(.84 + .16 * e).toFixed(4)})` : '';
+          });
+          const now = p > .8;
+          if (now !== arrived) {
+            arrived = now;
+            // Стрелка входит с запасом хода и сама успокаивается на цели.
+            if (now) current = target - 46;
+          }
+        });
+        if (REDUCE) return;
+        const point = (x, y) => {
+          if (!centre) { const b = compass.getBoundingClientRect(); centre = { x:b.left + b.width / 2, y:b.top + b.height / 2 }; }
+          // Покой стрелки — северо-восток (−45°), как на первом экране.
+          target = norm(Math.atan2(y - centre.y, x - centre.x) * 180 / Math.PI + 45);
+        };
+        if (HOVER) {
+          stage.addEventListener('pointermove', (event) => {
+            if (aim) { const b = aim.getBoundingClientRect(); point(b.left + b.width / 2, b.top + b.height / 2); }
+            else point(event.clientX, event.clientY);
+          }, { passive:true });
+          stage.addEventListener('pointerleave', () => { aim = null; target = 0; });
+          $$('[data-aim]', host).forEach(node => {
+            node.addEventListener('pointerenter', () => { aim = node; });
+            node.addEventListener('pointerleave', () => { aim = null; });
+          });
+        }
+        let turn = 0, since = 0;
+        loop(compass, (t, dt) => {
+          if (!HOVER) target = Math.sin(t * .45) * 15;
+          current += norm(target - current) * Math.min(1, dt * 3.4);
+          alpha += ((arrived ? 1 : 0) - alpha) * Math.min(1, dt * 5);
+          needle.style.transform = `rotate(${current.toFixed(3)}deg)`;
+          needle.style.opacity = alpha.toFixed(3);
+          // Шкала идёт против стрелки, двадцать раз в секунду.
+          since += dt;
+          if (spin && since > .05) {
+            turn = (turn - since * .6) % 360; since = 0;
+            spin.setAttribute('transform', `rotate(${turn.toFixed(3)} 300 300)`);
+          }
+        });
+      });
+
+      flush();
+    })();
+  </script>
+</body>
+</html>
