@@ -3,18 +3,16 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- Safari держал страницу в кэше и показывал старую вёрстку с новым
-       фоном: правки «не доходили» до клиентки. Саму страницу не кэшируем,
-       а её файлы помечены версией в адресе. -->
-  <meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
   <title>The Performance — Институт культуры влияния</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <!-- Шрифты не блокируют первую отрисовку: подключаются как print и
-       переключаются на экранные сразу после загрузки. -->
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400&family=Manrope:wght@300;400;500;600&family=Onest:wght@300&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-  <noscript><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400&family=Manrope:wght@300;400;500;600&family=Onest:wght@300&display=swap" rel="stylesheet"></noscript>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400&family=Manrope:wght@300;400;500;600&family=Onest:wght@300&display=swap" rel="stylesheet">
   <script>document.documentElement.classList.add('is-preloading');</script>
+  <link rel="preload" href="three.min.js" as="script">
+  <!-- Без defer: инлайновый скрипт ниже создаёт WebGLRenderer прямо во время
+       разбора страницы, поэтому THREE обязан быть уже определён. Отложить
+       загрузку можно только вместе с переносом инициализации в DOMContentLoaded. -->
+  <script src="three.min.js"></script>
   <style>
     @font-face { font-family:"Anticva"; src:url("fonts/Anticva-Regular.otf") format("opentype"); font-style:normal; font-weight:400; font-display:block; }
     :root {
@@ -45,12 +43,7 @@
       /* Карусель на 30% мельче прежнего. На узких экранах в min() побеждает
          доля ширины, поэтому она выше: иначе карточка ужимается сильнее,
          чем на 30%, и становится совсем мелкой. */
-      /* Высота кольца — остаток экрана после всего прочего, посчитанный
-         явно: заголовок (~130px), отступы сверху и снизу, зазор под ним и
-         запас сцены под тени. Прежняя доля (50svh) ничего этого не учитывала,
-         блок перерастал экран на 44-132px, и вёрстка ехала. */
-      --ring-chrome:clamp(330px, 42svh, 470px);
-      --ring-h:clamp(200px, min(calc(100svh - var(--ring-chrome)), 40vw), 470px);
+      --ring-h:clamp(280px, min(50svh, 40vw), 560px);
       /* Карточка шире и ниже прежнего: пропорция 1.0 — ширина ещё +20%. */
       --card-h:calc(var(--ring-h) - 40px);
       --card-w:calc(var(--card-h) / 1.385);
@@ -89,10 +82,7 @@
       display:grid; place-items:center;
       height:100svh; overflow:hidden;
       background:var(--void);
-      /* Подъём шторки снизу вверх. --veil: 0 — опущена, 1 — закрыла экран.
-         По умолчанию 1: если скрипт прокрутки почему-то не отработал, блок
-         должен быть виден, а не срезан под ноль. Скрипт выставляет своё
-         значение на первом же кадре, поэтому анимация та же. */
+      /* Подъём шторки снизу вверх. --veil: 0 — опущена, 1 — закрыла экран. */
       clip-path:inset(calc((1 - var(--veil,1)) * 100%) 0 0 0);
       /* Сглаживается только сама шторка: за то же движение прокрутки край
          доезжает мягко, а не рывком вслед за пальцем. Фраз и длины трека
@@ -110,26 +100,18 @@
     .philosophy-track .philosophy {
       position:sticky; top:0; min-height:100svh; display:grid; align-content:center;
       /* Тот же приём, что у тёмной шторки: блок открывается снизу вверх.
-         --handoff считается в блоке фраз и растёт на уходе последней.
-         По умолчанию 1 — по той же причине: без скрипта блок остаётся
-         видимым, а не исчезает целиком. */
+         --handoff считается в блоке фраз и растёт на уходе последней. */
       clip-path:inset(calc((1 - var(--handoff,1)) * 100%) 0 0 0);
     }
     /* Карусель — снова отдельная секция, после «Философии». */
     /* Заголовок и карусель — одна группа: в один экран, с общим воздухом. */
     .circle-section {
       position:relative; z-index:2;
-      display:grid; justify-items:center;
+      display:grid; align-content:center; justify-items:center;
       /* Зазор больше — кольцо опускается ниже под заголовок. */
-      gap:clamp(24px,4svh,56px);
+      gap:clamp(28px,5svh,64px);
       min-height:100svh; padding:clamp(24px,4svh,56px) 0;
-      /* Группа стояла высоко на экране ноутбука: сцена берёт заметный
-         запас под тени, и он поднимал всё вверх. Опускаем группу, задав
-         её положение в блоке, а не переносом — перенос при высоте ровно
-         в экран ничего не давал. */
-      align-content:start;
-      padding-top:clamp(40px,6svh,84px);
-      background:var(--bg-light);
+      background:var(--void);
     }
     /* Карусель временно скрыта: убрать у секции, чтобы
        вернуть её обратно. Разметка и скрипт остаются нетронутыми. */
@@ -138,15 +120,13 @@
     .circle-title {
       margin:0; padding:0 20px;
       /* Та же гарнитура, что у «Философии»: Anticva, прописные.
-         Блок светлый — надпись тёмная, как в «Философии». */
+         Цвет остаётся светлым — блок тёмный. */
       font-family:Anticva,Georgia,serif;
-      font-size:clamp(1.9rem,.9rem + 2.8vw,3.6rem);
+      font-size:clamp(2.3rem,1.1rem + 3.4vw,4.3rem);
       font-weight:400; line-height:1.111; letter-spacing:.01em;
       text-transform:uppercase;
       text-align:center; text-wrap:balance;
-      color:var(--ink);
-      /* Приподнят над кольцом: прежде почти касался верхних карточек. */
-      margin-top:calc(clamp(-40px,-3svh,-16px) + 10px);
+      color:var(--light);
     }
     .veil__line {
       margin:0;
@@ -274,60 +254,27 @@
       /* Сцена уже кольца: при пяти карточках диаметр ~2x ширины карточки,
          поэтому узкая сцена нужна, чтобы крайние уходили за края.
          Без потолка — на больших мониторах всё растёт пропорционально. */
-      /* Во всю ширину и без жёсткой обрезки: прежний overflow резал по
-         прямой прямо по светлому полю — обрывались и тени, и скругления
-         дальних карточек. Вместо реза края растворяются маской, поэтому
-         оборваться нечему ни при каком размере экрана.
-         Высота с запасом: задний ряд кольца выше переднего, и тень
-         падает ниже самой карточки. */
-      width:100%; margin-inline:auto;
-      height:calc(var(--ring-h) + clamp(80px,10svh,130px));
-      /* Запас нужен с обеих сторон, но снизу больше: тень падает вниз.
-         Кольцо смещено кверху ровно настолько, чтобы над ним осталось
-         место под тень, а лишняя высота ушла вниз. */
-      align-items:center;
-      padding-bottom:clamp(10px,1.4svh,20px);
-      overflow:visible;
+      width:var(--stage-w); margin-inline:auto;
+      height:var(--ring-h);
+      overflow:hidden;
       perspective:3000px;
       cursor:grab; touch-action:pan-y;
       user-select:none;
     }
     .ring-stage.is-dragging { cursor:grabbing; }
-    /* Края кольца прячем накладкой в цвет фона, а не маской на сцене:
-       маска в WebKit создаёт собственный слой и плющит перспективу —
-       карточки переставали скрывать свою обратную сторону, и сквозь
-       дальние просвечивал зеркальный текст. Накладка 3D не трогает. */
-    .circle-section::before,
-    .circle-section::after {
-      content:''; position:absolute; z-index:2; top:0; bottom:0;
-      width:clamp(40px,7vw,120px); pointer-events:none;
-    }
-    .circle-section::before { left:0; background:linear-gradient(to right, var(--bg-light), rgba(241,236,236,0)); }
-    .circle-section::after { right:0; background:linear-gradient(to left, var(--bg-light), rgba(241,236,236,0)); }
     .ring-tilt { transform:rotateX(-7deg); transform-style:preserve-3d; }
     .ring { position:relative; transform-style:preserve-3d; }
     .ring__item { position:absolute; inset:0; transform-style:preserve-3d; }
     .ring__face {
       position:absolute; inset:0;
       border-radius:14px; overflow:hidden;
-      -webkit-backface-visibility:hidden;
       backface-visibility:hidden;
       background-size:cover; background-position:center;
-      /* Без тени: размытие пересчитывалось на каждом кадре для каждой
-         из десяти карточек, и видеокарта не успевала — на экране ползли
-         тёмные пятна, которых не было на скриншотах. */
+      box-shadow:0 18px 48px rgba(0,0,0,.55);
     }
-    /* Изнанка больше не рисуется: отвёрнутые карточки скрываются по углу,
-       а её затемнённая копия успевала мелькнуть чёрной заливкой в момент
-       переключения — это и читалось как лаг. */
-    .ring__face--back { display:none; }
-    /* Без filter: он пересчитывался на каждом кадре для каждой карточки,
-       и видеокарта не успевала — на экране проступали обрывки прошлых
-       кадров тёмными пятнами (на скриншотах их не видно, потому что
-       снимок собирается из разметки, а не с экрана). Затемнение теперь
-       даёт полупрозрачная подложка поверх фото. */
+    .ring__face--back { transform:rotateY(180deg); filter:brightness(.35); }
     .ring__photo { position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
-      opacity:.72; }
+      filter:saturate(.86) brightness(.62); }
     /* Подпись поверх фото: чередуется сверху и снизу, как в макете. */
     .ring__copy {
       position:absolute; z-index:2; left:11.1%; right:11.1%;
@@ -354,10 +301,7 @@
        сплошной градиент сверху и снизу пачкал фото. */
     /* Подпись лежит прямо на фото: радиальная подложка читалась как
        грязное чёрное пятно под текстом. */
-    /* Ни тени под текстом, ни отдельного слоя: слой ставился против
-       зеркального текста в Safari, но отвёрнутые карточки теперь скрыты
-       по углу — а каждая подпись держала собственный буфер видеопамяти. */
-    .ring__copy { isolation:isolate; }
+    .ring__copy { isolation:isolate; text-shadow:0 1px 12px rgba(0,0,0,.55); }
 
     @media (prefers-reduced-motion:reduce) {
       .ring-stage { height:auto; overflow-x:auto; perspective:none; }
@@ -596,14 +540,19 @@
   </style>
 </head>
 <body>
+  <section class="preloader" aria-label="Загрузка">
+    <canvas class="preloader__globe" id="three-canvas" aria-hidden="true"></canvas>
+    <canvas class="preloader__particles" id="preloader-particles" aria-hidden="true"></canvas>
+    <span class="loader-counter" id="counter" aria-live="polite">0%</span>
+  </section>
   <main class="hero">
     <button class="menu-toggle" type="button" aria-label="Открыть меню" aria-expanded="false"><i></i><i></i><i></i></button>
-    <a class="brand" href="#" aria-label="The Performance — на главную"><img class="brand__art" src="HERO/10%20%E2%80%94%20EYE/%D0%9B%D0%9E%D0%93%D0%9E%D0%9B%D0%9E%D0%93%D0%9E.svg?v=202609251533" alt=""></a>
+    <a class="brand" href="#" aria-label="The Performance — на главную"><img class="brand__art" src="HERO/10%20%E2%80%94%20EYE/%D0%9B%D0%9E%D0%93%D0%9E%D0%9B%D0%9E%D0%93%D0%9E.svg" alt=""></a>
     <nav class="menu" aria-label="Основная навигация"><div class="menu__group"><b>Институт</b><a class="active" href="#">Манифест</a><a href="#">Методология</a></div><div class="menu__group"><b>Развитие</b><a href="#">Направления</a><a href="#">Пути</a></div><div class="menu__group"><b>Пространство</b><a href="#">События</a><a href="#">Истории</a></div><div class="menu__group"><b>Медиа</b><a href="#">Публикации</a><a href="#">FAQ</a></div></nav>
-    <button class="cta" type="button"><span class="cta__label cta__label--desktop">Запросить участие</span><span class="cta__label cta__label--mobile">Участие</span><img class="cta__arrow" src="figma-arrow.svg?v=202609251533" alt="" aria-hidden="true"></button>
+    <button class="cta" type="button"><span class="cta__label cta__label--desktop">Запросить участие</span><span class="cta__label cta__label--mobile">Участие</span><img class="cta__arrow" src="figma-arrow.svg" alt="" aria-hidden="true"></button>
     <section class="copy" aria-labelledby="hero-title"><p class="eyebrow">The Performance&nbsp;&nbsp;—&nbsp;&nbsp;Est. 2016</p><h1 class="title" id="hero-title"><span class="title__line title__line--primary"><span class="side-note side-note--left"><span>Видеть</span><span>иначе</span></span><span class="title__word">Институт</span><span class="side-note side-note--right"><span>Говорить</span><span>убедительно</span></span></span><span class="title__line title__line--secondary">Культуры <br class="mobile-only">влияния</span></h1></section>
-    <div class="mobile-mantra" aria-hidden="true"><span class="mobile-mantra__dots"><img src="figma-dot-large.svg?v=202609251533" alt=""><img src="figma-dot-medium.svg?v=202609251533" alt=""><img src="figma-dot-small.svg?v=202609251533" alt=""></span><span>видеть иначе</span></div>
-    <div class="compass" aria-label="Интерактивный компас"><img class="compass__base" src="compass-base.svg?v=202609251533" alt=""><img class="compass__needle" src="compass-needle.svg?v=202609251533" alt=""></div>
+    <div class="mobile-mantra" aria-hidden="true"><span class="mobile-mantra__dots"><img src="figma-dot-large.svg" alt=""><img src="figma-dot-medium.svg" alt=""><img src="figma-dot-small.svg" alt=""></span><span>видеть иначе</span></div>
+    <div class="compass" aria-label="Интерактивный компас"><img class="compass__base" src="compass-base.svg" alt=""><img class="compass__needle" src="compass-needle.svg" alt=""></div>
     <i class="cross cross--left" aria-hidden="true">＋</i><i class="cross cross--right" aria-hidden="true">＋</i>
     <p class="meta meta--left"><span>＋&nbsp; Листайте и&nbsp;исследуйте</span><span>&nbsp;&nbsp;&nbsp;&nbsp;пространство института</span></p><p class="meta meta--right"><span>Москва&nbsp; /&nbsp; Online</span><span>Приём заявок открыт</span></p>
   </main>
@@ -622,27 +571,27 @@
   <!-- Философия: блок прилипает, и прокрутка листает ленту по горизонтали.
        Страница идёт дальше только когда доехала последняя карточка. -->
   <div class="philosophy-track" id="philosophy-track">
-  <section class="philosophy philosophy--v2" aria-label="Философия">
+  <section class="philosophy" aria-label="Философия">
     <div class="chrome chrome--section chrome--dark" aria-hidden="true">
-      <span class="chrome__toggle" aria-hidden="true"><i></i><i></i><i></i></span><span class="chrome__brand"><img src="HERO/10%20%E2%80%94%20EYE/%D0%9B%D0%9E%D0%93%D0%9E%D0%9B%D0%9E%D0%93%D0%9E.svg?v=202609251533" alt=""></span>
-      <span class="chrome__cta"><span class="chrome__cta-label chrome__cta-label--desktop">Запросить участие</span><span class="chrome__cta-label chrome__cta-label--mobile">Участие</span><img src="figma-arrow.svg?v=202609251533" alt=""></span>
+      <span class="chrome__toggle" aria-hidden="true"><i></i><i></i><i></i></span><span class="chrome__brand"><img src="HERO/10%20%E2%80%94%20EYE/%D0%9B%D0%9E%D0%93%D0%9E%D0%9B%D0%9E%D0%93%D0%9E.svg" alt=""></span>
+      <span class="chrome__cta"><span class="chrome__cta-label chrome__cta-label--desktop">Запросить участие</span><span class="chrome__cta-label chrome__cta-label--mobile">Участие</span><img src="figma-arrow.svg" alt=""></span>
       <p class="chrome__meta chrome__meta--left"><span>＋&nbsp; Листайте и&nbsp;исследуйте</span><span>&nbsp;&nbsp;&nbsp;&nbsp;пространство института</span></p>
       <p class="chrome__meta chrome__meta--right"><span>Москва&nbsp; /&nbsp; Online</span><span>Приём заявок открыт</span></p>
     </div>
     <h2 class="philosophy__title">Философия</h2>
     <div class="philosophy__rail">
       <article class="pcard pcard--red pcard--brand">
-        <picture><source media="(min-width:1200px)" srcset="cards/card-silk-lg.jpg"><img class="pcard__media" src="cards/card-silk-sm.jpg?v=202609251533" alt="" decoding="async"></picture>
+        <picture><source media="(min-width:1200px)" srcset="cards/card-silk-lg.jpg"><img class="pcard__media" src="cards/card-silk-sm.jpg" alt="" decoding="async"></picture>
         <div class="pcard__brand">
-          <img src="cards/logo-big.svg?v=202609251533" alt="">
+          <img src="cards/logo-big.svg" alt="">
           <p class="pcard__brand-name">The Performance</p>
           <p class="pcard__brand-note">Пространство на&nbsp;пересечении культуры, образования и&nbsp;лидерства.</p>
         </div>
-        
+        <span class="pcard__brand-tag">Перформанс</span>
       </article>
 
       <article class="pcard pcard--green">
-        <picture><source media="(min-width:1200px)" srcset="cards/card-green-lg.jpg"><img class="pcard__media" src="cards/card-green-sm.jpg?v=202609251533" alt="" decoding="async"></picture>
+        <picture><source media="(min-width:1200px)" srcset="cards/card-green-lg.jpg"><img class="pcard__media" src="cards/card-green-sm.jpg" alt="" decoding="async"></picture>
         <div class="pcard__badges">
           <span class="pcard__badge">01</span><span class="pcard__badge">принцип</span>
         </div>
@@ -653,7 +602,7 @@
       </article>
 
       <article class="pcard pcard--light">
-        <picture><source media="(min-width:1200px)" srcset="cards/card-bird-lg.jpg"><img class="pcard__media" src="cards/card-bird-sm.jpg?v=202609251533" alt="" decoding="async"></picture>
+        <picture><source media="(min-width:1200px)" srcset="cards/card-bird-lg.jpg"><img class="pcard__media" src="cards/card-bird-sm.jpg" alt="" decoding="async"></picture>
         <div class="pcard__badges">
           <span class="pcard__badge">02</span><span class="pcard__badge">принцип</span>
         </div>
@@ -664,7 +613,63 @@
       </article>
 
       <article class="pcard pcard--dark">
-        <picture><source media="(min-width:1200px)" srcset="cards/card-deep-lg.jpg"><img class="pcard__media" src="cards/card-deep-sm.jpg?v=202609251533" alt="" decoding="async"></picture>
+        <picture><source media="(min-width:1200px)" srcset="cards/card-deep-lg.jpg"><img class="pcard__media" src="cards/card-deep-sm.jpg" alt="" decoding="async"></picture>
+        <div class="pcard__badges">
+          <span class="pcard__badge">03</span><span class="pcard__badge">принцип</span>
+        </div>
+        <div class="pcard__copy">
+          <h3 class="pcard__name">Соединять культуру и&nbsp;лидерство</h3>
+          <p class="pcard__note">Влияние без&nbsp;фундамента&nbsp;—<br>громкость</p>
+        </div>
+      </article>
+    </div>
+  </section>
+  </div>
+
+  <div class="philosophy-track" id="philosophy-track-v2">
+  <section class="philosophy philosophy--v2" aria-label="Философия — вариант 2">
+    <div class="chrome chrome--section chrome--dark" aria-hidden="true">
+      <span class="chrome__toggle" aria-hidden="true"><i></i><i></i><i></i></span><span class="chrome__brand"><img src="HERO/10%20%E2%80%94%20EYE/%D0%9B%D0%9E%D0%93%D0%9E%D0%9B%D0%9E%D0%93%D0%9E.svg" alt=""></span>
+      <span class="chrome__cta"><span class="chrome__cta-label chrome__cta-label--desktop">Запросить участие</span><span class="chrome__cta-label chrome__cta-label--mobile">Участие</span><img src="figma-arrow.svg" alt=""></span>
+      <p class="chrome__meta chrome__meta--left"><span>＋&nbsp; Листайте и&nbsp;исследуйте</span><span>&nbsp;&nbsp;&nbsp;&nbsp;пространство института</span></p>
+      <p class="chrome__meta chrome__meta--right"><span>Москва&nbsp; /&nbsp; Online</span><span>Приём заявок открыт</span></p>
+    </div>
+    <h2 class="philosophy__title">Философия</h2>
+    <div class="philosophy__rail">
+      <article class="pcard pcard--red pcard--brand">
+        <picture><source media="(min-width:1200px)" srcset="cards/card-silk-lg.jpg"><img class="pcard__media" src="cards/card-silk-sm.jpg" alt="" decoding="async"></picture>
+        <div class="pcard__brand">
+          <img src="cards/logo-big.svg" alt="">
+          <p class="pcard__brand-name">The Performance</p>
+          <p class="pcard__brand-note">Пространство на&nbsp;пересечении культуры, образования и&nbsp;лидерства.</p>
+        </div>
+        
+      </article>
+
+      <article class="pcard pcard--green">
+        <picture><source media="(min-width:1200px)" srcset="cards/card-green-lg.jpg"><img class="pcard__media" src="cards/card-green-sm.jpg" alt="" decoding="async"></picture>
+        <div class="pcard__badges">
+          <span class="pcard__badge">01</span><span class="pcard__badge">принцип</span>
+        </div>
+        <div class="pcard__copy">
+          <h3 class="pcard__name">Мыслить через слово</h3>
+          <p class="pcard__note">Речь развивает интеллект, а&nbsp;не&nbsp;украшает его</p>
+        </div>
+      </article>
+
+      <article class="pcard pcard--light">
+        <picture><source media="(min-width:1200px)" srcset="cards/card-bird-lg.jpg"><img class="pcard__media" src="cards/card-bird-sm.jpg" alt="" decoding="async"></picture>
+        <div class="pcard__badges">
+          <span class="pcard__badge">02</span><span class="pcard__badge">принцип</span>
+        </div>
+        <div class="pcard__copy">
+          <h3 class="pcard__name">Формировать влияние</h3>
+          <p class="pcard__note">Говорить так, чтобы менялась не&nbsp;тема разговора, а&nbsp;положение дел</p>
+        </div>
+      </article>
+
+      <article class="pcard pcard--dark">
+        <picture><source media="(min-width:1200px)" srcset="cards/card-deep-lg.jpg"><img class="pcard__media" src="cards/card-deep-sm.jpg" alt="" decoding="async"></picture>
         <div class="pcard__badges">
           <span class="pcard__badge">03</span><span class="pcard__badge">принцип</span>
         </div>
@@ -679,9 +684,9 @@
 
   <!-- Среда единомышленников: карусель идёт после «Философии». -->
   <section class="circle-section" aria-label="Среда единомышленников">
-    <div class="chrome chrome--section chrome--dark" aria-hidden="true">
-      <span class="chrome__toggle" aria-hidden="true"><i></i><i></i><i></i></span><span class="chrome__brand"><img src="HERO/10%20%E2%80%94%20EYE/%D0%9B%D0%9E%D0%93%D0%9E%D0%9B%D0%9E%D0%93%D0%9E.svg?v=202609251533" alt=""></span>
-      <span class="chrome__cta"><span class="chrome__cta-label chrome__cta-label--desktop">Запросить участие</span><span class="chrome__cta-label chrome__cta-label--mobile">Участие</span><img src="figma-arrow.svg?v=202609251533" alt=""></span>
+    <div class="chrome chrome--section chrome--light" aria-hidden="true">
+      <span class="chrome__toggle" aria-hidden="true"><i></i><i></i><i></i></span><span class="chrome__brand"><img src="HERO/10%20%E2%80%94%20EYE/%D0%9B%D0%9E%D0%93%D0%9E%D0%9B%D0%9E%D0%93%D0%9E.svg" alt=""></span>
+      <span class="chrome__cta"><span class="chrome__cta-label chrome__cta-label--desktop">Запросить участие</span><span class="chrome__cta-label chrome__cta-label--mobile">Участие</span><img src="figma-arrow.svg" alt=""></span>
       <p class="chrome__meta chrome__meta--left"><span>＋&nbsp; Листайте и&nbsp;исследуйте</span><span>&nbsp;&nbsp;&nbsp;&nbsp;пространство института</span></p>
       <p class="chrome__meta chrome__meta--right"><span>Москва&nbsp; /&nbsp; Online</span><span>Приём заявок открыт</span></p>
     </div>
@@ -696,30 +701,403 @@
 
   <!-- Та же обвязка, что на первом экране: не двигается, только цвет. -->
   <div class="chrome" id="chrome" aria-hidden="true">
-    <span class="chrome__toggle" aria-hidden="true"><i></i><i></i><i></i></span><span class="chrome__brand"><img src="HERO/10%20%E2%80%94%20EYE/%D0%9B%D0%9E%D0%93%D0%9E%D0%9B%D0%9E%D0%93%D0%9E.svg?v=202609251533" alt=""></span>
-    <span class="chrome__cta"><span class="chrome__cta-label chrome__cta-label--desktop">Запросить участие</span><span class="chrome__cta-label chrome__cta-label--mobile">Участие</span><img src="figma-arrow.svg?v=202609251533" alt=""></span>
+    <span class="chrome__toggle" aria-hidden="true"><i></i><i></i><i></i></span><span class="chrome__brand"><img src="HERO/10%20%E2%80%94%20EYE/%D0%9B%D0%9E%D0%93%D0%9E%D0%9B%D0%9E%D0%93%D0%9E.svg" alt=""></span>
+    <span class="chrome__cta"><span class="chrome__cta-label chrome__cta-label--desktop">Запросить участие</span><span class="chrome__cta-label chrome__cta-label--mobile">Участие</span><img src="figma-arrow.svg" alt=""></span>
     <p class="chrome__meta chrome__meta--left"><span>＋&nbsp; Листайте и&nbsp;исследуйте</span><span>&nbsp;&nbsp;&nbsp;&nbsp;пространство института</span></p>
     <p class="chrome__meta chrome__meta--right"><span>Москва&nbsp; /&nbsp; Online</span><span>Приём заявок открыт</span></p>
   </div>
 
   <i class="cursor-mark" aria-hidden="true"></i>
   <script>
-    // Заставка со сферой убрана: она рисовалась через WebGL, а на машине
-    // клиентки он недоступен — вызов падал, скрипт обрывался, и страница
-    // застревала с невидимыми блоками. Сайт открывается сразу компасом.
-    document.documentElement.classList.remove('is-preloading');
-    (() => {
+    // Страховка: если заставка не довела себя до конца за 9 секунд (нет
+    // WebGL, ошибка внутри, свёрнутая вкладка), сайт открывается сам.
+    setTimeout(() => {
+      const preloader = document.querySelector('.preloader');
+      if (!preloader || preloader.classList.contains('is-complete')) return;
       const hero = document.querySelector('.hero');
       const compass = document.querySelector('.compass');
-      if (hero) { hero.classList.add('is-revealing'); hero.classList.add('is-revealed'); }
-      if (compass) {
-        compass.style.opacity = '1';
-        compass.classList.add('is-idle');
-      }
       const needle = document.querySelector('.compass__needle');
-      if (needle) needle.style.opacity = '1';
+      document.documentElement.classList.remove('is-preloading');
+      document.documentElement.style.setProperty('--handoff','1');
+      const veil = document.querySelector('.veil');
+      if (veil) { veil.style.setProperty('--veil','1'); veil.style.setProperty('--handoff','1'); }
+      if (compass) { compass.style.opacity='1'; compass.classList.add('is-idle'); }
+      if (needle) needle.style.opacity='1';
+      if (hero) { hero.classList.remove('is-assembly'); hero.classList.add('is-revealing'); hero.classList.add('is-revealed'); }
+      preloader.classList.add('is-transitioning');
+      preloader.classList.add('is-complete');
+      document.querySelectorAll('#three-canvas,#preloader-particles').forEach(c => { c.width=c.height=0; c.style.display='none'; });
       dispatchEvent(new Event('compass:interaction-ready'));
+    }, 9000);
+
+    try {
+    (() => {
+      const HOLD_GLOBE = 1710;
+      const TRANSITION = 5200;
+      const BG = 0xF1ECEC;
+      const INK = '#2B2B29';
+      const preloader = document.querySelector('.preloader');
+      const hero = document.querySelector('.hero');
+      const globeCanvas = document.querySelector('#three-canvas');
+      const particlesCanvas = document.querySelector('#preloader-particles');
+      const counter = document.querySelector('#counter');
+      const compass = document.querySelector('.compass');
+      const compassNeedle = document.querySelector('.compass__needle');
+      const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+      const startedAt = performance.now();
+      const renderer = new THREE.WebGLRenderer({ canvas:globeCanvas, antialias:true, alpha:true });
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(46, innerWidth / innerHeight, .1, 100);
+      const stage = new THREE.Group();
+      const material = new THREE.ShaderMaterial({
+        uniforms:{ map:{ value:null }, dissolve:{ value:0 } },
+        vertexShader:'varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }',
+        fragmentShader:'uniform sampler2D map; uniform float dissolve; varying vec2 vUv; float hash(vec2 p){ return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453123); } void main(){ vec4 c=texture2D(map,vUv); if(c.a<.04) discard; float cell=hash(floor(vUv*vec2(256.,144.))); float threshold=cell*.20+(1.-vUv.y)*.58; if(threshold<dissolve) discard; float a=smoothstep(.04,.11,c.a); if(gl_FrontFacing){gl_FragColor=vec4(c.rgb*a,a);}else{gl_FragColor=vec4(mix(c.rgb,vec3(.68),.72)*a,a*.42);}}',
+        transparent:true, side:THREE.DoubleSide, depthWrite:false
+      });
+      const globe = new THREE.Mesh(new THREE.SphereGeometry(.98, 96, 64), material);
+      let pointerX = 0;
+      let pointerY = 0;
+      let frame;
+      let transitionStarted = false;
+      let contentRevealStarted = false;
+      let needleArrivalStarted = false;
+      renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+      renderer.setClearColor(BG, 0);
+      scene.add(stage);
+      stage.add(globe);
+      globe.rotation.x = -.56;
+
+      const fitCamera = () => {
+        camera.fov = innerWidth < 768 ? 54 : 46;
+        camera.aspect = innerWidth / innerHeight;
+        camera.position.z = innerWidth < 768 ? 6.2 : 6;
+        camera.updateProjectionMatrix();
+        renderer.setSize(innerWidth, innerHeight);
+      };
+      let globeTextureCanvas;
+      const createTexture = () => {
+        const canvas = document.createElement('canvas');
+        const resolution = 2;
+        canvas.width = 2048 * resolution;
+        canvas.height = 1024 * resolution;
+        const context = canvas.getContext('2d');
+        context.setTransform(resolution, 0, 0, resolution, 0, 0);
+        context.textAlign = 'center';
+        context.textBaseline = 'middle';
+        context.fontKerning = 'normal';
+        const bands = [{ y:115,title:45,sub:20 },{ y:340,title:62,sub:25 },{ y:595,title:75,sub:29 },{ y:840,title:52,sub:22 }];
+        bands.forEach(({ y,title,sub }) => {
+          context.font = `400 ${title}px "Cormorant Garamond"`;
+          context.fillStyle = INK;
+          [340,1024,1708].forEach(x => context.fillText('PERFORMANCE', x, y));
+          context.font = `300 ${sub}px "Onest", sans-serif`;
+          context.fillStyle = 'rgba(43,43,41,.64)';
+          [341,1024,1707].forEach(x => context.fillText('ИНСТИТУТ КУЛЬТУРЫ ВЛИЯНИЯ', x, y + 61));
+        });
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.ClampToEdgeWrapping;
+        texture.minFilter = texture.magFilter = THREE.LinearFilter;
+        texture.generateMipmaps = false;
+        globeTextureCanvas = canvas;
+        return texture;
+      };
+      material.uniforms.map.value = createTexture();
+      fitCamera();
+      // Именованные обработчики: безымянные стрелки потом не снять, а они
+      // держат замыканием весь граф three.js и дёргают setSize на каждый
+      // resize уже невидимого канваса.
+      const trackPointer = event => {
+        pointerX = (event.clientX / innerWidth - .5) * 2;
+        pointerY = (event.clientY / innerHeight - .5) * 2;
+      };
+      addEventListener('pointermove', trackPointer, { passive:true });
+      addEventListener('resize', fitCamera, { passive:true });
+
+      const render = (now) => {
+        globe.rotation.y = now * .00019;
+        globe.rotation.z = .12 + Math.sin(now * .00022) * .018;
+        globe.position.y = .05 * Math.sin(now * .00031);
+        stage.rotation.y += (pointerX * .18 - stage.rotation.y) * .045;
+        stage.rotation.x += (-pointerY * .10 - stage.rotation.x) * .045;
+        renderer.render(scene, camera);
+        frame = requestAnimationFrame(render);
+      };
+      render(performance.now());
+      // Первая текстура 4096x2048 освобождается перед подменой, иначе она
+      // остаётся в видеопамяти рядом со второй.
+      const textureReady = Promise.all([document.fonts.load('400 80px "Cormorant Garamond"'), document.fonts.load('300 24px "Onest"')]).then(() => {
+        const previous = material.uniforms.map.value;
+        material.uniforms.map.value = createTexture();
+        previous?.dispose();
+      });
+      const criticalAssets = Promise.all([textureReady, document.fonts.ready, ...[...document.querySelectorAll('.compass img')].map(image => image.decode?.().catch(() => undefined) || Promise.resolve())]);
+
+      let pixelScale = 1;
+      const sizeParticles = () => {
+        const ratio = Math.min(devicePixelRatio || 1, 2);
+        // Размер берём у самого канваса, а не у окна: innerWidth включает
+        // полосу прокрутки, а канвас — нет. Из-за этих ~15px рисунок частиц
+        // сжимался по горизонтали и облако собиралось левее вектора.
+        const box = particlesCanvas.getBoundingClientRect();
+        const cssW = box.width || innerWidth;
+        const cssH = box.height || innerHeight;
+        particlesCanvas.width = Math.round(cssW * ratio);
+        particlesCanvas.height = Math.round(cssH * ratio);
+        const context = particlesCanvas.getContext('2d');
+        // Масштаб считаем из фактических размеров — тогда одна единица
+        // контекста равна ровно одному CSS-пикселю страницы.
+        pixelScale = particlesCanvas.width / cssW;
+        context.setTransform(pixelScale, 0, 0,
+                             particlesCanvas.height / cssH, 0, 0);
+        return context;
+      };
+      const ease = value => value * value * (3 - 2 * value);
+      const clamp01 = value => Math.min(1, Math.max(0, value));
+      const toWorld = (x, y) => {
+        const point = new THREE.Vector3(x / innerWidth * 2 - 1, -(y / innerHeight * 2 - 1), 0).unproject(camera);
+        const ray = point.sub(camera.position).normalize();
+        return camera.position.clone().add(ray.multiplyScalar(-camera.position.z / ray.z));
+      };
+      const updateCounter = () => {
+        if (transitionStarted) return;
+        const elapsed = performance.now() - startedAt;
+        counter.textContent = `${Math.min(94, Math.floor(elapsed / HOLD_GLOBE * 94))}%`;
+        requestAnimationFrame(updateCounter);
+      };
+      updateCounter();
+
+      const mix = (from, to, progress) => from + (to - from) * progress;
+      const shuffle = values => {
+        for (let index = values.length - 1; index > 0; index--) {
+          const swap = Math.floor(Math.random() * (index + 1));
+          [values[index], values[swap]] = [values[swap], values[index]];
+        }
+        return values;
+      };
+      const cellHash = (u, v) => {
+        const x = Math.floor(u * 256);
+        const y = Math.floor(v * 144);
+        const value = Math.sin(x * 127.1 + y * 311.7) * 43758.5453123;
+        return (value - Math.floor(value)) * .20 + (1 - v) * .58;
+      };
+      // The source points are sampled only from the dark pixels of the actual
+      // globe typography. Their UV cell is the same cell that dissolves in the
+      // globe shader, so letters visibly break into the very points that leave.
+      const sampleGlobeTypography = count => {
+        const context = globeTextureCanvas.getContext('2d', { willReadFrequently:true });
+        const { width, height } = globeTextureCanvas;
+        const pixels = context.getImageData(0, 0, width, height).data;
+        const candidates = [];
+        const occupied = new Set();
+        for (let y = 3; y < height; y += 4) {
+          for (let x = 3; x < width; x += 4) {
+            const offset = (y * width + x) * 4;
+            if (pixels[offset + 3] < 60 || pixels[offset] > 186) continue;
+            const u = x / width;
+            const v = y / height;
+            const key = `${Math.floor(u * 256)}:${Math.floor(v * 144)}`;
+            if (occupied.has(key)) continue;
+            occupied.add(key);
+            candidates.push({ u, v, dissolve:cellHash(u, v) });
+          }
+        }
+        const picked = shuffle(candidates).slice(0, count);
+        return Array.from({ length:count }, (_, index) => picked[index % picked.length]);
+      };
+      // Final coordinates are sampled from compass-base.svg itself. A small
+      // grid guard prevents a pile of fat dots on dark, thicker SVG strokes.
+      const sampleCompassBase = count => {
+        const base = compass.querySelector('.compass__base');
+        const map = document.createElement('canvas');
+        map.width = map.height = 600;
+        const mapContext = map.getContext('2d', { willReadFrequently:true });
+        // Только чистый вектор. Патина — это фактически второй компас со
+        // смещёнными кольцами: подмешанная в цели, она собирала частицы в
+        // два несовпадающих рисунка, и это читалось как раздвоение.
+        mapContext.drawImage(base, 0, 0, 600, 600);
+        const points = [];
+        const grid = new Set();
+        try {
+          const pixels = mapContext.getImageData(0, 0, 600, 600).data;
+          for (let y = 1; y < 599; y += 2) {
+            for (let x = 1; x < 599; x += 2) {
+              const offset = (y * 600 + x) * 4;
+              const alpha = pixels[offset + 3];
+              const brightness = (pixels[offset] + pixels[offset + 1] + pixels[offset + 2]) / 3;
+              const key = `${Math.floor(x / 3)}:${Math.floor(y / 3)}`;
+              if (alpha < 22 || brightness > 210 || grid.has(key) || Math.random() > .86) continue;
+              grid.add(key);
+              points.push({ x, y });
+            }
+          }
+        } catch (error) { /* the asset remains visible even if a file preview blocks pixel reads */ }
+        const fallback = Array.from({ length:count }, (_, index) => {
+          const angle = index * 2.399963;
+          const radius = 60 + (index % 310);
+          return { x:300 + Math.cos(angle) * radius, y:300 + Math.sin(angle) * radius };
+        });
+        const picked = shuffle(points);
+        return Array.from({ length:count }, (_, index) => picked[index % picked.length] || fallback[index]);
+      };
+      const projectGlobePoint = (u, v, output) => {
+        const phi = u * Math.PI * 2;
+        const theta = v * Math.PI;
+        output.set(-Math.cos(phi) * Math.sin(theta), Math.cos(theta), Math.sin(phi) * Math.sin(theta));
+        globe.localToWorld(output);
+        output.project(camera);
+        return { x:(output.x + 1) * innerWidth * .5, y:(1 - output.y) * innerHeight * .5 };
+      };
+      const animateTransition = () => new Promise(resolve => {
+        const context = sizeParticles();
+        const rect = compass.getBoundingClientRect();
+        const source = { x:innerWidth / 2, y:innerHeight / 2 };
+        const target = { x:rect.left + rect.width / 2, y:rect.top + rect.height / 2 };
+        const originWorld = new THREE.Vector3();
+        const targetWorld = toWorld(target.x, target.y);
+        const particleCount = innerWidth < 768 ? 3050 : 5600;
+        const sourcePoints = sampleGlobeTypography(particleCount);
+        const targetPoints = sampleCompassBase(particleCount);
+        const particles = sourcePoints.map((sourcePoint, index) => {
+          const point = targetPoints[index];
+          const dx = point.x - 300;
+          const dy = point.y - 300;
+          const radius = Math.hypot(dx, dy);
+          const angle = Math.atan2(dy, dx);
+          // Облако держится у будущего контура: точка разлетается недалеко
+          // от собственного места на компасе, а не в общее широкое поле.
+          // Иначе перед сборкой видно россыпь далеко за контуром.
+          // Разлёт как в версии, которая нравилась: широкое общее поле,
+          // большой угловой разброс — движение читается размашисто.
+          const fieldRadius = Math.min(rect.width * .40, Math.max(radius / 600 * rect.width, rect.width * (.07 + Math.random() * .34)));
+          const fieldAngle = angle + (Math.random() - .5) * 1.45;
+          return {
+            ...sourcePoint,
+            targetX:target.x + dx / 600 * rect.width,
+            targetY:target.y + dy / 600 * rect.height,
+            fieldX:target.x + Math.cos(fieldAngle) * fieldRadius,
+            fieldY:target.y + Math.sin(fieldAngle) * fieldRadius,
+            releaseJitter:Math.random() * .055,
+            buildDelay:radius / 300 * .07 + Math.random() * .09,
+            bend:(Math.random() - .5) * rect.width * .045,
+            size:.40 + Math.random() * .31,
+            ink:.94 + Math.random() * .18
+          };
+        });
+        const projector = new THREE.Vector3();
+        const transitionStart = performance.now();
+        transitionStarted = true;
+        hero.classList.add('is-assembly');
+        document.documentElement.classList.remove('is-preloading');
+        preloader.classList.add('is-transitioning');
+        counter.textContent = '100%';
+        const tick = now => {
+          const t = Math.min(1, (now - transitionStart) / TRANSITION);
+          const e = reduceMotion ? 1 : ease(t);
+          const lowering = ease(clamp01(e / .54));
+          const finalGlobeScale = innerWidth < 768 ? .83 : .9;
+          stage.position.lerpVectors(originWorld, targetWorld, lowering);
+          stage.scale.setScalar(mix(1, finalGlobeScale, lowering));
+          stage.updateMatrixWorld(true);
+          // This is a stencil dissolve, never a global alpha fade: individual
+          // glyph cells disappear as their matching particles are released.
+          material.uniforms.dissolve.value = clamp01(e / .257);
+          // Begin the permanent vector contour the moment the last particles
+          // reach their mapped SVG positions. This overlaps the two layers,
+          // rather than leaving a static particle-only hold before the compass.
+          // Один множитель на передачу: контур растёт как handoff, частицы
+          // гаснут как (1 - handoff). Сумма плотностей держится около
+          // единицы — нет ни наложения двух картинок, ни белого провала.
+          const handoff = ease(clamp01((e - .70) / .14));
+          compass.style.opacity = String(handoff);
+          compassNeedle.style.opacity = String(ease(clamp01((e - .80) / .12)));
+          if (!contentRevealStarted && e >= .32) {
+            contentRevealStarted = true;
+            hero.classList.add('is-revealing');
+            requestAnimationFrame(() => hero.classList.add('is-revealed'));
+          }
+          // Чистим по фактическому боксу канваса: по innerWidth правая
+          // полоса шириной со скроллбар оставалась бы неочищенной.
+          context.clearRect(0, 0, particlesCanvas.width / pixelScale, particlesCanvas.height / pixelScale);
+          if (!reduceMotion) {
+            particles.forEach(particle => {
+              const released = ease(clamp01((material.uniforms.dissolve.value - particle.dissolve - particle.releaseJitter) / .171));
+              if (released <= .001) return;
+              const sourcePoint = projectGlobePoint(particle.u, particle.v, projector);
+              const spread = ease(clamp01((e - .05 - particle.releaseJitter) / .190));
+          const assembly = ease(clamp01((e - .31 - particle.buildDelay) / .225));
+              const driftX = Math.cos((particle.u + e * .28) * 17) * particle.bend * (1 - assembly);
+              const driftY = Math.sin((particle.v - e * .22) * 19) * particle.bend * .55 * (1 - assembly);
+              const fieldX = mix(sourcePoint.x, particle.fieldX + driftX, spread);
+              const fieldY = mix(sourcePoint.y, particle.fieldY + driftY, spread);
+              const x = mix(fieldX, particle.targetX, assembly);
+              const y = mix(fieldY, particle.targetY, assembly);
+              // Keep the particles fine, but give a small portion more ink so
+              // the eye reads an actual material breakup rather than a fade.
+              const alpha = Math.min(.93, (.70 + assembly * .21) * released * particle.ink) * (1 - handoff);
+              context.globalAlpha = alpha;
+              context.fillStyle = INK;
+              context.fillRect(x - particle.size * .5, y - particle.size * .5, particle.size, particle.size);
+            });
+          }
+          if (t < 1) requestAnimationFrame(tick); else {
+            cancelAnimationFrame(frame);
+            compass.style.opacity = '1';
+            compassNeedle.style.opacity = '1';
+            hero.classList.remove('is-assembly');
+            if (!contentRevealStarted) {
+              hero.classList.add('is-revealing');
+              requestAnimationFrame(() => hero.classList.add('is-revealed'));
+            }
+            setTimeout(() => preloader.classList.add('is-complete'), 410);
+            // The needle settles only after the base has fully assembled. As
+            // soon as that tiny motion ends, desktop pointer control (or the
+            // mobile idle drift) is enabled — there is no invisible 3 s hold.
+            if (!needleArrivalStarted) {
+              needleArrivalStarted = true;
+              compass.classList.add('is-arriving');
+              setTimeout(() => {
+                compass.classList.remove('is-arriving');
+                compass.classList.add('is-idle');
+                window.dispatchEvent(new Event('compass:interaction-ready'));
+              }, 650);
+            }
+            // Видеопамять возвращаем ПОСЛЕ того, как прелоадер полностью
+            // исчез: раньше канвас стирался мгновенно, а белый слой гас ещё
+            // секунду — экран успевал «побелеть» поверх собранного компаса.
+            removeEventListener('pointermove', trackPointer);
+            removeEventListener('resize', fitCamera);
+            setTimeout(() => {
+              material.uniforms.map.value?.dispose();
+              material.dispose();
+              globe.geometry.dispose();
+              renderer.dispose();
+              renderer.forceContextLoss?.();
+              globeCanvas.width = globeCanvas.height = 0;
+              // Канвас частиц тоже освобождаем: это ещё ~33 МБ.
+              particlesCanvas.width = particlesCanvas.height = 0;
+            }, 1200);
+            resolve();
+          }
+        };
+        requestAnimationFrame(tick);
+      });
+
+      (async () => {
+        await Promise.race([criticalAssets, wait(1710)]);
+        await wait(Math.max(0, HOLD_GLOBE - (performance.now() - startedAt)));
+        animateTransition();
+      })();
     })();
+
+    } catch (error) {
+      // Любой сбой в заставке (нет WebGL, заблокирован canvas) раньше
+      // обрывал весь скрипт: блоки с фразами и «Философией» оставались
+      // скрытыми навсегда. Теперь сайт просто открывается без заставки.
+      console.warn('Заставка не запустилась:', error);
+    }
 
     // ───────── Шторка + фразы ─────────
     // Единственный источник истины — позиция прокрутки. Никаких «сработало
@@ -853,13 +1231,6 @@
       const request = () => { if (!ticking) { ticking = true; requestAnimationFrame(() => { ticking = false; render(); }); } };
       addEventListener('scroll', request, { passive:true });
       addEventListener('resize', request, { passive:true });
-      // В фоновой вкладке кадры не выдаются: флаг залипал, и прокрутка
-      // переставала пересчитываться — блоки оставались скрытыми навсегда.
-      addEventListener('visibilitychange', () => {
-        if (document.visibilityState !== 'visible') return;
-        ticking = false;
-        render();
-      });
       document.fonts.ready.then(render);
       render();
     })();
@@ -981,14 +1352,6 @@
 
       let ticking = false;
       const request = () => { if (!ticking) { ticking = true; requestAnimationFrame(() => { ticking = false; paint(); }); } };
-      if (!track._railVisBound) {
-        track._railVisBound = true;
-        addEventListener('visibilitychange', () => {
-          if (document.visibilityState !== 'visible') return;
-          ticking = false;
-          if (!MOBILE_RAIL.matches) paint();
-        });
-      }
       if (!track._railBound) {
         track._railBound = true;
         addEventListener('scroll', () => { if (!MOBILE_RAIL.matches) request(); }, { passive:true });
@@ -1032,7 +1395,8 @@
       // Размеры берём из фактической геометрии сцены, а не из строки
       // кастомного свойства: getPropertyValue на :root возвращает исходный
       // calc(...) текстом, и parseFloat дал бы NaN.
-      const SPEED = 1.3;    // ~8 град/с: карточка сменяется за ~6 с
+      const SPACING = 3;    // параметр кольца из Originkit: factor = 1 + spacing*0.15
+      const SPEED = 2.6;    // ~15 град/с: карточка сменяется за ~3 с
       // Размеры пересчитываются, а не берутся один раз: на старте сцена ещё
       // не имеет реальной высоты, и кольцо получалось нулевым.
       let CARD_W = 0, CARD_H = 0, radius = 0;
@@ -1042,15 +1406,17 @@
       // Фото из папки «фото сайт», размер 370x551 — ровно карточка из макета.
       // Присланные фото карусели (307x443 — размер карточки из макета).
       const CARDS = [
-        { name:'Предприниматели', note:'Которым важно доносить\u00A0идеи', place:'bottom' },
-        { name:'Преподаватели',   note:'Которым важно доносить\u00A0идеи', place:'top' },
-        { name:'Руководители',    note:'Которым важно вести за\u00A0собой', place:'bottom' },
-        { name:'Исследователи',   note:'Которым важно быть\u00A0понятыми', place:'top' },
-        { name:'Авторы',          note:'Которым важно звучать\u00A0точно', place:'bottom' }
+        { image:'cards/ring-2.png', name:'Предприниматели', note:'Которым важно доносить\u00A0идеи', place:'bottom' },
+        { image:'cards/ring-1.png', name:'Преподаватели',   note:'Которым важно доносить\u00A0идеи', place:'top' },
+        { image:'cards/ring-2.png', name:'Руководители',    note:'Которым важно вести за\u00A0собой', place:'bottom' },
+        { image:'cards/ring-1.png', name:'Исследователи',   note:'Которым важно быть\u00A0понятыми', place:'top' },
+        { image:'cards/ring-2.png', name:'Авторы',          note:'Которым важно звучать\u00A0точно', place:'bottom' }
       ];
       const SENSITIVITY = 5;
 
       let angle = 360 / COUNT;
+      // Зазор между карточками на 5% шире прежнего.
+      const factorFor = () => (1 + SPACING * 0.15) * (NARROW.matches ? 0.42 : 0.60);
       const degPerSec = SPEED * 6;
 
       // Пересчёт размеров от живой высоты сцены: на старте она ещё нулевая,
@@ -1058,26 +1424,24 @@
       const resize = () => {
         if (typeof build === 'function' && COUNT !== countFor()) build();
         const stageH = stage.getBoundingClientRect().height || innerHeight * .79;
-        // Поле вокруг кольца: тень падает ниже карточки и шире её, а сцена
-        // всё-таки обрезает по себе. Растягивать одну высоту было мало —
-        // карточка считается от неё же и росла следом, съедая запас.
-        const BLEED = Math.round(Math.min(200, Math.max(120, stageH * .26)));
-        CARD_H = Math.round((stageH - BLEED) * 0.9);
-        CARD_W = Math.round(CARD_H / (NARROW.matches ? 1.49 : 1.22));
+        CARD_H = Math.round(stageH - 40);
+        CARD_W = Math.round(CARD_H / (NARROW.matches ? 1.204 : 1.385));
         // Кольцо разворачиваем по ширине сцены, а не по ширине карточки:
         // крайние карточки должны доходить до краёв — до линии логотипа
         // и кнопки. factor остаётся как поправка на плотность.
         const stageW = stage.getBoundingClientRect().width || innerWidth;
-        // Радиус всегда считаем от хорды, а не от ширины сцены. Прежняя
-        // десктопная формула (доля от ширины сцены) зазор не гарантировала:
-        // на 1440x900 она давала радиус 487 при карточке 296, и десять
-        // карточек вставали внахлёст — сплошная стопка вместо кольца.
-        // Хорда между соседними центрами = 2·R·sin(π/COUNT); чтобы между
-        // карточками остался просвет, она должна быть шире самой карточки.
-        // GAP берём с запасом: перспектива сближает спроецированные центры
-        // сильнее, чем даёт плоский расчёт.
-        const GAP = NARROW.matches ? 29 : 105;
-        radius = Math.round((CARD_W + GAP) / (2 * Math.sin(Math.PI / COUNT)));
+        if (NARROW.matches) {
+          // Пять карточек: радиус от полуширины карточки плюс зазор,
+          // иначе соседние перекрываются и кольцо схлопывается в стопку.
+          // Хорда между соседними центрами = 2·R·sin(π/COUNT). Чтобы между
+          // карточками остался зазор, она должна быть шире самой карточки.
+          // GAP берём с запасом: перспектива сближает спроецированные
+          // центры сильнее, чем даёт плоский расчёт по хорде.
+          const GAP = 29;
+          radius = Math.round((CARD_W + GAP) / (2 * Math.sin(Math.PI / COUNT)));
+        } else {
+          radius = (stageW - CARD_W) / 2 * factorFor();
+        }
         ring.style.width = `${CARD_W}px`;
         ring.style.height = `${CARD_H}px`;
         [...ring.children].forEach((item, i) => {
@@ -1097,7 +1461,7 @@
           const item = document.createElement('div');
           item.className = 'ring__item';
           // Пока во всех карточках одна и та же фотография-заглушка.
-          const tone = i % 2 === 0 ? '#2A2724' : '#6E1B1B';
+          const tone = i % 2 === 0 ? '#171717' : '#3A0F14';
           const front = document.createElement('div');
           front.className = 'ring__face ring__face--front';
           front.style.background = tone;
@@ -1118,10 +1482,17 @@
           copy.append(name, note);
           front.appendChild(copy);
 
-          // Обратной стороны нет: отвёрнутые карточки скрываются по углу,
-          // так что изнанку никто не увидит. Десять лишних фотографий в
-          // разметке только нагружали прокрутку и мелькали чёрным.
-          item.append(front);
+          // Обратная сторона — то же фото, приглушённое: карточка читается
+          // как один объект, а не как две разные с изнанки.
+          const back = document.createElement('div');
+          back.className = 'ring__face ring__face--back';
+          back.style.background = tone;
+          const backPhoto = document.createElement('img');
+          backPhoto.className = 'ring__photo';
+          backPhoto.src = 'cards/ring-photo.jpg';
+          backPhoto.alt = '';
+          back.appendChild(backPhoto);
+          item.append(front, back);
           ring.appendChild(item);
         }
 
@@ -1134,30 +1505,7 @@
       let rotY = 0, velocity = 0, last = 0, frame = 0;
       const drag = { active:false, x:0 };
 
-      // Safari не скрывает изнанку карточки надёжно: при вложенных 3D-слоях
-      // backface-visibility у него не срабатывает, и сквозь дальнюю половину
-      // кольца просвечивал зеркальный текст подписей. Поэтому гасим дальние
-      // карточки сами, по углу поворота — это одинаково во всех браузерах.
-      const apply = () => {
-        ring.style.transform = `translateZ(${-radius}px) rotateY(${rotY}deg)`;
-        const cards = ring.children;
-        for (let i = 0; i < cards.length; i++) {
-          // Угол карточки относительно зрителя: 0 — лицом, 180 — спиной.
-          let facing = (rotY + i * angle) % 360;
-          if (facing < 0) facing += 360;
-          const away = facing > 90 && facing < 270;
-          const card = cards[i];
-          if (card._away !== away) {
-            card._away = away;
-            // Прячем именно грань: тень и фон живут на ней, и при скрытии
-            // одного лишь родителя Safari продолжал рисовать их тёмными
-            // пятнами поверх светлого блока.
-            const face = card.firstElementChild;
-            if (face) face.style.display = away ? 'none' : '';
-            card.style.visibility = away ? 'hidden' : '';
-          }
-        }
-      };
+      const apply = () => { ring.style.transform = `translateZ(${-radius}px) rotateY(${rotY}deg)`; };
       // Только здесь: карточки уже созданы, apply объявлен. Пересчитываем
       // при ресайзе и после загрузки шрифтов, когда сцена получает высоту.
       resize();
