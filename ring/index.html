@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Среда единомышленников — The Performance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<style>
+  @font-face {
+    font-family: "Anticva";
+    src: url("fonts/Anticva-Regular.otf") format("opentype");
+    font-weight: 400;
+    font-display: swap;
+  }
+
+  :root {
+    --bg-light: #F1ECEC;
+    --ink: #161514;
+    --edge-x: clamp(14px, 1.7vw, 30px);
+    --edge-y: clamp(18px, 2.6vh, 30px);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body { overflow-x: clip; }
+
+  body {
+    margin: 0;
+    background: var(--bg-light);
+    color: var(--ink);
+    font-family: Manrope, Arial, sans-serif;
+    font-synthesis: none;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .section {
+    position: relative;
+    min-height: 100vh;
+    min-height: 100svh;
+    display: grid;
+    justify-items: center;
+    align-content: start;
+    padding-top: clamp(56px, 9vh, 110px);
+    padding-bottom: clamp(24px, 4vh, 56px);
+    gap: clamp(24px, 4vh, 56px);
+  }
+
+  /* Технические подписи по углам — как на остальных блоках сайта. */
+  .corner {
+    position: fixed;
+    z-index: 3;
+    font-size: clamp(10px, .92vw, 12px);
+    line-height: 1.5;
+    letter-spacing: .24px;
+    text-transform: uppercase;
+    opacity: .72;
+    pointer-events: none;
+  }
+  .corner--tl { top: var(--edge-y); left: var(--edge-x); }
+  .corner--tr { top: var(--edge-y); right: var(--edge-x); text-align: right; }
+  .corner--bl { bottom: var(--edge-y); left: var(--edge-x); }
+  .corner--br { bottom: var(--edge-y); right: var(--edge-x); text-align: right; }
+
+  .title {
+    margin: 0;
+    padding: 0 20px;
+    font-family: Anticva, Georgia, serif;
+    font-size: clamp(1.9rem, .9rem + 2.8vw, 3.6rem);
+    font-weight: 400;
+    line-height: 1.111;
+    letter-spacing: .01em;
+    text-transform: uppercase;
+    text-align: center;
+    text-wrap: balance;
+  }
+
+  #ring { width: 100%; }
+
+  .hint {
+    position: fixed;
+    bottom: calc(var(--edge-y) + 26px);
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: clamp(10px, .9vw, 12px);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    opacity: .4;
+    pointer-events: none;
+  }
+
+  @media (max-width: 780px) {
+    .corner--bl, .corner--br { display: none; }
+    .title { font-size: clamp(1.5rem, 6.2vw, 2.3rem); }
+  }
+</style>
+</head>
+<body>
+
+  <span class="corner corner--tl">Среда единомышленников</span>
+  <span class="corner corner--tr">05 / 08</span>
+
+  <main class="section">
+    <h1 class="title">Среда<br>единомышленников</h1>
+    <div id="ring"></div>
+  </main>
+
+  <span class="corner corner--bl">＋&nbsp; Листайте и&nbsp;исследуйте<br>&nbsp;&nbsp;&nbsp;&nbsp;пространство института</span>
+  <span class="corner corner--br">Москва&nbsp; /&nbsp; Online<br>Приём заявок открыт</span>
+
+  <span class="hint">потяните, чтобы повернуть</span>
+
+  <script src="app.js"></script>
+</body>
+</html>
