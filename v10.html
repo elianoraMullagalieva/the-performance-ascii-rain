@@ -610,51 +610,65 @@
     .ph { display:flex; align-items:flex-end; width:100%; height:100%; padding:18px; color:var(--light); background:linear-gradient(165deg,var(--graphite) 0%,var(--graphite) 34%,var(--bordeaux) 100%); }
     .ph .small { opacity:.7; }
 
-    /* ───────── 1. Среда единомышленников — лента участников ─────────
-       Карточка одного размера, прямая, без перспективы: фото 3:4 сверху,
-       под ним подпись на светлом — имя заголовком, роль мелко, цитата
-       отдельной строкой с висячей кавычкой. Текст не ложится на лицо.
-       Ширину и высоту ряда задаёт скрипт: высота — по самой высокой подписи. */
-    .peers { position:relative; padding:clamp(110px,15vh,160px) 0 clamp(70px,10vh,120px); overflow:clip; }
-    .peers__head { max-width:62rem; margin:0 auto clamp(40px,6vh,64px); padding-inline:var(--edge-x); text-align:center; }
-    .peers__intro { max-width:46ch; margin:clamp(18px,2.4vh,26px) auto 0; }
-    .peers__stage { position:relative; height:560px; touch-action:pan-y; cursor:grab; user-select:none; -webkit-user-select:none; }
+    /* ───────── 1Б. Лента участников ───────── */
+    .peers { position:relative; padding:clamp(100px,14vh,150px) 0 clamp(60px,9vh,100px); overflow:clip; }
+    .peers__head { align-items:end; margin-bottom:clamp(30px,5vh,56px); }
+    .peers__head h2 { grid-column:1 / span 7; }
+    .peers__intro { grid-column:9 / span 4; max-width:40ch; }
+    .peers__stage { position:relative; height:clamp(420px,56vh,620px); touch-action:pan-y; cursor:grab; user-select:none; -webkit-user-select:none; }
     .peers__stage.is-dragging { cursor:grabbing; }
-    .peer { position:absolute; left:0; top:0; width:250px; will-change:transform; }
-    .peer__frame { position:relative; overflow:hidden; aspect-ratio:3 / 4; border-radius:14px; background:var(--graphite); }
+    .peer { position:absolute; left:0; top:0; overflow:hidden; border-radius:14px; background:var(--graphite); will-change:transform; }
     .peer__photo { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; filter:saturate(.88); pointer-events:none; }
-    /* Подпись под фото: имя — заголовок в Anticva, как у секций; роль — техническая
-       строка; цитата — Cormorant, отдельно, за тонкой линией. */
-    .peer__copy { padding:clamp(14px,1.3vw,20px) 2px 0; color:var(--ink); }
-    .peer__name { margin:0; font:400 clamp(.95rem,.82rem + .36vw,1.2rem)/1.15 Anticva,Georgia,serif; letter-spacing:.03em; text-transform:uppercase; }
-    /* Роль занимает две строки всегда: линия под ней стоит на одной высоте у всех карточек. */
-    .peer__role { min-height:2.7em; margin:5px 0 0; opacity:.55; }
-    .peer__quote { margin:clamp(10px,1vw,14px) 0 0; padding-top:clamp(10px,1vw,14px); border-top:1px solid var(--rule-c); font:400 clamp(1.05rem,.9rem + .42vw,1.3rem)/1.26 "Cormorant Garamond",Georgia,serif; letter-spacing:0; text-indent:-.42em; text-wrap:pretty; }
-    /* Указатель. Проявляется и дышит, только пока блок на экране (класс ставит
-       скрипт). Не через a-fade: у подвала страницы порог появления недостижим. */
-    .peers__cue { display:flex; justify-content:center; margin-top:clamp(26px,4vh,44px); }
-    .motion .peers__cue { opacity:0; transform:translate3d(0,10px,0); transition:opacity .9s var(--ease) .3s,transform .9s var(--ease) .3s; }
-    .motion .peers__cue.is-live { opacity:1; transform:none; }
-    .peers__cue-svg { display:block; width:260px; height:24px; overflow:visible; }
-    .peers__cue-tip { transform-origin:212px 12px; }
-    .motion .peers__cue.is-live .peers__cue-tip { animation:peers-breathe 4.2s var(--ease) infinite alternate; }
-    @keyframes peers-breathe { from { transform:translate3d(0,0,0) rotate(-1.2deg); } to { transform:translate3d(4px,0,0) rotate(1.2deg); } }
+    /* Подпись на фото: затемнение только под текстом, не по всей карточке. */
+    .peer__copy { position:absolute; left:0; right:0; bottom:0; padding:clamp(14px,1.6vw,24px); color:var(--light); background:linear-gradient(180deg,rgba(17,17,17,0) 0%,rgba(17,17,17,.78) 60%,rgba(17,17,17,.9) 100%); }
+    .peer__quote { margin:0 0 10px; font:300 clamp(.85rem,.62rem + .6vw,1.05rem)/1.3 Manrope,Arial,sans-serif; letter-spacing:.01em; text-wrap:pretty; }
+    .peer__name { margin:0; font:500 clamp(.95rem,.6rem + .98vw,1.2rem)/1.15 Manrope,Arial,sans-serif; letter-spacing:-.01em; }
+    .peer__role { margin:4px 0 0; opacity:.7; }
+    .peers__hint { margin:18px var(--edge-x) 0; opacity:.6; text-align:center; }
 
-    /* ───────── Телефон: отдельная раскладка, не сжатый десктоп ───────── */
     @media (max-width:780px) {
       .h-sec { font-size:clamp(1.5rem,6.2vw,2.3rem); }
       .btn { width:auto; min-width:190px; }
-      .peers { padding-top:88px; }
-      .peers__intro { margin-top:16px; }
-      /* Карточка уже: ширину и высоту ряда считает скрипт. */
-      .peer { width:210px; }
-      .peers__cue { margin-top:24px; }
+      .peers { padding-top:80px; }
+      .peers__head h2,.peers__intro { grid-column:1 / -1; }
+      .peers__intro { margin-top:18px; }
+      .peers__stage { height:400px; }
     }
 
     @media (prefers-reduced-motion:reduce) {
       .peers__cue-tip { animation:none !important; }
     }
+  </style>
   <style id="rest-styles">
+
+    /* ───────── 1. Среда — «кольцо → ряд» ─────────
+       Карточки стоят в 0,0 и двигаются только transform; на кольце они
+       квадратные (clip-path по фото), в ряду — 3:4 с подписью под фото.
+       Высоту дорожки пишет скрипт (--faces-run). */
+    .faces { position:relative; height:var(--faces-run,420vh); }
+    .faces__stage { position:sticky; top:0; height:100vh; height:100svh; overflow:hidden; }
+    .faces__ring { position:absolute; inset:0; visibility:hidden; }
+    .faces__ring.is-on { visibility:visible; }
+    .face { position:absolute; left:0; top:0; margin:0; width:var(--card-w,300px); height:var(--card-h,400px); opacity:0; transform-origin:50% 50%; will-change:transform,opacity; }
+    .face img { display:block; width:100%; height:100%; object-fit:cover; border-radius:14px; background:var(--graphite); }
+    /* Подпись под карточкой: имя, роль, мысль — тем же Manrope, что и весь текст. */
+    .face__cap { position:absolute; left:0; right:0; top:calc(100% + 14px); display:grid; gap:4px; pointer-events:none; }
+    .face__name { font:400 clamp(.95rem,.82rem + .36vw,1.2rem)/1.15 Anticva,Georgia,serif; letter-spacing:.03em; text-transform:uppercase; }
+    .face__role { opacity:.55; }
+    .face__quote { margin-top:8px; padding-top:10px; border-top:1px solid var(--rule-c); font:300 var(--fz-text)/1.42 Manrope,sans-serif; letter-spacing:.01em; text-wrap:pretty; }
+    .face__cap > span { opacity:0; transform:translate3d(0,.6em,0); transition:opacity .3s var(--ease),transform .3s var(--ease),filter .3s var(--ease); }
+    .faces__ring.is-row .face__cap > span { filter:blur(6px); }
+    .faces__ring.is-captioned .face__cap > span { opacity:1; transform:none; filter:none; transition-duration:.9s; transition-delay:calc(var(--slot,0) * 100ms + var(--line,0) * 70ms); }
+    .face__cap > span:nth-child(2) { --line:1; } .face__cap > span:nth-child(3) { --line:2; }
+    /* Подпись сцены — внизу слева, как угловые слова манифеста; появляется с рядом. */
+    .faces__label { position:absolute; left:var(--edge-x); bottom:var(--edge-y); opacity:0; transition:opacity .9s var(--ease) .3s; }
+    .faces__stage.is-captioned .faces__label { opacity:.6; }
+    @media (max-width:780px) {
+      .face__quote { display:none; }
+    }
+    @media (prefers-reduced-motion:reduce) {
+      .face__cap > span,.faces__label { transition:none; }
+    }
 
     /* ───────── 3. Программы ─────────
        Факультет — направление, программа — продукт, формат — способ участия.
@@ -715,9 +729,10 @@
     .club__head { display:flex; padding-inline:var(--edge-x); margin-bottom:28px; }
     .club__label { opacity:.6; }
     .club__card { position:relative; margin-inline:var(--edge-x); aspect-ratio:16 / 10; min-height:560px; border-radius:14px; overflow:hidden; color:var(--light); }
-    .club__ph { position:absolute; inset:0; align-items:flex-start; background:linear-gradient(160deg,#1b1917 0%,var(--graphite) 45%,#3a2422 100%); }
+    .club__ph { position:absolute; inset:0; align-items:flex-start; background:#1b1917 url(club/club.jpg) center/cover no-repeat; }
+    .club__ph .small { visibility:hidden; }
     .club__ph .small { opacity:.5; }
-    .club__card::after { content:''; position:absolute; inset:0; background:linear-gradient(180deg,rgba(17,17,17,0) 40%,rgba(17,17,17,.45) 100%); pointer-events:none; }
+    .club__card::after { content:''; position:absolute; inset:0; background:linear-gradient(180deg,rgba(17,17,17,.12) 0%,rgba(17,17,17,.28) 45%,rgba(17,17,17,.62) 100%); pointer-events:none; }
     .club__copy { position:absolute; left:50%; top:12%; width:min(44%,560px); z-index:1; display:grid; gap:18px; }
     .club__eyebrow { opacity:.75; }
     .club__title { font:400 clamp(2rem,1.2rem + 3.4vw,4.4rem)/1.04 Anticva,Georgia,serif; text-transform:uppercase; letter-spacing:.01em; margin:0; }
@@ -869,63 +884,26 @@
          Карточки одинаковые и прямые: фото 3:4 сверху, подпись под ним — как
          подпись под портретом в журнале, текст не ложится на лицо. Восемь
          человек — восемь карточек, без повторов. -->
-    <section class="peers" id="peers" data-theme="light" aria-labelledby="peers-title">
-      <header class="peers__head">
-        <h2 class="h-sec a-rise" id="peers-title" data-in><span class="ln"><span class="ln__i">Среда</span></span><span class="ln"><span class="ln__i">единомышленников</span></span></h2>
-        <p class="t peers__intro a-fade" data-in style="--d:260ms">Люди действия, которые уже состоялись в&nbsp;своих индустриях. Имена, роли и&nbsp;цитаты здесь условные&nbsp;— до&nbsp;согласования с&nbsp;участниками.</p>
-      </header>
-      <div class="peers__stage" id="peers-stage" aria-label="Участники: лента едет сама, её можно потянуть">
-        <article class="peer">
-          <div class="peer__frame"><picture><source media="(min-width:1200px)" srcset="people/p1-900.jpg"><img class="peer__photo" src="people/p1-600.jpg" alt="" loading="lazy" decoding="async" draggable="false"></picture></div>
-          <div class="peer__copy"><h3 class="peer__name">Марина Ветрова</h3><p class="small peer__role">Предприниматель, основатель бренда</p><p class="peer__quote">«Я перестала готовить речь и&nbsp;начала готовить мысль. Слова приходят сами»</p></div>
-        </article>
-        <article class="peer">
-          <div class="peer__frame"><picture><source media="(min-width:1200px)" srcset="people/p2-900.jpg"><img class="peer__photo" src="people/p2-600.jpg" alt="" loading="lazy" decoding="async" draggable="false"></picture></div>
-          <div class="peer__copy"><h3 class="peer__name">Сергей Долин</h3><p class="small peer__role">Генеральный директор</p><p class="peer__quote">«Самое трудное&nbsp;— замолчать вовремя. Здесь учат паузе как инструменту»</p></div>
-        </article>
-        <article class="peer">
-          <div class="peer__frame"><picture><source media="(min-width:1200px)" srcset="people/p3-900.jpg"><img class="peer__photo" src="people/p3-600.jpg" alt="" loading="lazy" decoding="async" draggable="false"></picture></div>
-          <div class="peer__copy"><h3 class="peer__name">Анна Светлова</h3><p class="small peer__role">Руководитель направления</p><p class="peer__quote">«Аргумент работает, когда его слышат, а&nbsp;не&nbsp;когда он верен»</p></div>
-        </article>
-        <article class="peer">
-          <div class="peer__frame"><picture><source media="(min-width:1200px)" srcset="people/p4-900.jpg"><img class="peer__photo" src="people/p4-600.jpg" alt="" loading="lazy" decoding="async" draggable="false"></picture></div>
-          <div class="peer__copy"><h3 class="peer__name">Илья Берг</h3><p class="small peer__role">Исследователь, преподаватель</p><p class="peer__quote">«Я думал, что говорю понятно. Оказалось, понятно&nbsp;— это когда меняется решение собеседника»</p></div>
-        </article>
-        <article class="peer">
-          <div class="peer__frame"><picture><source media="(min-width:1200px)" srcset="people/p5-900.jpg"><img class="peer__photo" src="people/p5-600.jpg" alt="" loading="lazy" decoding="async" draggable="false"></picture></div>
-          <div class="peer__copy"><h3 class="peer__name">Даниил Верт</h3><p class="small peer__role">Архитектор</p><p class="peer__quote">«Присутствие&nbsp;— это не&nbsp;громкость. Это точность внимания»</p></div>
-        </article>
-        <article class="peer">
-          <div class="peer__frame"><picture><source media="(min-width:1200px)" srcset="people/p6-900.jpg"><img class="peer__photo" src="people/p6-600.jpg" alt="" loading="lazy" decoding="async" draggable="false"></picture></div>
-          <div class="peer__copy"><h3 class="peer__name">Мария Орлова</h3><p class="small peer__role">Юрист, партнёр</p><p class="peer__quote">«Переговоры выигрывает не&nbsp;тот, кто говорит больше, а&nbsp;тот, кто точнее формулирует»</p></div>
-        </article>
-        <article class="peer">
-          <div class="peer__frame"><picture><source media="(min-width:1200px)" srcset="people/p7-900.jpg"><img class="peer__photo" src="people/p7-600.jpg" alt="" loading="lazy" decoding="async" draggable="false"></picture></div>
-          <div class="peer__copy"><h3 class="peer__name">Антон Коваль</h3><p class="small peer__role">Продюсер</p><p class="peer__quote">«Влияние начинается там, где я&nbsp;беру ответственность за&nbsp;сказанное»</p></div>
-        </article>
-        <article class="peer">
-          <div class="peer__frame"><picture><source media="(min-width:1200px)" srcset="people/p8-900.jpg"><img class="peer__photo" src="people/p8-600.jpg" alt="" loading="lazy" decoding="async" draggable="false"></picture></div>
-          <div class="peer__copy"><h3 class="peer__name">Елена Савина</h3><p class="small peer__role">Врач, руководитель клиники</p><p class="peer__quote">«Я научилась слышать вопрос до&nbsp;того, как его задали»</p></div>
-        </article>
-      </div>
-      <!-- Указатель «листайте» в манере компаса: пунктир лимба, шкала, ось и
-           кончик стрелки. Красный — только заливка кончика, с уходом в тёмное. -->
-      <div class="peers__cue" id="peers-cue" aria-hidden="true">
-        <svg class="peers__cue-svg" viewBox="0 0 260 24" width="260" height="24" fill="none" stroke="#161514" stroke-width="1" stroke-linecap="round">
-          <defs><linearGradient id="peers-tip" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#6E1B1B"/><stop offset="1" stop-color="#A71F1F"/></linearGradient></defs>
-          <path d="M2 12H58" stroke-dasharray="1 5" opacity=".7"/>
-          <path d="M66 12H128" stroke-dasharray="1.2 3.5" opacity=".7"/>
-          <path d="M132 12H212"/>
-          <path d="M152 9v6M172 9v6M192 9v6" opacity=".7"/>
-          <path d="M162 10.5v3M182 10.5v3M202 10.5v3" opacity=".5"/>
-          <circle cx="130" cy="12" r="3" fill="#F1ECEC"/>
-          <g class="peers__cue-tip">
-            <path d="M212 9.4L244 12L212 14.6Z" fill="#2A2724" stroke="#161514" stroke-linejoin="round"/>
-            <path d="M238 11.2L250 12L238 12.8Z" fill="url(#peers-tip)" stroke="none"/>
-          </g>
-        </svg>
+    <!-- 1. Среда единомышленников — «кольцо → ряд» (по коду Sur(face), прислан Эли 22.10).
+         Без заголовка: сразу после «Философии» портреты летают кольцом и растут,
+         затем выстраиваются в ряд, и только тогда появляются имя, роль, мысль.
+         Дорожка — высота прокрутки; всё видимое живёт в прилипшей сцене. -->
+    <section class="faces" id="peers" data-theme="light" aria-label="Среда единомышленников">
+      <div class="faces__stage" id="faces-stage">
+        <div class="faces__ring" id="faces-ring">
+          <figure class="face" data-focus=".2"><img src="people/p1-600.jpg" srcset="people/p1-600.jpg 600w, people/p1-900.jpg 900w" sizes="(max-width:780px) 72vw, 25vw" alt="" decoding="async" draggable="false"><figcaption class="face__cap"><span class="face__name">Александр Ровный</span><span class="small face__role">Генеральный директор</span><span class="face__quote">«Самое трудное — замолчать вовремя. Здесь учат паузе как инструменту»</span></figcaption></figure>
+          <figure class="face" data-focus=".2"><img src="people/p2-600.jpg" srcset="people/p2-600.jpg 600w, people/p2-900.jpg 900w" sizes="(max-width:780px) 72vw, 25vw" alt="" decoding="async" draggable="false"><figcaption class="face__cap"><span class="face__name">Марк Лёвин</span><span class="small face__role">Предприниматель, основатель бренда</span><span class="face__quote">«Я перестал готовить речь и начал готовить мысль. Слова приходят сами»</span></figcaption></figure>
+          <figure class="face" data-focus=".2"><img src="people/p3-600.jpg" srcset="people/p3-600.jpg 600w, people/p3-900.jpg 900w" sizes="(max-width:780px) 72vw, 25vw" alt="" decoding="async" draggable="false"><figcaption class="face__cap"><span class="face__name">Анна Светлова</span><span class="small face__role">Руководитель направления</span><span class="face__quote">«Аргумент работает, когда его слышат, а не когда он верен»</span></figcaption></figure>
+          <figure class="face" data-focus=".2"><img src="people/p4-600.jpg" srcset="people/p4-600.jpg 600w, people/p4-900.jpg 900w" sizes="(max-width:780px) 72vw, 25vw" alt="" decoding="async" draggable="false"><figcaption class="face__cap"><span class="face__name">Илья Берг</span><span class="small face__role">Исследователь, преподаватель</span><span class="face__quote">«Я думал, что говорю понятно. Оказалось, понятно — это когда меняется решение собеседника»</span></figcaption></figure>
+          <figure class="face" data-focus=".2"><img src="people/p5-600.jpg" srcset="people/p5-600.jpg 600w, people/p5-900.jpg 900w" sizes="(max-width:780px) 72vw, 25vw" alt="" decoding="async" draggable="false"><figcaption class="face__cap"><span class="face__name">Михаил Градов</span><span class="small face__role">Архитектор</span><span class="face__quote">«Присутствие — это не громкость. Это точность внимания»</span></figcaption></figure>
+          <figure class="face" data-focus=".2"><img src="people/p6-600.jpg" srcset="people/p6-600.jpg 600w, people/p6-900.jpg 900w" sizes="(max-width:780px) 72vw, 25vw" alt="" decoding="async" draggable="false"><figcaption class="face__cap"><span class="face__name">Артём Снегирёв</span><span class="small face__role">Продюсер</span><span class="face__quote">«Влияние начинается там, где я беру ответственность за сказанное»</span></figcaption></figure>
+          <figure class="face" data-focus=".2"><img src="people/p7-600.jpg" srcset="people/p7-600.jpg 600w, people/p7-900.jpg 900w" sizes="(max-width:780px) 72vw, 25vw" alt="" decoding="async" draggable="false"><figcaption class="face__cap"><span class="face__name">Вера Долина</span><span class="small face__role">Юрист, партнёр</span><span class="face__quote">«Переговоры выигрывает не тот, кто говорит больше, а тот, кто точнее формулирует»</span></figcaption></figure>
+          <figure class="face" data-focus=".2"><img src="people/p8-600.jpg" srcset="people/p8-600.jpg 600w, people/p8-900.jpg 900w" sizes="(max-width:780px) 72vw, 25vw" alt="" decoding="async" draggable="false"><figcaption class="face__cap"><span class="face__name">Полина Март</span><span class="small face__role">Врач, руководитель клиники</span><span class="face__quote">«Я научилась слышать вопрос до того, как его задали»</span></figcaption></figure>
+        </div>
+        <p class="small faces__label" id="faces-label" aria-hidden="true">Среда единомышленников</p>
       </div>
     </section>
+
 
     <!-- 3. Программы — новая образовательная архитектура (письмо заказчицы, 21.10).
          Факультет — постоянное направление, программа — продукт, формат — способ участия.
@@ -1648,6 +1626,8 @@
       const letters = [...title.textContent].map(ch => { const l = document.createElement('span'); l.className = 'l'; l.textContent = ch; return l; });
       title.textContent = ''; letters.forEach(l => title.appendChild(l));
       if (REDUCE) return;
+      // Слежение героя за курсором глушится на время манифеста (capture идёт раньше его обработчика).
+      hero.addEventListener('pointermove', e => { if (handoff) e.stopImmediatePropagation(); }, { capture:true });
 
       // Стрелку героя крутит его же скрипт; обёртка добавляет наш медленный поворот.
       const wrap = document.createElement('div');
@@ -1712,6 +1692,9 @@
         const on = p > 0 && r.bottom > 0;
         if (on !== handoff) {
           handoff = on; hero.classList.toggle('is-handoff', on);
+          // Пока идёт манифест, стрелка героя не следит за курсором: её угол
+          // задаёт только прокрутка. Синтетический pointerleave возвращает её в 0.
+          if (on) hero.dispatchEvent(new Event('pointerleave'));
           // Вне манифеста герой живёт сам: заставка управляет его прозрачностью
           // классами, и inline-стили не должны их перебивать.
           if (!on) { [compass, ...fading, stage, brand].filter(Boolean).forEach(n => { n.style.opacity = ''; }); compass.style.transform = ''; base.style.transform = ''; wrap.style.removeProperty('--turn'); wrap.style.removeProperty('--breath'); }
@@ -1792,19 +1775,30 @@
           pins[i].setAttribute('cx', sx.toFixed(1)); pins[i].setAttribute('cy', sy.toFixed(1)); pins[i].style.opacity = q > 0 ? out.toFixed(3) : '0';
         });
 
-        // Стрелка. Акт 1 — одна медленная дуга. Акт 2 — к каждому принципу по очереди.
-        let turn = -96 * easeIO(clamp01((p - .03) / .40));
-        const live = tenetP.map((q, i) => ({ q, i })).filter(x => x.q > 0 && x.i < 3);
-        if (live.length) {
-          const cur = live[live.length - 1];
-          const target = aimAt(cx, cy, anchors[cur.i].x, anchors[cur.i].y) - 45;
-          const prev = cur.i ? aimAt(cx, cy, anchors[cur.i - 1].x, anchors[cur.i - 1].y) - 45 : turn;
-          turn = prev + (target - prev) * easeIO(clamp01(cur.q / .7));
+        // Стрелка. Акт 1 — медленный малый дрейф (−28°). Переход к «Философии» —
+        // последнее движение приводит её на «Мыслить точно». Дальше — по часовой
+        // к каждому появляющемуся принципу: 01 → 02 → 03 → «Одна система».
+        const cw = (from, to) => from + (((to - from) % 360) + 360) % 360;   // короткий путь только по часовой
+        // Покой стрелки — северо-восток (−45°): угол на точку уже учитывает это (aimAt = atan2 + 45).
+        const aim = i => aimAt(cx, cy, anchors[i].x, anchors[i].y);
+        let turn = -28 * easeIO(clamp01((p - .03) / .40));
+        if (anchors.length) {
+          const first = aim(0);
+          const d0 = first - turn; const dCCW = ((d0 % 360) - 360) % 360;    // к первому принципу — ближней стороной
+          const approach = easeIO(clamp01((p - .45) / .14));
+          turn = turn + (Math.abs(dCCW) < 180 ? dCCW : d0) * approach;
+          const live = tenetP.map((q, i) => ({ q, i })).filter(x => x.q > 0 && x.i > 0);
+          if (live.length) {
+            const cur = live[live.length - 1];
+            const prev = aim(cur.i - 1), target = cw(prev, aim(cur.i));
+            turn = prev + (target - prev) * easeIO(clamp01(cur.q / .7));
+          }
         }
         wrap.style.setProperty('--turn', `${turn.toFixed(2)}deg`);
 
         const at = Math.min(keys.length - 1, Math.floor(clamp01((p - .11) / .13) * keys.length));
-        const label = live.length ? TENET_NAMES[live[live.length - 1].i] : (titleP > 0 ? 'философия' : NAMES[at]);
+        const shown = tenetP.filter(q => q > 0).length;
+        const label = shown ? TENET_NAMES[shown - 1] : (titleP > 0 ? 'философия' : NAMES[at]);
         if (wordNode && wordNode.textContent !== label) wordNode.textContent = label;
         stage.style.opacity = out.toFixed(3);
       };
@@ -2005,42 +1999,49 @@
         }, { rootMargin:'120px' }).observe(target);
       };
 
-      // ───────── 1. Лента участников ─────────
-      // Карточки одинаковые и прямые. От x зависит только лёгкий подъём к краям
-      // (несколько пикселей), форма карточки не меняется. Лента едет сама,
-      // тянется с инерцией; кадр считается только пока блок виден.
+      // ───────── 1. Лента участников (дуга, вариант v8) ─────────
       safe('peers', () => {
         const stage = document.getElementById('peers-stage');
-        const cue = document.getElementById('peers-cue');
         if (!stage) return;
         const cards = [...stage.querySelectorAll('.peer')], N = cards.length;
         if (!N) return;
-        const SPEED = 16;                        // px/с на макете 1440 — медленнее, чем взгляд
-        const LIFT = 14;                         // подъём у краёв, px на макете 1440
-        let offset = 0, vel = 0, drag = null, stageH = 0;
+        const SPEED = 34;                        // px/с в макетных пикселях 1440
+        let offset = 0, vel = 0, drag = null, last = 0, auto = 0;
+        const rq = (p, r) => {
+          // Скруглённый четырёхугольник: карточка с наклонными верхом и низом.
+          let d = '';
+          for (let i = 0; i <= p.length; i++) {
+            const c = p[i % p.length], a = p[(i + p.length - 1) % p.length], b = p[(i + 1) % p.length];
+            const la = Math.hypot(a[0] - c[0], a[1] - c[1]), lb = Math.hypot(b[0] - c[0], b[1] - c[1]), k = Math.min(r, la / 2, lb / 2);
+            const p1 = [c[0] + (a[0] - c[0]) / la * k, c[1] + (a[1] - c[1]) / la * k], p2 = [c[0] + (b[0] - c[0]) / lb * k, c[1] + (b[1] - c[1]) / lb * k];
+            d += (i ? 'L' : 'M') + p1[0].toFixed(1) + ' ' + p1[1].toFixed(1) + 'Q' + c[0].toFixed(1) + ' ' + c[1].toFixed(1) + ' ' + p2[0].toFixed(1) + ' ' + p2[1].toFixed(1);
+          }
+          return `path("${d}Z")`;
+        };
         const paint = (dt) => {
-          const R = stage.getBoundingClientRect(), narrow = NARROW.matches;
-          const u = narrow ? 1 : Math.max(.78, Math.min(1.34, R.width / 1440));
+          const R = stage.getBoundingClientRect(), narrow = NARROW.matches, u = narrow ? R.width / 640 : R.width / 1440;
+          const cx = R.width / 2, span = 706 * u;
           if (!drag) { if (Math.abs(vel) > 1) { offset += vel * dt; vel *= Math.pow(.05, dt); } else vel = 0; }
-          if (!REDUCE && !drag) offset += SPEED * u * dt;
-          const W = (narrow ? 210 : 250) * u, gap = (narrow ? 16 : 26) * u, pitch = W + gap, L = pitch * N, cx = R.width / 2;
-          // Высота ряда — по самой высокой карточке: подписи разной длины,
-          // а низ ряда должен быть один. Пишется только когда меняется.
-          let h = 0;
-          for (const el of cards) { if (el.style.width !== `${W.toFixed(1)}px`) el.style.width = `${W.toFixed(1)}px`; h = Math.max(h, el.offsetHeight); }
-          if (Math.abs(h + LIFT * u - stageH) > 1) { stageH = h + LIFT * u; stage.style.height = `${stageH.toFixed(1)}px`; }
+          if (!REDUCE && !drag) auto += SPEED * u * dt;
+          const s = offset + auto, pitch = (narrow ? 230 : 292) * u, L = pitch * N, cy = R.height / 2;
+          const H = (x) => { const q = Math.min(1.25, Math.abs(x - cx) / span); return (narrow ? 300 : 340 + 100 * Math.pow(q, 2.6)) * u; };
           for (let i = 0; i < N; i++) {
-            // Ряд зациклен: карточка, ушедшая за левый край, встаёт в хвост.
-            const xl = ((i * pitch - offset) % L + L) % L - pitch * 1.5;
-            const d = Math.min(1, Math.abs(xl + W / 2 - cx) / (R.width / 2));
-            const y = LIFT * u * (1 - d * d);
-            cards[i].style.transform = `translate3d(${xl.toFixed(2)}px,${y.toFixed(2)}px,0)`;
+            const xl0 = ((i * pitch - s) % L + L) % L - pitch * 1.5, tt = xl0 - cx, x = cx + tt * (1 + .083 * (tt / span) * (tt / span)), d = Math.min(1.2, Math.abs(x - cx) / span);
+            const W = (narrow ? 190 : 230 + 56 * d * d) * u, xl = x - W / 2, xr = x + W / 2, hl = H(xl), hr = H(xr), hm = Math.max(hl, hr), yc = cy - 10 * d * d * u;
+            const el = cards[i];
+            el.style.width = `${W.toFixed(1)}px`; el.style.height = `${hm.toFixed(1)}px`;
+            el.style.transform = `translate3d(${xl.toFixed(2)}px,${(yc - hm / 2).toFixed(2)}px,0)`;
+            el.style.clipPath = narrow ? '' : rq([[0, (hm - hl) / 2], [W, (hm - hr) / 2], [W, (hm + hr) / 2], [0, (hm + hl) / 2]], 14);
           }
         };
+        const tick = (now) => {
+          const dt = last ? Math.min((now - last) / 1000, .1) : 0;
+          last = now;
+          paint(dt);
+        };
+        // Пока виден — свой цикл; иначе один кадр, чтобы раскладка была на месте.
         paint(0);
-        loop(stage, (t, dt) => paint(dt));
-        // Стрелка дышит, только пока блок на экране.
-        if (cue) new IntersectionObserver(([e]) => cue.classList.toggle('is-live', e.isIntersecting), { rootMargin:'80px' }).observe(cue);
+        if (!REDUCE || true) loop(stage, (t, dt) => paint(dt));
         stage.addEventListener('pointerdown', (e) => { drag = { x:e.clientX, t:performance.now() }; vel = 0; stage.setPointerCapture?.(e.pointerId); stage.classList.add('is-dragging'); });
         stage.addEventListener('pointermove', (e) => {
           if (!drag) return;
@@ -2106,6 +2107,88 @@
           const dark = theme === 'dark';
           if (dark !== onDark) { onDark = dark; shell.classList.toggle('chrome--dark', !dark); }
         });
+      });
+
+      // ───────── 1. Среда — «кольцо → ряд» (порт lib/faces.js из Sur(face)) ─────────
+      // Состояние выводится из позиции дорожки каждый кадр (назад отыгрывает
+      // само); вращение кольца — по времени, только пока сцена на экране.
+      safe('faces', () => {
+        const section = document.getElementById('peers'), stage = document.getElementById('faces-stage'), ring = document.getElementById('faces-ring');
+        if (!section || !stage || !ring) return;
+        const cards = [...ring.querySelectorAll('.face')], N = cards.length;
+        if (!N) return;
+        const imgs = cards.map(el => el.querySelector('img'));
+        const focus = cards.map(el => Math.min(1, Math.max(0, parseFloat(el.dataset.focus || '.5'))));
+        const GUTTER = 24, GAP = 16, SPIN = 4, RING_R = .40, RING_SIDE = .15, G0 = .55;
+        // Такты в высотах экрана от момента, когда сцена прилипла.
+        const B = { appear:[.05, .3], grow:[.05, 2.05], spinStop:[1.8, 2.05], fold:[2.05, 2.85], tail:.2 };
+        const rad = d => d * Math.PI / 180, mix = (a, b, t) => a + (b - a) * t;
+        const smooth = (a, b, x) => { const t = clamp01((x - a) / (b - a)); return t * t * (3 - 2 * t); };
+        const geo = {}; let slots = cards.map((_, i) => i), unwrap = new Array(N).fill(0), spin = 0, travel = 0, captioned = false, lastFold = -1;
+        const measure = () => {
+          const W = document.documentElement.clientWidth, H = innerHeight, mobile = NARROW.matches;
+          let cw = mobile ? W * .72 : (W - 2 * GUTTER - 3 * GAP) / 4, ch = cw * 4 / 3;
+          const maxH = H * (mobile ? .5 : .5);
+          if (ch > maxH) { ch = maxH; cw = ch * 3 / 4; }
+          const Bb = Math.min(H, W * 1.25);
+          Object.assign(geo, { W, H, cx:W / 2, cy:H / 2, cw, ch, R1:RING_R * Bb, side1:RING_SIDE * Bb, clip0:(ch - cw) / 2, rowY:H * (mobile ? .42 : .44), slot:j => GUTTER + j * (cw + GAP) + cw / 2 });
+          const rowW = N * cw + (N - 1) * GAP;
+          travel = Math.max(0, rowW - (W - 2 * GUTTER));
+          ring.style.setProperty('--card-w', `${cw.toFixed(1)}px`); ring.style.setProperty('--card-h', `${ch.toFixed(1)}px`);
+          section.style.setProperty('--faces-run', `${((B.fold[1] + travel / H + B.tail) * 100 + 100).toFixed(1)}vh`);
+        };
+        const pose = (i, pH) => {
+          const g = mix(G0, 1, span(pH, B.grow[0], B.grow[1])), theta = i * (360 / N) + spin, R = geo.R1 * g;
+          return { x:geo.cx + R * Math.cos(rad(theta)), y:geo.cy + R * Math.sin(rad(theta)), r:theta + 90, s:geo.side1 * g / geo.cw, o:REDUCE ? 1 : span(pH, B.appear[0], B.appear[1]) };
+        };
+        let pH = 0;
+        const render = () => {
+          const foldRaw = REDUCE ? 1 : span(pH, B.fold[0], B.fold[1]);
+          const strip = span(pH, B.fold[1], B.fold[1] + travel / geo.H), shift = travel * strip;
+          const poses = cards.map((_, i) => pose(i, pH));
+          if (foldRaw <= 0) {
+            // Порядок ряда — по x на кольце: карточки едут к ближним местам.
+            const byX = poses.map((_, i) => i).sort((a, b) => poses[a].x - poses[b].x);
+            byX.forEach((ci, slot) => { slots[ci] = slot; });
+            unwrap = poses.map(p => 360 * Math.round(p.r / 360));
+          }
+          const e = easeInOut(foldRaw), eX = easeInOut(span(foldRaw, 0, .6)), eY = easeInOut(span(foldRaw, .4, 1));
+          let visible = false;
+          cards.forEach((el, i) => {
+            const p = poses[i];
+            const x = mix(p.x, geo.slot(slots[i]) - shift, eX), y = mix(p.y, geo.rowY, eY), r = mix(p.r - unwrap[i], 0, eX), s = mix(p.s, 1, e), o = Math.max(p.o, e);
+            const inset = 2 * geo.clip0 * (1 - e), top = inset * focus[i], bottom = inset - top;
+            const c = (top - bottom) / 2 * s, a = rad(r), ox = -c * Math.sin(a), oy = c * Math.cos(a);
+            if (o > 0) visible = true;
+            el.style.transform = `translate3d(${(x - ox - geo.cw / 2).toFixed(1)}px,${(y - oy - geo.ch / 2).toFixed(1)}px,0) rotate(${r.toFixed(2)}deg) scale(${s.toFixed(4)})`;
+            el.style.opacity = o.toFixed(3);
+            const clip = `inset(${top.toFixed(1)}px 0px ${bottom.toFixed(1)}px round 14px)`;
+            if (imgs[i].__clip !== clip) { imgs[i].__clip = clip; imgs[i].style.clipPath = clip; }
+            const z = String(16 - slots[i]); if (el.style.zIndex !== z) el.style.zIndex = z;
+            el.style.setProperty('--slot', slots[i]);
+          });
+          ring.classList.toggle('is-on', visible);
+          captioned = foldRaw >= .98;
+          ring.classList.toggle('is-row', foldRaw >= .9);
+          ring.classList.toggle('is-captioned', captioned);
+          stage.classList.toggle('is-captioned', captioned);
+          lastFold = foldRaw;
+        };
+        const seen = watch(section, '200px');
+        measure();
+        jobs.push(() => {
+          if (!seen.on) return;
+          const r = section.getBoundingClientRect();
+          pH = Math.max(0, -r.top / innerHeight);
+          render();
+        });
+        addEventListener('resize', () => { measure(); render(); }, { passive:true });
+        if (!REDUCE) loop(stage, (t, dt) => {
+          const speed = SPIN * (1 - smooth(B.spinStop[0], B.spinStop[1], pH));
+          if (pH <= B.appear[0] || speed <= 0) return;
+          spin += dt * speed; render();
+        });
+        render();
       });
 
       // ───────── 3. Программы: фильтр на data-атрибутах ─────────
