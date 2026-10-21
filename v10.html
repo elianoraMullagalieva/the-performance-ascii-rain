@@ -478,7 +478,7 @@
     .manifest__corner { position:absolute; margin:0; font:300 clamp(.75rem,.7rem + .1vw,.8125rem)/1.4 Onest,Manrope,sans-serif; letter-spacing:.08em; text-transform:uppercase; opacity:calc(.6 * var(--corners,1)); }
     /* ── Философия ── */
     .manifest__title { position:absolute; left:0; right:0; top:var(--title-y,17%); margin:0; text-align:center; font-family:Anticva,Georgia,serif; font-size:clamp(2.3rem,1.1rem + 3.4vw,4.3rem); font-weight:400; line-height:1.1; letter-spacing:.01em; text-transform:uppercase; }
-    .manifest__title .l { display:inline-block; will-change:transform,opacity; }
+    .manifest__title .l { display:inline-block; will-change:transform,opacity,filter; }
     .manifest__tenets { margin:0; padding:0; list-style:none; }
     .manifest__tenet { position:absolute; width:clamp(220px,15.5vw,270px); }
     /* Принципы за пределами лимба: компас в центре занимает 34% ширины. */
@@ -487,7 +487,13 @@
     .manifest__tenet--3 { left:74%; top:70%; }
     /* Четвёртый — ниже третьего по левому краю, но с запасом от угловой подписи. */
     .manifest__tenet--4 { left:8%; top:67%; }
-    .manifest__n { display:block; margin-bottom:10px; font:300 clamp(.75rem,.7rem + .1vw,.8125rem)/1 Onest,Manrope,sans-serif; letter-spacing:.1em; opacity:.6; }
+    /* Знак принципа: тонкий кружок с точками из языка компаса (вместо 01/02/03).
+       Кружок прорисовывается, точки всплывают — скрипт ведёт --mk от 0 до 1. */
+    .manifest__n { display:block; width:30px; height:30px; margin-bottom:12px; color:var(--ink); }
+    .manifest__n svg { display:block; width:100%; height:100%; overflow:visible; fill:none; stroke:currentColor; stroke-width:1; stroke-linecap:butt; opacity:min(1, calc(var(--mk,0) * 4)); }
+    .manifest__n .mk__ring { stroke-dasharray:92; stroke-dashoffset:calc(92 * (1 - var(--mk,0))); opacity:.7; transform:rotate(-90deg); transform-origin:50% 50%; }
+    .manifest__n .mk__ring--in { stroke-dasharray:48; stroke-dashoffset:calc(48 * (1 - var(--mk,0))); opacity:.5; }
+    .manifest__n .mk__dot { fill:currentColor; stroke:none; opacity:var(--mk,0); transform:scale(var(--mk,0)); transform-origin:50% 50%; }
     .manifest__tn { margin:0 0 8px; font:500 clamp(1.188rem,.814rem + 1.04vw,1.697rem)/1.12 Manrope,Arial,sans-serif; letter-spacing:-.01em; }
     .manifest__tn .ln { display:block; overflow:hidden; padding-bottom:.14em; margin-bottom:-.14em; }
     .manifest__tn .ln__i { display:block; will-change:transform; }
@@ -501,9 +507,10 @@
       /* На телефоне сцену не ведёт скрипт — лист виден сразу, а не ждёт прокрутки. */
       .motion .manifest { opacity:1; }
       .manifest__title { position:static; margin:90px 0 28px; }
-      .manifest__title .l { opacity:1 !important; transform:none !important; }
+      .manifest__title .l { opacity:1 !important; transform:none !important; filter:none !important; }
+      .manifest__n { --mk:1; }
       .manifest__tenet { position:static; width:auto; margin-bottom:28px; opacity:1 !important; }
-      .manifest__tn .ln__i,.manifest__td { transform:none !important; opacity:1 !important; }
+      .manifest__tn .ln__i,.manifest__td { transform:none !important; opacity:1 !important; filter:none !important; }
       .manifest__chart { display:none; }
       /* Без пустого хвоста: лист кончается на четвёртом принципе, угловая
          подпись на телефоне не нужна — её ведёт прокрутка, которой здесь нет. */
@@ -523,6 +530,7 @@
     }
   </style>
   <style id="manifest-img-styles">
+    .manifest__leg:nth-child(3) { padding-left:calc(29% + 6px); }
     /* Вставки-картинки в фразах: кадр чуть ниже базовой линии, лёгкий наклон
        на внутреннем слое (внешний слой двигает скрипт). */
     .manifest__img { display:inline-block; vertical-align:-.14em; width:1.55em; height:1.04em; margin:0 .06em; }
@@ -854,19 +862,19 @@
       <svg class="manifest__chart" id="manifest-chart" aria-hidden="true"></svg>
       <h2 class="manifest__title" id="manifest-title" aria-hidden="true">Философия</h2>
       <ol class="manifest__legs" id="manifest-legs">
-        <li class="manifest__leg"><b>Мысль</b> <i class="manifest__img manifest__img--1" aria-hidden="true"><span style="--img:url(cards/card-green-sm.jpg)"></span></i> рождается в слове.</li>
-        <li class="manifest__leg"><b>Слово</b> формирует <i class="manifest__img manifest__img--2" aria-hidden="true"><span style="--img:url(cards/card-bird-sm.jpg)"></span></i> влияние.</li>
-        <li class="manifest__leg"><b>Влияние</b> <i class="manifest__img manifest__img--3" aria-hidden="true"><span style="--img:url(cards/card-silk-sm.jpg)"></span></i> формирует <b>реальность</b>.</li>
+        <li class="manifest__leg"><b>Мысль</b> рождается в слове.</li>
+        <li class="manifest__leg"><b>Слово</b> формирует влияние.</li>
+        <li class="manifest__leg"><b>Влияние</b> формирует <b>реальность</b>.</li>
       </ol>
       <!-- Принципы — формулировки заказчицы из письма от 21.10. Стоят вокруг
            компаса: два сверху по сторонам, третий справа внизу — там, куда
            в конце приходит стрелка. -->
       <ol class="manifest__tenets" id="manifest-tenets">
-        <li class="manifest__tenet manifest__tenet--1"><span class="manifest__n">01</span><h3 class="manifest__tn"><span class="ln"><span class="ln__i">Мыслить точно</span></span></h3><p class="manifest__td">Развивать способность видеть суть, формулировать позицию и&nbsp;выстраивать логику мысли.</p></li>
-        <li class="manifest__tenet manifest__tenet--2"><span class="manifest__n">02</span><h3 class="manifest__tn"><span class="ln"><span class="ln__i">Говорить убедительно</span></span></h3><p class="manifest__td">Превращать мысль в&nbsp;слово, которое создаёт понимание, доверие и&nbsp;побуждает к&nbsp;действию.</p></li>
-        <li class="manifest__tenet manifest__tenet--3"><span class="manifest__n">03</span><h3 class="manifest__tn"><span class="ln"><span class="ln__i">Влиять осознанно</span></span></h3><p class="manifest__td">Управлять собственным вниманием и&nbsp;присутствием, чувствовать контекст и&nbsp;менять качество коммуникации.</p></li>
+        <li class="manifest__tenet manifest__tenet--1"><span class="manifest__n" data-n="01"><svg viewBox="0 0 32 32" aria-hidden="true"><circle class="mk__ring" cx="16" cy="16" r="14.5"/><circle class="mk__dot" cx="16" cy="16" r="2.4"/></svg></span><h3 class="manifest__tn"><span class="ln"><span class="ln__i">Мыслить точно</span></span></h3><p class="manifest__td">Развивать способность видеть суть, формулировать позицию и&nbsp;выстраивать логику мысли.</p></li>
+        <li class="manifest__tenet manifest__tenet--2"><span class="manifest__n" data-n="02"><svg viewBox="0 0 32 32" aria-hidden="true"><circle class="mk__ring" cx="16" cy="16" r="14.5"/><circle class="mk__dot" cx="23.5" cy="19.5" r="2.4"/></svg></span><h3 class="manifest__tn"><span class="ln"><span class="ln__i">Говорить убедительно</span></span></h3><p class="manifest__td">Превращать мысль в&nbsp;слово, которое создаёт понимание, доверие и&nbsp;побуждает к&nbsp;действию.</p></li>
+        <li class="manifest__tenet manifest__tenet--3"><span class="manifest__n" data-n="03"><svg viewBox="0 0 32 32" aria-hidden="true"><circle class="mk__ring" cx="16" cy="16" r="14.5"/><circle class="mk__dot" cx="16" cy="11.2" r="2.2"/><circle class="mk__dot" cx="11.6" cy="19" r="2.2"/><circle class="mk__dot" cx="20.4" cy="19" r="2.2"/></svg></span><h3 class="manifest__tn"><span class="ln"><span class="ln__i">Влиять осознанно</span></span></h3><p class="manifest__td">Управлять собственным вниманием и&nbsp;присутствием, чувствовать контекст и&nbsp;менять качество коммуникации.</p></li>
         <!-- Четвёртый блок уравновешивает композицию. Текст — черновик, согласовать с заказчицей. -->
-        <li class="manifest__tenet manifest__tenet--4"><span class="manifest__n">I&nbsp;—&nbsp;III</span><h3 class="manifest__tn"><span class="ln"><span class="ln__i">Одна система</span></span></h3><p class="manifest__td">Принципы не&nbsp;изучаются порознь: каждая программа института работает со&nbsp;всеми тремя&nbsp;— от&nbsp;мысли к&nbsp;слову, от&nbsp;слова к&nbsp;влиянию.</p></li>
+        <li class="manifest__tenet manifest__tenet--4"><span class="manifest__n" data-n="I — III"><svg viewBox="0 0 32 32" aria-hidden="true"><circle class="mk__ring" cx="16" cy="16" r="14.5"/><circle class="mk__ring mk__ring--in" cx="16" cy="16" r="7.5"/><circle class="mk__dot" cx="16" cy="16" r="1.6"/></svg></span><h3 class="manifest__tn"><span class="ln"><span class="ln__i">Одна система</span></span></h3><p class="manifest__td">Принципы не&nbsp;изучаются порознь: каждая программа института работает со&nbsp;всеми тремя&nbsp;— от&nbsp;мысли к&nbsp;слову, от&nbsp;слова к&nbsp;влиянию.</p></li>
       </ol>
     </section>
   </div>
@@ -1635,8 +1643,8 @@
       needle.replaceWith(wrap); wrap.appendChild(needle);
       // Выноски от лимба к принципам.
       const NS = 'http://www.w3.org/2000/svg';
-      const leads = tenets.slice(0, 3).map(() => { const l = document.createElementNS(NS, 'line'); chart.appendChild(l); return l; });
-      const pins = leads.map(() => { const c = document.createElementNS(NS, 'circle'); c.setAttribute('r', 3); chart.appendChild(c); return c; });
+      // Выносок к принципам больше нет (Эли, 22.10): стрелка сама показывает на принцип.
+      const leads = [];
 
       const fit = () => {
         legs.style.setProperty('--fz-leg', '10rem');
@@ -1667,17 +1675,21 @@
       // только пока трек на экране и не спорит с прокруткой — поворот от неё
       // лежит в --turn, дыхание складывается с ним в CSS.
       const base = compass.querySelector('.compass__base');
-      let handoff = false, frame = 0;
+      let handoff = false, frame = 0, turnTarget = 0, turnNow = 0, lastNow = 0;
       const breathe = (now) => {
-        const t = now / 1000;
+        const t = now / 1000, dt = lastNow ? Math.min((now - lastNow) / 1000, .1) : 0;
+        lastNow = now;
         if (handoff) {
+          // Поворот догоняет цель с инерцией: прокрутка задаёт «куда», время — «как».
+          turnNow += (turnTarget - turnNow) * (1 - Math.exp(-dt * 3.2));
+          wrap.style.setProperty('--turn', `${turnNow.toFixed(2)}deg`);
           wrap.style.setProperty('--breath', `${(Math.sin(t * 1.25) * 1).toFixed(2)}deg`);
           if (base) base.style.transform = `rotate(${(Math.sin(t * .42) * 1.6).toFixed(2)}deg)`;
         }
         frame = requestAnimationFrame(breathe);
       };
       new IntersectionObserver(([e]) => {
-        if (e.isIntersecting) { if (!frame) frame = requestAnimationFrame(breathe); }
+        if (e.isIntersecting) { if (!frame) { lastNow = 0; frame = requestAnimationFrame(breathe); } }
         else if (frame) { cancelAnimationFrame(frame); frame = 0; }
       }).observe(track);
       const paint = () => {
@@ -1708,8 +1720,8 @@
         const inP = clamp01((p - .10) / .12), fadeP = easeIO(clamp01((p - .24) / .07)), gather = clamp01((p - .27) / .12);
         const colOut = easeIO(clamp01((p - .43) / .04));            // столбец гаснет
         const drop = easeIO(clamp01((p - .44) / .12));              // компас опускается в центр
-        const titleP = clamp01((p - .53) / .08);                    // заголовок
-        const tenetP = tenets.map((t, i) => clamp01((p - (.59 + i * .07)) / .08));
+        const titleP = clamp01((p - .52) / .13);                    // заголовок: длиннее и мягче
+        const tenetP = tenets.map((t, i) => clamp01((p - (.60 + i * .07)) / .11));
         const out = 1;                                              // блок не гаснет: уходит листом
         // Угловая подпись гаснет на выходе: иначе она проезжает по логотипу героя.
         stage.style.setProperty('--corners', (clamp01((p - .09) / .03) * clamp01(1 + exit / 140)).toFixed(3));
@@ -1752,27 +1764,23 @@
 
         // Акт 2: заголовок по буквам, принципы по одному, выноски за ними.
         letters.forEach((l, i) => {
-          const t = easeOut(clamp01((titleP - (i / letters.length) * .6) / .4));
+          const t = easeIO(clamp01((titleP - (i / letters.length) * .55) / .45));
           l.style.opacity = (t * out).toFixed(3);
-          l.style.transform = `translate3d(0,${((1 - t) * .45).toFixed(3)}em,0)`;
+          // Буквы проявляются из размытия и чуть собираются по масштабу — без скачка.
+          l.style.transform = `translate3d(0,${((1 - t) * .32).toFixed(3)}em,0) scale(${(.94 + .06 * t).toFixed(4)})`;
+          l.style.filter = t < .98 ? `blur(${((1 - t) * 7).toFixed(1)}px)` : '';
         });
         tenets.forEach((t, i) => {
           const q = tenetP[i];
           const n = t.querySelector('.manifest__n'), tn = t.querySelector('.manifest__tn .ln__i'), td = t.querySelector('.manifest__td');
           const a = easeOut(clamp01(q / .4)), b = easeOut(clamp01((q - .15) / .55)), c = easeOut(clamp01((q - .4) / .6));
-          n.style.opacity = (a * out).toFixed(3);
+          n.style.setProperty('--mk', easeIO(a).toFixed(3));
           tn.style.transform = `translate3d(0,${((1 - b) * 110).toFixed(1)}%,0)`;
           tn.style.opacity = out.toFixed(3);
+          tn.style.filter = b > 0 && b < .98 ? `blur(${((1 - b) * 4).toFixed(1)}px)` : '';
           td.style.opacity = (c * out).toFixed(3);
           td.style.transform = `translate3d(0,${((1 - c) * 10).toFixed(1)}px,0)`;
-          // Выноска растёт от лимба к принципу; у четвёртого блока выноски нет.
-          if (!leads[i]) return;
-          const R = w * k * .36, ang = Math.atan2(anchors[i].y - cy, anchors[i].x - cx);
-          const sx = cx + Math.cos(ang) * R, sy = cy + Math.sin(ang) * R;
-          const ex = sx + (anchors[i].x - sx) * easeIO(clamp01((q - .05) / .6)), ey = sy + (anchors[i].y - sy) * easeIO(clamp01((q - .05) / .6));
-          leads[i].setAttribute('x1', sx.toFixed(1)); leads[i].setAttribute('y1', sy.toFixed(1)); leads[i].setAttribute('x2', ex.toFixed(1)); leads[i].setAttribute('y2', ey.toFixed(1));
-          leads[i].style.opacity = q > 0 ? (.45 * out).toFixed(3) : '0';
-          pins[i].setAttribute('cx', sx.toFixed(1)); pins[i].setAttribute('cy', sy.toFixed(1)); pins[i].style.opacity = q > 0 ? out.toFixed(3) : '0';
+          td.style.filter = c > 0 && c < .98 ? `blur(${((1 - c) * 3).toFixed(1)}px)` : '';
         });
 
         // Стрелка. Акт 1 — медленный малый дрейф (−28°). Переход к «Философии» —
@@ -1791,10 +1799,11 @@
           if (live.length) {
             const cur = live[live.length - 1];
             const prev = aim(cur.i - 1), target = cw(prev, aim(cur.i));
-            turn = prev + (target - prev) * easeIO(clamp01(cur.q / .7));
+            turn = prev + (target - prev) * easeIO(clamp01(cur.q / .9));
           }
         }
-        wrap.style.setProperty('--turn', `${turn.toFixed(2)}deg`);
+        turnTarget = turn;
+        if (!frame) { turnNow = turn; wrap.style.setProperty('--turn', `${turn.toFixed(2)}deg`); }
 
         const at = Math.min(keys.length - 1, Math.floor(clamp01((p - .11) / .13) * keys.length));
         const shown = tenetP.filter(q => q > 0).length;
