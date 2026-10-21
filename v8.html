@@ -448,6 +448,10 @@
     .manifest-track { position:relative; z-index:2; height:760vh; height:760svh; margin-top:-100vh; margin-top:-100svh; }
     /* Сцена прозрачна и не ловит курсор: под ней первый экран со своей шапкой. */
     .manifest { position:sticky; top:0; height:100vh; height:100svh; overflow:hidden; background:transparent; color:var(--ink); pointer-events:none; }
+    /* Сцена лежит на первом экране с нулевой прокрутки: до старта она невидима.
+       Без скрипта класса .motion нет — тогда трек не наезжает на героя. */
+    .motion .manifest { opacity:0; }
+    html:not(.motion) .manifest-track { margin-top:0; }
     /* Пока компас едет, плавные переходы героя выключены: иначе каждый кадр
        прокрутки сглаживался бы ещё раз и отставал. */
     .hero.is-handoff > * { transition:none; }
@@ -1309,17 +1313,19 @@
           handoff = on; hero.classList.toggle('is-handoff', on);
           // Вне манифеста герой живёт сам: заставка управляет его прозрачностью
           // классами, и inline-стили не должны их перебивать.
-          if (!on) { [compass, ...fading].forEach(n => { n.style.opacity = ''; }); compass.style.transform = ''; wrap.style.removeProperty('--turn'); }
+          if (!on) { [compass, ...fading, stage].forEach(n => { n.style.opacity = ''; }); compass.style.transform = ''; wrap.style.removeProperty('--turn'); }
         }
         if (!on) return;
 
         // ── Акты. Манифест: 0–.50. Философия: .50–1. ──
         const lift = easeIO(clamp01(p / .09));
-        const inP = clamp01((p - .10) / .12), fadeP = easeIO(clamp01((p - .25) / .06)), gather = clamp01((p - .32) / .12);
-        const colOut = easeIO(clamp01((p - .50) / .04));            // столбец гаснет
-        const drop = easeIO(clamp01((p - .51) / .13));              // компас опускается в центр
-        const titleP = clamp01((p - .60) / .08);                    // заголовок
-        const tenetP = tenets.map((t, i) => clamp01((p - (.66 + i * .07)) / .08));
+        // Лишние слова серятся и чуть размываются, ключевые уже съезжаются —
+        // одно движение, не два. Переход к «Философии» короче.
+        const inP = clamp01((p - .10) / .12), fadeP = easeIO(clamp01((p - .24) / .07)), gather = clamp01((p - .27) / .12);
+        const colOut = easeIO(clamp01((p - .43) / .04));            // столбец гаснет
+        const drop = easeIO(clamp01((p - .44) / .12));              // компас опускается в центр
+        const titleP = clamp01((p - .53) / .08);                    // заголовок
+        const tenetP = tenets.map((t, i) => clamp01((p - (.59 + i * .07)) / .08));
         const out = 1 - clamp01((p - .96) / .04);                   // выход
         stage.style.setProperty('--corners', clamp01((p - .09) / .03).toFixed(3));
         fading.forEach(n => { n.style.opacity = (1 - clamp01(p / .035)).toFixed(3); });
@@ -1345,7 +1351,9 @@
           if (!key) { op *= 1 - fadeP; y -= fadeP * 14; }
           if (key) op *= 1 - colOut;
           w.style.opacity = op.toFixed(3);
-          w.style.filter = t < .96 ? `blur(${((1 - t) * 8).toFixed(1)}px)` : '';
+          // Размытие: при входе (все слова) и на уходе (только служебные, ≤ 6 разом, до 5px).
+          const blur = t < .96 ? (1 - t) * 8 : (!key && fadeP > 0 && fadeP < 1 ? fadeP * 5 : 0);
+          w.style.filter = blur > .3 ? `blur(${blur.toFixed(1)}px)` : '';
           if (!key) w.style.transform = `translate3d(0,${y.toFixed(1)}px,0)`;
         });
         if (gather === 0) measure();
@@ -1382,7 +1390,7 @@
         });
 
         // Стрелка. Акт 1 — одна медленная дуга. Акт 2 — к каждому принципу по очереди.
-        let turn = -96 * easeIO(clamp01((p - .03) / .45));
+        let turn = -96 * easeIO(clamp01((p - .03) / .40));
         const live = tenetP.map((q, i) => ({ q, i })).filter(x => x.q > 0 && x.i < 3);
         if (live.length) {
           const cur = live[live.length - 1];
@@ -1392,7 +1400,7 @@
         }
         wrap.style.setProperty('--turn', `${turn.toFixed(2)}deg`);
 
-        const at = Math.min(keys.length - 1, Math.floor(clamp01((p - .11) / .14) * keys.length));
+        const at = Math.min(keys.length - 1, Math.floor(clamp01((p - .11) / .13) * keys.length));
         const label = live.length ? TENET_NAMES[live[live.length - 1].i] : (titleP > 0 ? 'философия' : NAMES[at]);
         if (wordNode && wordNode.textContent !== label) wordNode.textContent = label;
         stage.style.opacity = out.toFixed(3);
