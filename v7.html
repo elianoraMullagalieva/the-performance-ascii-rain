@@ -443,7 +443,12 @@
     /* ───────── Манифест ─────────
        Светлый лист поверх первого экрана. Трек даёт прокрутку, лист стоит. */
     .manifest-track { position:relative; z-index:2; height:340vh; height:340svh; }
-    .manifest { position:sticky; top:0; height:100vh; height:100svh; overflow:hidden; background:var(--bg-light); color:var(--ink); }
+    /* Сцена прозрачна и не ловит курсор: под ней первый экран со своей шапкой. */
+    .manifest { position:sticky; top:0; height:100vh; height:100svh; overflow:hidden; background:transparent; color:var(--ink); pointer-events:none; }
+    /* Пока компас едет, плавные переходы героя выключены: иначе каждый кадр
+       прокрутки сглаживался бы ещё раз и отставал. */
+    .hero.is-handoff > * { transition:none; }
+    .hero.is-handoff .compass { will-change:transform; }
     /* Три фразы — три строки, каждая целиком, лесенкой. Кегль подбирает скрипт
        так, чтобы самая длинная строка вошла в поле; значение здесь — запасное. */
     /* По наброску заказчицы (Figma 2026:126): Anticva, зигзагом — первая строка
@@ -456,17 +461,10 @@
     .manifest__w { display:inline-block; will-change:opacity,transform,filter; }
     /* Ключевые слова тем же цветом: в наброске заказчицы красного нет. */
     .manifest__w.is-key { position:relative; z-index:2; }
-    /* Компас приходит с первого экрана: пока лист поднимается, он стоит ровно
-       там же, где компас героя, потом уходит вверх над фразы и мельчает.
-       Положение и размер пишет скрипт. */
-    .manifest__compass { position:absolute; left:0; top:0; width:clamp(300px,32vw,460px); aspect-ratio:1; transform:translate(var(--cx,50vw),var(--cy,50vh)) translate(-50%,-50%) scale(var(--k,1)); transform-origin:50% 50%; will-change:transform; }
-    .manifest__compass img { position:absolute; inset:0; width:100%; height:100%; }
-    .manifest__base { transform:rotate(var(--spin,0deg)); transform-origin:50% 50%; }
-    .manifest__needle { transform:rotate(var(--rot,0deg)); transform-origin:50% 50%; }
+    /* Обёртка стрелки героя: её поворачивает манифест, саму стрелку — герой. */
+    .needle-wrap { position:absolute; inset:0; z-index:2; transform-origin:50% 50%; transform:rotate(var(--turn,0deg)); }
     .manifest__corner--bl { left:var(--edge-x); bottom:var(--edge-y); }
     .manifest__corner { position:absolute; margin:0; font:300 clamp(.75rem,.7rem + .1vw,.8125rem)/1.4 Onest,Manrope,sans-serif; letter-spacing:.08em; text-transform:uppercase; opacity:calc(.6 * var(--corners,1)); }
-    /* На листе закреплённая шапка без нижних подписей первого экрана. */
-    .chrome--manifest .chrome__meta { display:none; }
     @media (max-width:780px) {
       .manifest-track { height:auto; }
       .manifest { position:relative; height:auto; min-height:100vh; min-height:100svh; padding:110px var(--edge-x) 160px; }
@@ -474,7 +472,7 @@
       .manifest__leg { white-space:normal; font-size:clamp(1.5rem,7vw,2.1rem); margin-bottom:.5em; }
       .manifest__leg:nth-child(1),.manifest__leg:nth-child(2),.manifest__leg:nth-child(3) { padding-left:0; }
       .manifest__w { opacity:1 !important; filter:none !important; transform:none !important; }
-      .manifest__compass { position:static; width:150px; margin:0 auto 36px; transform:none; }
+      .manifest { background:var(--bg-light); pointer-events:auto; }
       .manifest__corner--bl { bottom:40px; }
     }
     @media (prefers-reduced-motion:reduce) {
@@ -633,9 +631,8 @@
     <p class="meta meta--left"><span>＋&nbsp; Листайте и&nbsp;исследуйте</span><span>&nbsp;&nbsp;&nbsp;&nbsp;пространство института</span></p><p class="meta meta--right"><span>Москва&nbsp; /&nbsp; Online</span><span>Приём заявок открыт</span></p>
   </main>
 
-  <!-- Манифест: светлый лист наезжает на первый экран. Три фразы — три строки,
-       каждая целиком; по прокрутке лишние слова тают, четыре ключевых собираются
-       в столбец. Компас у края указывает на текущее слово. -->
+  <!-- Манифест: без шторки. Первый экран остаётся под прозрачной сценой, его
+       текст гаснет, а сам компас героя поднимается наверх и ведёт по фразам. -->
   <div class="manifest-track" id="manifest-track">
     <section class="manifest" id="manifest" aria-label="Мысль, слово, влияние, реальность">
       <p class="manifest__corner manifest__corner--bl"><span id="manifest-word">мысль</span></p>
@@ -644,7 +641,6 @@
         <li class="manifest__leg"><b>Слово</b> формирует влияние.</li>
         <li class="manifest__leg"><b>Влияние</b> формирует <b>реальность</b>.</li>
       </ol>
-      <div class="manifest__compass" id="manifest-compass" aria-hidden="true"><img class="manifest__base" src="compass-base.svg" alt="" id="manifest-base"><img class="manifest__needle" src="compass-needle.svg" alt="" id="manifest-needle"></div>
     </section>
   </div>
 
@@ -1195,19 +1191,21 @@
     }
     }
 
-    // ───────── Манифест: три фразы и четыре слова ─────────
-    // Всё от позиции прокрутки: назад отыгрывает само, залипать нечему.
+    // ───────── Манифест: компас героя ведёт по трём фразам ─────────
+    // Шторки нет. Герой остаётся под прозрачной сценой: его текст гаснет, компас
+    // поднимается наверх с лёгким покачиванием, стрелка идёт одной медленной
+    // дугой. Всё от позиции прокрутки — назад отыгрывает само.
     (() => {
-      const track = document.getElementById('manifest-track'), stage = document.getElementById('manifest'), legs = document.getElementById('manifest-legs'), compass = document.getElementById('manifest-compass'), base = document.getElementById('manifest-base'), needle = document.getElementById('manifest-needle'), wordNode = document.getElementById('manifest-word');
-      const heroCompass = document.querySelector('.hero .compass');
-      const chrome = document.getElementById('chrome');
-      if (chrome) chrome.classList.add('chrome--dark', 'chrome--manifest');
-      const NAMES = ['мысль', 'слово', 'влияние', 'реальность'];
-      if (!track || !stage || !legs) return;
+      const track = document.getElementById('manifest-track'), stage = document.getElementById('manifest'), legs = document.getElementById('manifest-legs'), wordNode = document.getElementById('manifest-word');
+      const hero = document.querySelector('.hero'), compass = document.querySelector('.hero .compass'), needle = document.querySelector('.hero .compass__needle');
+      if (!track || !stage || !legs || !hero || !compass || !needle) return;
       const NARROW = matchMedia('(max-width:780px)');
       const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
       const clamp01 = v => Math.min(1, Math.max(0, v));
       const easeIO = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      const NAMES = ['мысль', 'слово', 'влияние', 'реальность'];
+      // Что гаснет на герое, пока компас едет.
+      const fading = [...hero.querySelectorAll('.copy, .meta, .cross, .mobile-mantra')];
 
       // Фразы режем на слова; <b> — ключевые.
       const words = [];
@@ -1226,6 +1224,11 @@
       const keys = words.filter(w => w.classList.contains('is-key'));
       if (REDUCE) return;
 
+      // Стрелку героя крутит его же скрипт; обёртка добавляет наш медленный поворот.
+      const wrap = document.createElement('div');
+      wrap.className = 'needle-wrap';
+      needle.replaceWith(wrap); wrap.appendChild(needle);
+
       // Кегль: самая длинная строка с её отступом входит в поле.
       const fit = () => {
         legs.style.setProperty('--fz-leg', '10rem');
@@ -1233,11 +1236,8 @@
         let k = Infinity;
         [...legs.children].forEach((leg, i) => { k = Math.min(k, (avail - [.40, .14, .29][i] * avail) / leg.scrollWidth); });
         // Потолок — кегль из наброска: 50px на холсте 1710.
-        const cap = innerWidth * .0292 / 16;
-        legs.style.setProperty('--fz-leg', `${Math.min(cap, 10 * k * .96).toFixed(3)}rem`);
+        legs.style.setProperty('--fz-leg', `${Math.min(innerWidth * .0292 / 16, 10 * k * .96).toFixed(3)}rem`);
       };
-      // Куда собираются слова: столбец левее центра, строки чуть сдвинуты —
-      // как на svz, не ровная таблица. Размер вниз — SHRINK.
       const SHRINK = .8;
       let from = [], to = [];
       const measure = () => {
@@ -1246,53 +1246,57 @@
         fit();
         const s = stage.getBoundingClientRect();
         from = keys.map(k => { const r = k.getBoundingClientRect(); return { x:r.left - s.left + r.width / 2, y:r.top - s.top + r.height / 2, w:r.width, h:r.height }; });
-        // Столбец по центру, строки чуть сдвинуты — как на svz, не таблица.
+        // Столбец по центру, строки чуть сдвинуты — не таблица.
         const step = from[0].h * SHRINK * 1.25, top = s.height * .7 - step * 1.5;
         to = keys.map((k, i) => ({ x:s.width * (.5 + [-.02, .015, -.01, .025][i]), y:top + step * i }));
       };
 
+      let handoff = false;
       const paint = () => {
         if (NARROW.matches) return;
         const r = track.getBoundingClientRect(), travel = track.offsetHeight - innerHeight;
         const p = clamp01(-r.top / travel);
-        // Порядок: компас уходит вверх → слова выходят → пауза → слова собираются.
-        const inP = clamp01((p - .17) / .28), outP = clamp01((p - .56) / .32);
-        stage.style.setProperty('--corners', clamp01(p / .05).toFixed(3));
-        // Пока слова не тронулись, замер повторяется: шрифт мог дойти позже.
-        if (outP === 0) measure();
-        if (!to.length) return;
+        const on = p > 0 && r.bottom > 0;
+        if (on !== handoff) { handoff = on; hero.classList.toggle('is-handoff', on); }
+        // Порядок: текст героя гаснет и компас едет → слова выходят → пауза →
+        // лишние слова исчезают → четыре слова съезжаются.
+        const lift = easeIO(clamp01(p / .24));
+        const inP = clamp01((p - .22) / .26), fadeP = easeIO(clamp01((p - .54) / .12)), gather = clamp01((p - .68) / .27);
+        stage.style.setProperty('--corners', clamp01((p - .2) / .06).toFixed(3));
+        fading.forEach(n => { n.style.opacity = (1 - clamp01(p / .1)).toFixed(3); });
+
+        // Компас: с места героя наверх, к размеру из наброска, с покачиванием.
+        const s = stage.getBoundingClientRect();
+        const w = compass.offsetWidth, restTop = innerHeight * .504;
+        const endK = Math.min(s.width * .2555, 437) / w, endY = s.height * .31 - w / 2;
+        const dy = (endY - restTop) * lift, k = 1 + (endK - 1) * lift, sway = Math.sin(lift * Math.PI) * 2.4;
+        compass.style.transform = `translateX(-50%) translate3d(0,${dy.toFixed(1)}px,0) scale(${k.toFixed(4)}) rotate(${sway.toFixed(2)}deg)`;
+        // Стрелка: одна медленная дуга на весь блок, без рывков.
+        wrap.style.setProperty('--turn', `${(-96 * easeIO(clamp01((p - .06) / .88))).toFixed(2)}deg`);
+
         words.forEach((w, i) => {
           const t = clamp01((inP - (i / words.length) * .72) / .28);
           const key = w.classList.contains('is-key');
           let op = t, y = (1 - t) * 12;
-          if (!key) { op *= 1 - easeIO(outP); y -= easeIO(outP) * 16; }
+          if (!key) { op *= 1 - fadeP; y -= fadeP * 14; }
           w.style.opacity = op.toFixed(3);
           w.style.filter = t < .96 ? `blur(${((1 - t) * 8).toFixed(1)}px)` : '';
           if (!key) w.style.transform = `translate3d(0,${y.toFixed(1)}px,0)`;
         });
-        // Слова съезжаются по одному: первое уже на месте, последнее ещё едет.
-        const qs = keys.map((k, i) => easeIO(clamp01((outP - i * .09) / .73)));
+        if (gather === 0) measure();
+        if (!to.length) return;
+        // Съезжаются по одному: первое уже на месте, последнее ещё едет.
         keys.forEach((k, i) => {
-          const q = qs[i], dx = (to[i].x - from[i].x) * q, dy = (to[i].y - from[i].y) * q;
-          k.style.transform = `translate3d(${dx.toFixed(1)}px,${dy.toFixed(1)}px,0) scale(${(1 - (1 - SHRINK) * q).toFixed(3)})`;
+          const q = easeIO(clamp01((gather - i * .08) / .76));
+          const dx = (to[i].x - from[i].x) * q, dy2 = (to[i].y - from[i].y) * q;
+          k.style.transform = `translate3d(${dx.toFixed(1)}px,${dy2.toFixed(1)}px,0) scale(${(1 - (1 - SHRINK) * q).toFixed(3)})`;
         });
-        // Компас. Пока лист поднимается, стоит там же, где компас героя: лист
-        // проходит под ним, и компас «переходит» на лист. Потом уходит вверх.
-        const s = stage.getBoundingClientRect();
-        const hc = heroCompass ? heroCompass.getBoundingClientRect() : { left:innerWidth / 2 - 200, top:innerHeight * .504, width:400, height:400 };
-        const hx = hc.left + hc.width / 2, hy = hc.top + hc.height / 2;
-        const lift = easeIO(clamp01(p / .2));
-        // Конечное положение — как в наброске: 437px на холсте 1710, центр на 31% высоты.
-        const endK = Math.min(s.width * .2555, 437) / hc.width, endY = s.height * .31;
-        const cx = hx + (s.width / 2 - hx) * lift, cy = (hy - s.top) + (endY - (hy - s.top)) * lift, k = 1 + (endK - 1) * lift;
-        compass.style.setProperty('--cx', `${cx.toFixed(1)}px`); compass.style.setProperty('--cy', `${cy.toFixed(1)}px`); compass.style.setProperty('--k', k.toFixed(3));
-        // Лимб медленно вращается от прокрутки, стрелка смотрит на текущее слово.
-        base.style.setProperty('--spin', `${(p * 140).toFixed(1)}deg`);
-        // Шапка первого экрана остаётся на месте: закреплённая копия включается с листом.
-        if (chrome) { const on = clamp01(p / .06) * (1 - clamp01((p - .9) / .08)); chrome.style.opacity = on.toFixed(3); chrome.classList.toggle('is-on', on > .5); }
-        const at = Math.min(keys.length - 1, Math.floor(clamp01((p - .2) / .36) * keys.length));
-        const tx = from[at].x + (to[at].x - from[at].x) * qs[at], ty = from[at].y + (to[at].y - from[at].y) * qs[at];
-        needle.style.setProperty('--rot', `${(Math.atan2(ty - cy, tx - cx) * 180 / Math.PI + 45).toFixed(1)}deg`);
+        // На выходе столбец и компас гаснут вместе — иначе сцена уезжает, а компас
+        // героя остаётся на месте и столбец проходит под ним.
+        const out = 1 - clamp01((p - .93) / .06);
+        stage.style.opacity = out.toFixed(3);
+        compass.style.opacity = out.toFixed(3);
+        const at = Math.min(keys.length - 1, Math.floor(clamp01((p - .24) / .3) * keys.length));
         if (wordNode && wordNode.textContent !== NAMES[at]) wordNode.textContent = NAMES[at];
       };
       let ticking = false;
