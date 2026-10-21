@@ -442,7 +442,8 @@
   <style id="manifest-styles">
     /* ───────── Манифест ─────────
        Светлый лист поверх первого экрана. Трек даёт прокрутку, лист стоит. */
-    .manifest-track { position:relative; z-index:2; height:340vh; height:340svh; }
+    /* Один трек на манифест и «Философию»: компас не уходит, а опускается в центр. */
+    .manifest-track { position:relative; z-index:2; height:760vh; height:760svh; }
     /* Сцена прозрачна и не ловит курсор: под ней первый экран со своей шапкой. */
     .manifest { position:sticky; top:0; height:100vh; height:100svh; overflow:hidden; background:transparent; color:var(--ink); pointer-events:none; }
     /* Пока компас едет, плавные переходы героя выключены: иначе каждый кадр
@@ -465,8 +466,31 @@
     .needle-wrap { position:absolute; inset:0; z-index:2; transform-origin:50% 50%; transform:rotate(var(--turn,0deg)); }
     .manifest__corner--bl { left:var(--edge-x); bottom:var(--edge-y); }
     .manifest__corner { position:absolute; margin:0; font:300 clamp(.75rem,.7rem + .1vw,.8125rem)/1.4 Onest,Manrope,sans-serif; letter-spacing:.08em; text-transform:uppercase; opacity:calc(.6 * var(--corners,1)); }
+    /* ── Философия ── */
+    .manifest__title { position:absolute; left:0; right:0; top:var(--title-y,17%); margin:0; text-align:center; font-family:Anticva,Georgia,serif; font-size:clamp(2.3rem,1.1rem + 3.4vw,4.3rem); font-weight:400; line-height:1.1; letter-spacing:.01em; text-transform:uppercase; }
+    .manifest__title .l { display:inline-block; will-change:transform,opacity; }
+    .manifest__tenets { margin:0; padding:0; list-style:none; }
+    .manifest__tenet { position:absolute; width:clamp(220px,15.5vw,270px); }
+    /* Принципы за пределами лимба: компас в центре занимает 34% ширины. */
+    .manifest__tenet--1 { left:8%; top:37%; }
+    .manifest__tenet--2 { left:74%; top:34%; }
+    .manifest__tenet--3 { left:74%; top:70%; }
+    .manifest__n { display:block; margin-bottom:10px; font:300 clamp(.75rem,.7rem + .1vw,.8125rem)/1 Onest,Manrope,sans-serif; letter-spacing:.1em; opacity:.6; }
+    .manifest__tn { margin:0 0 8px; font:500 clamp(1.188rem,.814rem + 1.04vw,1.697rem)/1.12 Manrope,Arial,sans-serif; letter-spacing:-.01em; }
+    .manifest__tn .ln { display:block; overflow:hidden; padding-bottom:.14em; margin-bottom:-.14em; }
+    .manifest__tn .ln__i { display:block; will-change:transform; }
+    .manifest__td { margin:0; font:300 clamp(.85rem,.62rem + .6vw,1.1rem)/1.34 Manrope,Arial,sans-serif; letter-spacing:.01em; color:#626262; text-wrap:pretty; }
+    .manifest__chart { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+    .manifest__chart line { stroke:var(--ink); stroke-width:1; opacity:.45; }
+    .manifest__chart circle { fill:var(--bg-light); stroke:var(--ink); stroke-width:1; }
+
     @media (max-width:780px) {
       .manifest-track { height:auto; }
+      .manifest__title { position:static; margin:90px 0 28px; }
+      .manifest__title .l { opacity:1 !important; transform:none !important; }
+      .manifest__tenet { position:static; width:auto; margin-bottom:28px; opacity:1 !important; }
+      .manifest__tn .ln__i,.manifest__td { transform:none !important; opacity:1 !important; }
+      .manifest__chart { display:none; }
       .manifest { position:relative; height:auto; min-height:100vh; min-height:100svh; padding:110px var(--edge-x) 160px; }
       .manifest__legs { position:static; transform:none; }
       .manifest__leg { white-space:normal; font-size:clamp(1.5rem,7vw,2.1rem); margin-bottom:.5em; }
@@ -636,70 +660,22 @@
   <div class="manifest-track" id="manifest-track">
     <section class="manifest" id="manifest" aria-label="Мысль, слово, влияние, реальность">
       <p class="manifest__corner manifest__corner--bl"><span id="manifest-word">мысль</span></p>
+      <svg class="manifest__chart" id="manifest-chart" aria-hidden="true"></svg>
+      <h2 class="manifest__title" id="manifest-title" aria-hidden="true">Философия</h2>
       <ol class="manifest__legs" id="manifest-legs">
         <li class="manifest__leg"><b>Мысль</b> рождается в слове.</li>
         <li class="manifest__leg"><b>Слово</b> формирует влияние.</li>
         <li class="manifest__leg"><b>Влияние</b> формирует <b>реальность</b>.</li>
       </ol>
+      <!-- Принципы — формулировки заказчицы из письма от 21.10. Стоят вокруг
+           компаса: два сверху по сторонам, третий справа внизу — там, куда
+           в конце приходит стрелка. -->
+      <ol class="manifest__tenets" id="manifest-tenets">
+        <li class="manifest__tenet manifest__tenet--1"><span class="manifest__n">01</span><h3 class="manifest__tn"><span class="ln"><span class="ln__i">Мыслить точно</span></span></h3><p class="manifest__td">Развивать способность видеть суть, формулировать позицию и&nbsp;выстраивать логику мысли.</p></li>
+        <li class="manifest__tenet manifest__tenet--2"><span class="manifest__n">02</span><h3 class="manifest__tn"><span class="ln"><span class="ln__i">Говорить убедительно</span></span></h3><p class="manifest__td">Превращать мысль в&nbsp;слово, которое создаёт понимание, доверие и&nbsp;побуждает к&nbsp;действию.</p></li>
+        <li class="manifest__tenet manifest__tenet--3"><span class="manifest__n">03</span><h3 class="manifest__tn"><span class="ln"><span class="ln__i">Влиять осознанно</span></span></h3><p class="manifest__td">Управлять собственным вниманием и&nbsp;присутствием, чувствовать контекст и&nbsp;менять качество коммуникации.</p></li>
+      </ol>
     </section>
-  </div>
-
-  <!-- Философия: блок прилипает, и прокрутка листает ленту по горизонтали.
-       Страница идёт дальше только когда доехала последняя карточка. -->
-  <div class="philosophy-track" id="philosophy-track">
-  <section class="philosophy philosophy--v2" aria-label="Философия">
-    <div class="chrome chrome--section chrome--dark" aria-hidden="true">
-      <span class="chrome__toggle" aria-hidden="true"><i></i><i></i><i></i></span><span class="chrome__brand"><img src="HERO/10%20%E2%80%94%20EYE/%D0%9B%D0%9E%D0%93%D0%9E%D0%9B%D0%9E%D0%93%D0%9E.svg" alt=""></span>
-      <span class="chrome__cta"><span class="chrome__cta-label chrome__cta-label--desktop">Запросить участие</span><span class="chrome__cta-label chrome__cta-label--mobile">Участие</span><img src="figma-arrow.svg" alt=""></span>
-      <p class="chrome__meta chrome__meta--left"><span>＋&nbsp; Листайте и&nbsp;исследуйте</span><span>&nbsp;&nbsp;&nbsp;&nbsp;пространство института</span></p>
-      <p class="chrome__meta chrome__meta--right"><span>Москва&nbsp; /&nbsp; Online</span><span>Приём заявок открыт</span></p>
-    </div>
-    <h2 class="philosophy__title">Философия</h2>
-    <div class="philosophy__rail">
-      <article class="pcard pcard--red pcard--brand">
-        <picture><source media="(min-width:1200px)" srcset="cards/card-silk-lg.jpg"><img class="pcard__media" loading="lazy" decoding="async" src="cards/card-silk-sm.jpg" alt="" decoding="async"></picture>
-        <div class="pcard__brand">
-          <img src="cards/logo-big.svg" alt="">
-          <p class="pcard__brand-name">The Performance</p>
-          <p class="pcard__brand-note">Пространство на&nbsp;пересечении культуры, образования и&nbsp;лидерства.</p>
-        </div>
-        
-      </article>
-
-      <article class="pcard pcard--green">
-        <picture><source media="(min-width:1200px)" srcset="cards/card-green-lg.jpg"><img class="pcard__media" loading="lazy" decoding="async" src="cards/card-green-sm.jpg" alt="" decoding="async"></picture>
-        <div class="pcard__badges">
-          <span class="pcard__badge">01</span><span class="pcard__badge">принцип</span>
-        </div>
-        <div class="pcard__copy">
-          <h3 class="pcard__name">Мыслить через слово</h3>
-          <p class="pcard__note">Речь развивает интеллект, а&nbsp;не&nbsp;украшает его</p>
-        </div>
-      </article>
-
-      <article class="pcard pcard--light">
-        <picture><source media="(min-width:1200px)" srcset="cards/card-bird-lg.jpg"><img class="pcard__media" loading="lazy" decoding="async" src="cards/card-bird-sm.jpg" alt="" decoding="async"></picture>
-        <div class="pcard__badges">
-          <span class="pcard__badge">02</span><span class="pcard__badge">принцип</span>
-        </div>
-        <div class="pcard__copy">
-          <h3 class="pcard__name">Формировать влияние</h3>
-          <p class="pcard__note">Говорить так, чтобы менялась не&nbsp;тема разговора, а&nbsp;положение дел</p>
-        </div>
-      </article>
-
-      <article class="pcard pcard--dark">
-        <picture><source media="(min-width:1200px)" srcset="cards/card-deep-lg.jpg"><img class="pcard__media" loading="lazy" decoding="async" src="cards/card-deep-sm.jpg" alt="" decoding="async"></picture>
-        <div class="pcard__badges">
-          <span class="pcard__badge">03</span><span class="pcard__badge">принцип</span>
-        </div>
-        <div class="pcard__copy">
-          <h3 class="pcard__name">Соединять культуру и&nbsp;лидерство</h3>
-          <p class="pcard__note">Влияние без&nbsp;фундамента&nbsp;—<br>громкость</p>
-        </div>
-      </article>
-    </div>
-  </section>
   </div>
 
   <!-- ═════════ ЗОНА НИЖЕ ГРАНИЦЫ ═════════
@@ -1191,24 +1167,25 @@
     }
     }
 
-    // ───────── Манифест: компас героя ведёт по трём фразам ─────────
+    // ───────── Манифест и «Философия»: один ход компаса ─────────
     // Шторки нет. Герой остаётся под прозрачной сценой: его текст гаснет, компас
-    // поднимается наверх с лёгким покачиванием, стрелка идёт одной медленной
-    // дугой. Всё от позиции прокрутки — назад отыгрывает само.
+    // поднимается наверх, ведёт по трём фразам, потом опускается в центр, над ним
+    // встаёт «Философия», вокруг — три принципа. Всё от позиции прокрутки.
     (() => {
       const track = document.getElementById('manifest-track'), stage = document.getElementById('manifest'), legs = document.getElementById('manifest-legs'), wordNode = document.getElementById('manifest-word');
+      const title = document.getElementById('manifest-title'), tenets = [...document.querySelectorAll('#manifest-tenets .manifest__tenet')], chart = document.getElementById('manifest-chart');
       const hero = document.querySelector('.hero'), compass = document.querySelector('.hero .compass'), needle = document.querySelector('.hero .compass__needle');
-      if (!track || !stage || !legs || !hero || !compass || !needle) return;
+      if (!track || !stage || !legs || !hero || !compass || !needle || !title) return;
       const NARROW = matchMedia('(max-width:780px)');
       const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
       const clamp01 = v => Math.min(1, Math.max(0, v));
       const easeIO = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      const easeOut = t => 1 - Math.pow(1 - t, 3);
       const NAMES = ['мысль', 'слово', 'влияние', 'реальность'];
-      // Что гаснет на герое, пока компас едет.
-      // Меню уходит вместе с текстом: на манифесте оно уже не нужно. Логотип и кнопка остаются.
+      const TENET_NAMES = ['мыслить точно', 'говорить убедительно', 'влиять осознанно'];
       const fading = [...hero.querySelectorAll('.copy, .meta, .cross, .mobile-mantra, .menu')];
 
-      // Фразы режем на слова; <b> — ключевые.
+      // Фразы режем на слова; <b> — ключевые. Заголовок — на буквы.
       const words = [];
       legs.querySelectorAll('.manifest__leg').forEach(leg => {
         [...leg.childNodes].forEach(node => {
@@ -1223,34 +1200,43 @@
         });
       });
       const keys = words.filter(w => w.classList.contains('is-key'));
+      const letters = [...title.textContent].map(ch => { const l = document.createElement('span'); l.className = 'l'; l.textContent = ch; return l; });
+      title.textContent = ''; letters.forEach(l => title.appendChild(l));
       if (REDUCE) return;
 
       // Стрелку героя крутит его же скрипт; обёртка добавляет наш медленный поворот.
       const wrap = document.createElement('div');
       wrap.className = 'needle-wrap';
       needle.replaceWith(wrap); wrap.appendChild(needle);
+      // Выноски от лимба к принципам.
+      const NS = 'http://www.w3.org/2000/svg';
+      const leads = tenets.map(() => { const l = document.createElementNS(NS, 'line'); chart.appendChild(l); return l; });
+      const pins = tenets.map(() => { const c = document.createElementNS(NS, 'circle'); c.setAttribute('r', 3); chart.appendChild(c); return c; });
 
-      // Кегль: самая длинная строка с её отступом входит в поле.
       const fit = () => {
         legs.style.setProperty('--fz-leg', '10rem');
         const avail = legs.clientWidth;
         let k = Infinity;
         [...legs.children].forEach((leg, i) => { k = Math.min(k, (avail - [.40, .14, .29][i] * avail) / leg.scrollWidth); });
-        // Потолок — кегль из наброска: 50px на холсте 1710.
         legs.style.setProperty('--fz-leg', `${Math.min(innerWidth * .0292 / 16, 10 * k * .96).toFixed(3)}rem`);
       };
       const SHRINK = .8;
-      let from = [], to = [];
+      let from = [], to = [], anchors = [];
       const measure = () => {
         if (NARROW.matches) return;
         keys.forEach(k => { k.style.transform = ''; });
         fit();
         const s = stage.getBoundingClientRect();
+        chart.setAttribute('viewBox', `0 0 ${s.width} ${s.height}`);
         from = keys.map(k => { const r = k.getBoundingClientRect(); return { x:r.left - s.left + r.width / 2, y:r.top - s.top + r.height / 2, w:r.width, h:r.height }; });
-        // Столбец по центру, строки чуть сдвинуты — не таблица.
         const step = from[0].h * SHRINK * 1.25, top = s.height * .7 - step * 1.5;
         to = keys.map((k, i) => ({ x:s.width * (.5 + [-.02, .015, -.01, .025][i]), y:top + step * i }));
+        // Точка принципа, к которой идёт выноска: ближний к центру край заголовка.
+        anchors = tenets.map((t, i) => { const r = t.querySelector('.manifest__tn').getBoundingClientRect(); return { x:(i === 0 ? r.right + 14 : r.left - 14) - s.left, y:r.top - s.top + r.height / 2 }; });
       };
+
+      // Угол стрелки на точку: покой стрелки героя — северо-восток (−45°).
+      const aimAt = (cx, cy, x, y) => Math.atan2(y - cy, x - cx) * 180 / Math.PI + 45;
 
       let handoff = false;
       const paint = () => {
@@ -1259,46 +1245,89 @@
         const p = clamp01(-r.top / travel);
         const on = p > 0 && r.bottom > 0;
         if (on !== handoff) { handoff = on; hero.classList.toggle('is-handoff', on); }
-        // Порядок: текст героя гаснет и компас едет → слова выходят → пауза →
-        // лишние слова исчезают → четыре слова съезжаются.
-        const lift = easeIO(clamp01(p / .24));
-        const inP = clamp01((p - .22) / .26), fadeP = easeIO(clamp01((p - .54) / .12)), gather = clamp01((p - .68) / .27);
-        stage.style.setProperty('--corners', clamp01((p - .2) / .06).toFixed(3));
-        fading.forEach(n => { n.style.opacity = (1 - clamp01(p / .1)).toFixed(3); });
 
-        // Компас: с места героя наверх, к размеру из наброска, с покачиванием.
+        // ── Акты. Манифест: 0–.50. Философия: .50–1. ──
+        const lift = easeIO(clamp01(p / .11));
+        const inP = clamp01((p - .10) / .12), fadeP = easeIO(clamp01((p - .25) / .06)), gather = clamp01((p - .32) / .12);
+        const colOut = easeIO(clamp01((p - .50) / .04));            // столбец гаснет
+        const drop = easeIO(clamp01((p - .51) / .13));              // компас опускается в центр
+        const titleP = clamp01((p - .60) / .08);                    // заголовок
+        const tenetP = tenets.map((t, i) => clamp01((p - (.66 + i * .08)) / .08));
+        const out = 1 - clamp01((p - .96) / .04);                   // выход
+        stage.style.setProperty('--corners', clamp01((p - .09) / .03).toFixed(3));
+        fading.forEach(n => { n.style.opacity = (1 - clamp01(p / .05)).toFixed(3); });
+
+        // Компас: с места героя наверх (акт 1), потом в центр и крупнее (акт 2).
         const s = stage.getBoundingClientRect();
         const w = compass.offsetWidth, restTop = innerHeight * .504;
-        const endK = Math.min(s.width * .2555, 437) / w, endY = s.height * .31 - w / 2;
-        const dy = (endY - restTop) * lift, k = 1 + (endK - 1) * lift, sway = Math.sin(lift * Math.PI) * 2.4;
-        compass.style.transform = `translateX(-50%) translate3d(0,${dy.toFixed(1)}px,0) scale(${k.toFixed(4)}) rotate(${sway.toFixed(2)}deg)`;
-        // Стрелка: одна медленная дуга на весь блок, без рывков.
-        wrap.style.setProperty('--turn', `${(-96 * easeIO(clamp01((p - .06) / .88))).toFixed(2)}deg`);
+        const topK = Math.min(s.width * .2555, 437) / w, topY = s.height * .31 - w / 2;
+        const midK = Math.min(s.width * .34, 600) / w, midY = s.height * .60 - w / 2;
+        const y1 = restTop + (topY - restTop) * lift, k1 = 1 + (topK - 1) * lift;
+        const yy = y1 + (midY - y1) * drop, k = k1 + (midK - k1) * drop;
+        // Покачивание — один полуоборот синуса на каждый переезд, в одну сторону.
+        const sway = Math.sin(lift * Math.PI) * 2.4 - Math.sin(drop * Math.PI) * 1.8;
+        compass.style.transform = `translateX(-50%) translate3d(0,${(yy - restTop).toFixed(1)}px,0) scale(${k.toFixed(4)}) rotate(${sway.toFixed(2)}deg)`;
+        compass.style.opacity = out.toFixed(3);
+        const cx = s.width / 2, cy = yy + w / 2;
 
+        // Акт 1: слова.
         words.forEach((w, i) => {
           const t = clamp01((inP - (i / words.length) * .72) / .28);
           const key = w.classList.contains('is-key');
           let op = t, y = (1 - t) * 12;
           if (!key) { op *= 1 - fadeP; y -= fadeP * 14; }
+          if (key) op *= 1 - colOut;
           w.style.opacity = op.toFixed(3);
           w.style.filter = t < .96 ? `blur(${((1 - t) * 8).toFixed(1)}px)` : '';
           if (!key) w.style.transform = `translate3d(0,${y.toFixed(1)}px,0)`;
         });
         if (gather === 0) measure();
         if (!to.length) return;
-        // Съезжаются по одному: первое уже на месте, последнее ещё едет.
         keys.forEach((k, i) => {
           const q = easeIO(clamp01((gather - i * .08) / .76));
-          const dx = (to[i].x - from[i].x) * q, dy2 = (to[i].y - from[i].y) * q;
+          const dx = (to[i].x - from[i].x) * q, dy2 = (to[i].y - from[i].y) * q - colOut * 18;
           k.style.transform = `translate3d(${dx.toFixed(1)}px,${dy2.toFixed(1)}px,0) scale(${(1 - (1 - SHRINK) * q).toFixed(3)})`;
         });
-        // На выходе столбец и компас гаснут вместе — иначе сцена уезжает, а компас
-        // героя остаётся на месте и столбец проходит под ним.
-        const out = 1 - clamp01((p - .93) / .06);
+
+        // Акт 2: заголовок по буквам, принципы по одному, выноски за ними.
+        letters.forEach((l, i) => {
+          const t = easeOut(clamp01((titleP - (i / letters.length) * .6) / .4));
+          l.style.opacity = (t * out).toFixed(3);
+          l.style.transform = `translate3d(0,${((1 - t) * .45).toFixed(3)}em,0)`;
+        });
+        tenets.forEach((t, i) => {
+          const q = tenetP[i];
+          const n = t.querySelector('.manifest__n'), tn = t.querySelector('.manifest__tn .ln__i'), td = t.querySelector('.manifest__td');
+          const a = easeOut(clamp01(q / .4)), b = easeOut(clamp01((q - .15) / .55)), c = easeOut(clamp01((q - .4) / .6));
+          n.style.opacity = (a * out).toFixed(3);
+          tn.style.transform = `translate3d(0,${((1 - b) * 110).toFixed(1)}%,0)`;
+          tn.style.opacity = out.toFixed(3);
+          td.style.opacity = (c * out).toFixed(3);
+          td.style.transform = `translate3d(0,${((1 - c) * 10).toFixed(1)}px,0)`;
+          // Выноска растёт от лимба к принципу.
+          const R = w * k * .36, ang = Math.atan2(anchors[i].y - cy, anchors[i].x - cx);
+          const sx = cx + Math.cos(ang) * R, sy = cy + Math.sin(ang) * R;
+          const ex = sx + (anchors[i].x - sx) * easeIO(clamp01((q - .05) / .6)), ey = sy + (anchors[i].y - sy) * easeIO(clamp01((q - .05) / .6));
+          leads[i].setAttribute('x1', sx.toFixed(1)); leads[i].setAttribute('y1', sy.toFixed(1)); leads[i].setAttribute('x2', ex.toFixed(1)); leads[i].setAttribute('y2', ey.toFixed(1));
+          leads[i].style.opacity = q > 0 ? (.45 * out).toFixed(3) : '0';
+          pins[i].setAttribute('cx', sx.toFixed(1)); pins[i].setAttribute('cy', sy.toFixed(1)); pins[i].style.opacity = q > 0 ? out.toFixed(3) : '0';
+        });
+
+        // Стрелка. Акт 1 — одна медленная дуга. Акт 2 — к каждому принципу по очереди.
+        let turn = -96 * easeIO(clamp01((p - .03) / .45));
+        const live = tenetP.map((q, i) => ({ q, i })).filter(x => x.q > 0);
+        if (live.length) {
+          const cur = live[live.length - 1];
+          const target = aimAt(cx, cy, anchors[cur.i].x, anchors[cur.i].y) - 45;
+          const prev = cur.i ? aimAt(cx, cy, anchors[cur.i - 1].x, anchors[cur.i - 1].y) - 45 : turn;
+          turn = prev + (target - prev) * easeIO(clamp01(cur.q / .7));
+        }
+        wrap.style.setProperty('--turn', `${turn.toFixed(2)}deg`);
+
+        const at = Math.min(keys.length - 1, Math.floor(clamp01((p - .11) / .14) * keys.length));
+        const label = live.length ? TENET_NAMES[live[live.length - 1].i] : (titleP > 0 ? 'философия' : NAMES[at]);
+        if (wordNode && wordNode.textContent !== label) wordNode.textContent = label;
         stage.style.opacity = out.toFixed(3);
-        compass.style.opacity = out.toFixed(3);
-        const at = Math.min(keys.length - 1, Math.floor(clamp01((p - .24) / .3) * keys.length));
-        if (wordNode && wordNode.textContent !== NAMES[at]) wordNode.textContent = NAMES[at];
       };
       let ticking = false;
       const request = () => { if (!ticking) { ticking = true; requestAnimationFrame(() => { ticking = false; paint(); }); } };
@@ -1359,90 +1388,6 @@
         pick();
       });
       pick();
-    })();
-
-    // ───────── «Философия»: блок прилипает, лента едет вбок ─────────
-    // Как в Кэмпе: доехали до блока — он фиксируется, следующая прокрутка
-    // долистывает карточки, и только потом страница идёт дальше.
-    (() => {
-      const tracks = [...document.querySelectorAll('.philosophy-track')];
-      if (!tracks.length) return;
-      // На узких экранах лента живёт нативным горизонтальным скроллом:
-      // пин и пересчёт на каждом кадре там только мешают и дают лаги.
-      const MOBILE_RAIL = matchMedia('(max-width:780px)');
-      tracks.forEach(setupRail);
-      // Ширина может смениться уже после загрузки (поворот экрана, ресайз
-      // окна): пересобираем поведение ленты, иначе она остаётся в режиме,
-      // выбранном на старте, и на десктопе не едет вовсе.
-      MOBILE_RAIL.addEventListener('change', () => tracks.forEach(setupRail));
-      function setupRail(track) {
-      const rail = track.querySelector('.philosophy__rail');
-      if (!rail) return;
-      if (MOBILE_RAIL.matches) {
-        track.style.height = '';
-        rail.style.removeProperty('--rail-x');
-        return;
-      }
-
-      const clamp01 = v => Math.min(1, Math.max(0, v));
-      // Вынос храним на треке: setupRail может вызваться повторно
-      // (смена брейкпоинта), и второй экземпляр не должен начинать
-      // с нулём, пока живы слушатели от первого.
-      if (typeof track._railOverflow !== 'number') track._railOverflow = 0;
-
-      const measure = () => {
-        // Реальный вынос ленты за правый край экрана.
-        const last = rail.lastElementChild;
-        if (!last) return;
-        // Вынос = сколько правый край последней карточки выступает за экран
-        // в НЕсдвинутом состоянии. Текущий сдвиг надо прибавить обратно,
-        // иначе замер зависит от того, где лента стоит в момент измерения.
-        const shift = parseFloat(rail.style.getPropertyValue('--rail-x')) || 0;
-        const right = last.getBoundingClientRect().right + shift;
-        track._railOverflow = Math.max(0, Math.round(right - innerWidth));
-        // Прокрутка на фиксации: вынос плюс запас, чтобы последняя карточка
-        // доезжала спокойным движением, а не мгновенно.
-        // Трек длиннее на долю холостого хода, иначе мёртвая зона в начале
-        // съела бы ход ленты и последняя карточка перестала бы доезжать.
-        const scroll = (track._railOverflow * 2.2 + innerHeight * .45) / (1 - LEAD_IN);
-        track.style.height = `calc(100svh + ${Math.round(scroll)}px)`;
-      };
-
-      // Первое движение после фиксации блок стоит: сначала человек видит,
-      // что попал на «Философию», и только вторым скроллом лента едет вбок.
-      const LEAD_IN = 0.22;
-
-      const paint = () => {
-        const rect = track.getBoundingClientRect();
-        const travel = track.offsetHeight - innerHeight;
-        const progress = travel > 0 ? clamp01(-rect.top / travel) : 0;
-        // Лента укладывается в окно LEAD_IN…RAIL_END, дальше блок просто
-        // стоит: последняя карточка успевает доехать и «отдышаться»
-        // до того, как следующая секция начнёт наезжать.
-        const RAIL_END = 0.78;
-        const moved = clamp01((progress - LEAD_IN) / (RAIL_END - LEAD_IN));
-        rail.style.setProperty('--rail-x', (moved * track._railOverflow).toFixed(1));
-      };
-
-      let ticking = false;
-      const request = () => { if (!ticking) { ticking = true; requestAnimationFrame(() => { ticking = false; paint(); }); } };
-      if (!track._railBound) {
-        track._railBound = true;
-        addEventListener('scroll', () => { if (!MOBILE_RAIL.matches) request(); }, { passive:true });
-        addEventListener('resize', () => { if (!MOBILE_RAIL.matches) { measure(); paint(); } }, { passive:true });
-        document.fonts.ready.then(() => { if (!MOBILE_RAIL.matches) { measure(); paint(); } });
-      }
-      // Первый measure() успевает отработать раньше, чем карточки получат
-      // финальную ширину (фото грузятся отдельно), и запоминает нулевой
-      // вынос — лента потом не едет вовсе. Пересчитываем, когда лента
-      // реально меняет размеры.
-      if (!track._railObserved && typeof ResizeObserver === 'function') {
-        track._railObserved = true;
-        new ResizeObserver(() => { measure(); paint(); }).observe(rail);
-      }
-      measure();
-      paint();
-      }
     })();
 
     (() => {
