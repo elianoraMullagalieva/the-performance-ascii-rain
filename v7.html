@@ -443,7 +443,9 @@
     /* ───────── Манифест ─────────
        Светлый лист поверх первого экрана. Трек даёт прокрутку, лист стоит. */
     /* Один трек на манифест и «Философию»: компас не уходит, а опускается в центр. */
-    .manifest-track { position:relative; z-index:2; height:760vh; height:760svh; }
+    /* Трек наезжает на первый экран целиком: первое же движение колеса гасит
+       заголовок и меню и поднимает компас, без холостого хода. */
+    .manifest-track { position:relative; z-index:2; height:760vh; height:760svh; margin-top:-100vh; margin-top:-100svh; }
     /* Сцена прозрачна и не ловит курсор: под ней первый экран со своей шапкой. */
     .manifest { position:sticky; top:0; height:100vh; height:100svh; overflow:hidden; background:transparent; color:var(--ink); pointer-events:none; }
     /* Пока компас едет, плавные переходы героя выключены: иначе каждый кадр
@@ -475,6 +477,7 @@
     .manifest__tenet--1 { left:8%; top:37%; }
     .manifest__tenet--2 { left:74%; top:34%; }
     .manifest__tenet--3 { left:74%; top:70%; }
+    .manifest__tenet--4 { left:8%; top:72%; }
     .manifest__n { display:block; margin-bottom:10px; font:300 clamp(.75rem,.7rem + .1vw,.8125rem)/1 Onest,Manrope,sans-serif; letter-spacing:.1em; opacity:.6; }
     .manifest__tn { margin:0 0 8px; font:500 clamp(1.188rem,.814rem + 1.04vw,1.697rem)/1.12 Manrope,Arial,sans-serif; letter-spacing:-.01em; }
     .manifest__tn .ln { display:block; overflow:hidden; padding-bottom:.14em; margin-bottom:-.14em; }
@@ -485,7 +488,7 @@
     .manifest__chart circle { fill:var(--bg-light); stroke:var(--ink); stroke-width:1; }
 
     @media (max-width:780px) {
-      .manifest-track { height:auto; }
+      .manifest-track { height:auto; margin-top:0; }
       .manifest__title { position:static; margin:90px 0 28px; }
       .manifest__title .l { opacity:1 !important; transform:none !important; }
       .manifest__tenet { position:static; width:auto; margin-bottom:28px; opacity:1 !important; }
@@ -500,7 +503,7 @@
       .manifest__corner--bl { bottom:40px; }
     }
     @media (prefers-reduced-motion:reduce) {
-      .manifest-track { height:auto; }
+      .manifest-track { height:auto; margin-top:0; }
       .manifest { position:relative; height:auto; min-height:100vh; padding:14vh 0; }
       .manifest__w { opacity:1 !important; filter:none !important; transform:none !important; }
     }
@@ -674,6 +677,8 @@
         <li class="manifest__tenet manifest__tenet--1"><span class="manifest__n">01</span><h3 class="manifest__tn"><span class="ln"><span class="ln__i">Мыслить точно</span></span></h3><p class="manifest__td">Развивать способность видеть суть, формулировать позицию и&nbsp;выстраивать логику мысли.</p></li>
         <li class="manifest__tenet manifest__tenet--2"><span class="manifest__n">02</span><h3 class="manifest__tn"><span class="ln"><span class="ln__i">Говорить убедительно</span></span></h3><p class="manifest__td">Превращать мысль в&nbsp;слово, которое создаёт понимание, доверие и&nbsp;побуждает к&nbsp;действию.</p></li>
         <li class="manifest__tenet manifest__tenet--3"><span class="manifest__n">03</span><h3 class="manifest__tn"><span class="ln"><span class="ln__i">Влиять осознанно</span></span></h3><p class="manifest__td">Управлять собственным вниманием и&nbsp;присутствием, чувствовать контекст и&nbsp;менять качество коммуникации.</p></li>
+        <!-- Четвёртый блок уравновешивает композицию. Текст — черновик, согласовать с заказчицей. -->
+        <li class="manifest__tenet manifest__tenet--4"><span class="manifest__n">I&nbsp;—&nbsp;III</span><h3 class="manifest__tn"><span class="ln"><span class="ln__i">Одна система</span></span></h3><p class="manifest__td">Принципы не&nbsp;изучаются порознь: каждая программа института работает со&nbsp;всеми тремя&nbsp;— от&nbsp;мысли к&nbsp;слову, от&nbsp;слова к&nbsp;влиянию.</p></li>
       </ol>
     </section>
   </div>
@@ -1182,7 +1187,7 @@
       const easeIO = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
       const easeOut = t => 1 - Math.pow(1 - t, 3);
       const NAMES = ['мысль', 'слово', 'влияние', 'реальность'];
-      const TENET_NAMES = ['мыслить точно', 'говорить убедительно', 'влиять осознанно'];
+      const TENET_NAMES = ['мыслить точно', 'говорить убедительно', 'влиять осознанно', 'одна система'];
       const fading = [...hero.querySelectorAll('.copy, .meta, .cross, .mobile-mantra, .menu')];
 
       // Фразы режем на слова; <b> — ключевые. Заголовок — на буквы.
@@ -1210,8 +1215,8 @@
       needle.replaceWith(wrap); wrap.appendChild(needle);
       // Выноски от лимба к принципам.
       const NS = 'http://www.w3.org/2000/svg';
-      const leads = tenets.map(() => { const l = document.createElementNS(NS, 'line'); chart.appendChild(l); return l; });
-      const pins = tenets.map(() => { const c = document.createElementNS(NS, 'circle'); c.setAttribute('r', 3); chart.appendChild(c); return c; });
+      const leads = tenets.slice(0, 3).map(() => { const l = document.createElementNS(NS, 'line'); chart.appendChild(l); return l; });
+      const pins = leads.map(() => { const c = document.createElementNS(NS, 'circle'); c.setAttribute('r', 3); chart.appendChild(c); return c; });
 
       const fit = () => {
         legs.style.setProperty('--fz-leg', '10rem');
@@ -1244,18 +1249,24 @@
         const r = track.getBoundingClientRect(), travel = track.offsetHeight - innerHeight;
         const p = clamp01(-r.top / travel);
         const on = p > 0 && r.bottom > 0;
-        if (on !== handoff) { handoff = on; hero.classList.toggle('is-handoff', on); }
+        if (on !== handoff) {
+          handoff = on; hero.classList.toggle('is-handoff', on);
+          // Вне манифеста герой живёт сам: заставка управляет его прозрачностью
+          // классами, и inline-стили не должны их перебивать.
+          if (!on) { [compass, ...fading].forEach(n => { n.style.opacity = ''; }); compass.style.transform = ''; wrap.style.removeProperty('--turn'); }
+        }
+        if (!on) return;
 
         // ── Акты. Манифест: 0–.50. Философия: .50–1. ──
-        const lift = easeIO(clamp01(p / .11));
+        const lift = easeIO(clamp01(p / .09));
         const inP = clamp01((p - .10) / .12), fadeP = easeIO(clamp01((p - .25) / .06)), gather = clamp01((p - .32) / .12);
         const colOut = easeIO(clamp01((p - .50) / .04));            // столбец гаснет
         const drop = easeIO(clamp01((p - .51) / .13));              // компас опускается в центр
         const titleP = clamp01((p - .60) / .08);                    // заголовок
-        const tenetP = tenets.map((t, i) => clamp01((p - (.66 + i * .08)) / .08));
+        const tenetP = tenets.map((t, i) => clamp01((p - (.66 + i * .07)) / .08));
         const out = 1 - clamp01((p - .96) / .04);                   // выход
         stage.style.setProperty('--corners', clamp01((p - .09) / .03).toFixed(3));
-        fading.forEach(n => { n.style.opacity = (1 - clamp01(p / .05)).toFixed(3); });
+        fading.forEach(n => { n.style.opacity = (1 - clamp01(p / .035)).toFixed(3); });
 
         // Компас: с места героя наверх (акт 1), потом в центр и крупнее (акт 2).
         const s = stage.getBoundingClientRect();
@@ -1304,7 +1315,8 @@
           tn.style.opacity = out.toFixed(3);
           td.style.opacity = (c * out).toFixed(3);
           td.style.transform = `translate3d(0,${((1 - c) * 10).toFixed(1)}px,0)`;
-          // Выноска растёт от лимба к принципу.
+          // Выноска растёт от лимба к принципу; у четвёртого блока выноски нет.
+          if (!leads[i]) return;
           const R = w * k * .36, ang = Math.atan2(anchors[i].y - cy, anchors[i].x - cx);
           const sx = cx + Math.cos(ang) * R, sy = cy + Math.sin(ang) * R;
           const ex = sx + (anchors[i].x - sx) * easeIO(clamp01((q - .05) / .6)), ey = sy + (anchors[i].y - sy) * easeIO(clamp01((q - .05) / .6));
@@ -1315,7 +1327,7 @@
 
         // Стрелка. Акт 1 — одна медленная дуга. Акт 2 — к каждому принципу по очереди.
         let turn = -96 * easeIO(clamp01((p - .03) / .45));
-        const live = tenetP.map((q, i) => ({ q, i })).filter(x => x.q > 0);
+        const live = tenetP.map((q, i) => ({ q, i })).filter(x => x.q > 0 && x.i < 3);
         if (live.length) {
           const cur = live[live.length - 1];
           const target = aimAt(cx, cy, anchors[cur.i].x, anchors[cur.i].y) - 45;
