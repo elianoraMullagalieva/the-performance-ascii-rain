@@ -1205,7 +1205,8 @@
       const easeIO = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
       const NAMES = ['мысль', 'слово', 'влияние', 'реальность'];
       // Что гаснет на герое, пока компас едет.
-      const fading = [...hero.querySelectorAll('.copy, .meta, .cross, .mobile-mantra')];
+      // Меню уходит вместе с текстом: на манифесте оно уже не нужно. Логотип и кнопка остаются.
+      const fading = [...hero.querySelectorAll('.copy, .meta, .cross, .mobile-mantra, .menu')];
 
       // Фразы режем на слова; <b> — ключевые.
       const words = [];
