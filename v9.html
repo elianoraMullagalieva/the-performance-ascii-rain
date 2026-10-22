@@ -1251,8 +1251,8 @@
       });
       const keys = words.filter(w => w.classList.contains('is-key'));
       // Варианты для выбора: заголовок 1–5, знаки А/Б. Выбор хранится в localStorage.
-      let titleMode = 1, marksMode = 'a';
-      try { titleMode = +(localStorage.getItem('tp-title') || 1) || 1; marksMode = localStorage.getItem('tp-marks') || 'a'; } catch (e) {}
+      let titleMode = 3, marksMode = 'a';
+      try { titleMode = +(localStorage.getItem('tp-title') || 3) || 3; marksMode = localStorage.getItem('tp-marks') || 'a'; } catch (e) {}
       const dev = document.getElementById('manifest-dev');
       const applyModes = () => {
         stage.className = stage.className.replace(/\btitle-\d\b|\bmarks-[ab]\b/g, '').trim() + ` title-${titleMode} marks-${marksMode}`;
@@ -1330,6 +1330,8 @@
         else if (frame) { cancelAnimationFrame(frame); frame = 0; }
       }).observe(track);
       const paint = () => {
+        // Герой закреплён: как только лист манифеста ушёл за верх — прячем его на любой ширине.
+        { const rb = track.getBoundingClientRect().bottom; const gone = rb <= 0 ? 'hidden' : ''; if (hero.style.visibility !== gone) hero.style.visibility = gone; }
         if (NARROW.matches) return;
         const r = track.getBoundingClientRect(), travel = track.offsetHeight - innerHeight;
         // Шкала актов кончается на .9: последний принцип дописан к .88, дальше
@@ -1340,8 +1342,10 @@
         const exit = Math.min(0, r.bottom - innerHeight);
         const on = p > 0 && r.bottom > 0;
         // Герой закреплён; когда лист манифеста целиком ушёл за верх, он не должен просвечивать под зоной.
-        const gone = r.bottom <= 0 ? 'hidden' : '';
-        if (hero.style.visibility !== gone) hero.style.visibility = gone;
+        // Уход: принципы и заголовок гаснут лесенкой и уплывают вверх, компас растворяется —
+        // следующий блок влетает снизу ещё до того, как они ушли (пересечение во времени, не в месте).
+        const leave = clamp01(-exit / (innerHeight * .55));
+        const cLeave = easeIO(clamp01((leave - .05) / .45));
         if (on !== handoff) {
           handoff = on; hero.classList.toggle('is-handoff', on);
           // Пока идёт манифест, стрелка героя не следит за курсором: её угол
@@ -1359,7 +1363,7 @@
         const inP = clamp01((p - .10) / .12), fadeP = easeIO(clamp01((p - .24) / .07)), gather = clamp01((p - .27) / .12);
         const colOut = easeIO(clamp01((p - .43) / .04));            // столбец гаснет
         const drop = easeIO(clamp01((p - .44) / .12));              // компас опускается в центр
-        const titleP = clamp01((p - .52) / .13);                    // заголовок: длиннее и мягче
+        let titleP = clamp01((p - .48) / .17);                      // заголовок: стартует вместе со спуском компаса…
         const tenetP = tenets.map((t, i) => clamp01((p - (.60 + i * .07)) / .11));
         const out = 1;                                              // блок не гаснет: уходит листом
         // Угловая подпись гаснет на выходе: иначе она проезжает по логотипу героя.
@@ -1376,10 +1380,12 @@
         const yy = y1 + (midY - y1) * drop, k = k1 + (midK - k1) * drop;
         // Покачивание — один полуоборот синуса на каждый переезд, в одну сторону.
         const sway = Math.sin(lift * Math.PI) * 2.4 - Math.sin(drop * Math.PI) * 1.8;
-        compass.style.transform = `translateX(-50%) translate3d(0,${(yy - restTop + exit).toFixed(1)}px,0) scale(${k.toFixed(4)}) rotate(${sway.toFixed(2)}deg)`;
-        compass.style.opacity = out.toFixed(3);
+        compass.style.transform = `translateX(-50%) translate3d(0,${(yy - restTop + exit - cLeave * 90).toFixed(1)}px,0) scale(${(k * (1 - cLeave * .06)).toFixed(4)}) rotate(${sway.toFixed(2)}deg)`;
+        compass.style.opacity = (out * (1 - cLeave)).toFixed(3);
         const cx = s.width / 2, cy = yy + w / 2;
 
+        // …но не раньше, чем верх компаса окажется на 30px ниже нижней кромки заголовка.
+        if (titleP > 0) { const ct = compass.getBoundingClientRect().top, tb = title.getBoundingClientRect().bottom; if (ct < tb + 30) titleP = 0; }
         // Акт 1: слова.
         words.forEach((w, i) => {
           const t = clamp01((inP - (i / words.length) * .72) / .28);
@@ -1408,8 +1414,12 @@
           switch (titleMode) {
             case 2: // снизу вверх из-под маски, слева направо
               t = easeIO(clamp01((titleP - (i / n) * .5) / .5)); tr = `translate3d(0,${((1 - t) * 108).toFixed(1)}%,0)`; break;
-            case 3: // буквы сходятся из разлёта
-              t = easeIO(clamp01((titleP - .05) / .95)); tr = `translate3d(${((i - mid) * .35 * (1 - t)).toFixed(3)}em,0,0)`; bl = (1 - t) * 4; break;
+            case 3: { // буквы летят с краёв из размытия к центру: чем ближе, тем чётче
+              const d = Math.abs(i - mid) / mid;                                  // 0 в центре → 1 у краёв
+              t = easeIO(clamp01((titleP - d * .18) / (1 - d * .18)));            // края стартуют чуть позже
+              const far = 1 - t;
+              tr = `translate3d(${((i - mid) * .55 * far).toFixed(3)}em,${(far * far * 6 * (i % 2 ? 1 : -1)).toFixed(1)}px,0) scale(${(1 + far * .12).toFixed(4)})`;
+              bl = far * (6 + 8 * d); break; }
             case 4: { // каскад от центра с лёгким наклоном
               const d = Math.abs(i - mid) / mid; t = easeIO(clamp01((titleP - d * .5) / .5)); tr = `translate3d(0,${((1 - t) * .5).toFixed(3)}em,0) rotate(${((1 - t) * -6).toFixed(2)}deg)`; break; }
             case 5: // оседание из масштаба, все буквы разом
@@ -1417,13 +1427,17 @@
             default: // морфинг из размытия
               t = easeIO(clamp01((titleP - (i / n) * .55) / .45)); tr = `translate3d(0,${((1 - t) * .32).toFixed(3)}em,0) scale(${(.94 + .06 * t).toFixed(4)})`; bl = (1 - t) * 7;
           }
-          l.style.opacity = (t * out).toFixed(3);
-          l.style.transform = tr;
+          const tLeave = easeIO(clamp01((leave - .02 - (i / n) * .12) / .35));
+          l.style.opacity = (t * out * (1 - tLeave)).toFixed(3);
+          l.style.transform = tr + ` translate3d(0,${(-tLeave * 48).toFixed(1)}px,0)`;
           l.style.filter = bl > .3 ? `blur(${bl.toFixed(1)}px)` : '';
         });
         tenets.forEach((t, i) => {
           const q = tenetP[i];
           const n = t.querySelector('.manifest__n'), tn = t.querySelector('.manifest__tn .ln__i'), td = t.querySelector('.manifest__td');
+          const pLeave = easeIO(clamp01((leave - [.08, .02, .14, .2][i]) / .4));
+          t.style.opacity = (1 - pLeave).toFixed(3);
+          t.style.transform = pLeave ? `translate3d(0,${(-pLeave * 56).toFixed(1)}px,0)` : '';
           const a = easeOut(clamp01(q / .4)), b = easeOut(clamp01((q - .15) / .55)), c = easeOut(clamp01((q - .4) / .6));
           n.style.setProperty('--mk', easeIO(a).toFixed(3));
           tn.style.transform = `translate3d(0,${((1 - b) * 110).toFixed(1)}%,0)`;
