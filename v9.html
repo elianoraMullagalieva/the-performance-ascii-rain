@@ -55,7 +55,7 @@
 .menu a,.menu b { position:relative; display:inline-block; width:max-content; color:inherit; text-decoration:none; cursor:pointer; transition:color .24s cubic-bezier(.16,1,.3,1),transform .24s cubic-bezier(.16,1,.3,1); }.menu a:before,.menu b:before { content:""; position:absolute; top:50%; left:-10px; width:4px; height:4px; background:var(--accent); opacity:0; transform:translateY(-50%) scale(.3); transition:opacity .18s ease,transform .24s cubic-bezier(.16,1,.3,1); }.menu a:hover,.menu b:hover { color:var(--accent); transform:translateX(4px); }.menu a:hover:before,.menu b:hover:before { opacity:1; transform:translateY(-50%) scale(1); }
     .cta { position:absolute; top:var(--edge-y); right:var(--edge-x); display:flex; align-items:center; justify-content:space-between; width:224px; height:50px; padding:0 17px; border:1px solid var(--ink); color:var(--ink); background:transparent; cursor:pointer; transition:border-color .24s cubic-bezier(.16,1,.3,1),color .24s cubic-bezier(.16,1,.3,1),background .24s cubic-bezier(.16,1,.3,1),transform .24s cubic-bezier(.16,1,.3,1); }.cta:hover { border-color:var(--accent); color:var(--bg-light); background:var(--accent); transform:translateY(-1px); }.cta:active { transform:translateY(0) scale(.98); }.cta:hover .cta__arrow { filter:brightness(0) invert(1); }.cta__label--mobile,.menu-toggle,.mobile-mantra { display:none; }.cta__arrow { width:12px; height:12px; object-fit:contain; transition:filter .24s cubic-bezier(.16,1,.3,1); }
     .copy { position:absolute; top:22.3%; left:0; width:100%; text-align:center; }.eyebrow { margin:0 0 14px; letter-spacing:.32px; }.title { margin:0; display:flex; flex-direction:column; align-items:center; font-family:Anticva,serif; font-size:clamp(49px,4.85vw,70px); font-weight:400; line-height:.98; letter-spacing:-2.8px; text-transform:uppercase; }.title__line,.title__word { display:block; white-space:nowrap; }.title__line--primary { position:relative; }.title > .title__line + .title__line { margin-top:10px; }.side-note { position:absolute; top:50%; width:max-content; font-family:Onest,Manrope,sans-serif; font-size:clamp(11px,.86vw,12px); font-weight:300; text-align:left; line-height:1.35; letter-spacing:.03em; transform:translateY(-50%); }.side-note span,.meta span { display:block; }.side-note--left { right:calc(100% + clamp(18px,1.857vw,32px)); }.side-note--right { left:calc(100% + clamp(18px,1.857vw,32px)); }
-    .compass { position:absolute; top:50.4%; left:50%; width:clamp(300px,32vw,460px); aspect-ratio:1; transform:translateX(-50%); }.compass__base,.compass__needle { position:absolute; inset:0; width:100%; height:100%; }.compass__needle { z-index:2; transform-origin:50% 50%; transition:opacity .239s cubic-bezier(.16,1,.3,1); will-change:transform,opacity; }.compass.is-arriving .compass__needle { animation:needle-arrival .615s cubic-bezier(.22,1,.36,1) both; }
+    .compass { position:absolute; top:50.4%; left:50%; width:clamp(300px,32vw,460px); aspect-ratio:1; transform:translateX(-50%); }.compass__base,.compass__needle { position:absolute; inset:0; width:100%; height:100%; }.compass__needle { z-index:2; transform-origin:50% 50%; transition:opacity .239s cubic-bezier(.16,1,.3,1); will-change:transform,opacity; }.compass.is-arriving .compass__needle { animation:needle-arrival 1.6s cubic-bezier(.22,1,.36,1) both; }
     .meta { position:absolute; bottom:calc(var(--edge-y) + env(safe-area-inset-bottom,0px)); line-height:1.45; letter-spacing:.06em; }.meta--left { left:var(--edge-x); }.meta--right { right:var(--edge-x); text-align:right; }.cross { position:absolute; top:58.2%; font-family:Anticva,serif; font-size:32px; font-weight:300; opacity:.55; }.cross--left { left:11px; }.cross--right { right:11px; }
     /* ───────── Шторка и блок фраз ─────────
        Всё считается от позиции прокрутки, а не от событий «докрутил докуда-то»:
@@ -397,7 +397,7 @@
     @media (max-width:360px) { .brand { width:110px; }.menu-toggle { left:14px; }.cta { right:12px; width:64px; padding:0 10px; }.title { width:calc(100% - 28px); font-size:clamp(36px,12.56vw,42px); }.side-note--left { left:14px; }.side-note--right { right:12px; }.meta--left { left:12px; }.meta--right { right:12px; } }
     @media (hover:none), (pointer:coarse) { .compass.is-idle .compass__needle { animation:needle-drift 7.2s cubic-bezier(.45,0,.55,1) infinite alternate; } }
     @keyframes needle-drift { from { transform:rotate(-15deg); } to { transform:rotate(15deg); } }
-    @keyframes needle-arrival { 0% { transform:rotate(-4deg); } 56% { transform:rotate(2.2deg); } 78% { transform:rotate(-1deg); } 100% { transform:rotate(0deg); } }
+    @keyframes needle-arrival { 0% { transform:rotate(-1.4deg); } 60% { transform:rotate(.5deg); } 100% { transform:rotate(0deg); } }
     @media (prefers-reduced-motion:reduce) { .compass__needle { animation:none; transition:none; } }
     @media (hover:hover) and (pointer:fine) { body.has-cursor-mark a:not(.brand),body.has-cursor-mark button,body.has-cursor-mark .menu b { cursor:none; }body.has-cursor-mark .brand { cursor:pointer; }.cursor-mark { position:fixed; z-index:20; top:0; left:0; width:8px; height:8px; background:var(--accent); pointer-events:none; opacity:0; transform:translate3d(var(--cursor-x,-20px),var(--cursor-y,-20px),0) translate(-50%,-50%) scale(.35); transition:opacity .16s ease,transform .18s cubic-bezier(.16,1,.3,1); will-change:transform,opacity; }.cursor-mark.is-active { opacity:1; transform:translate3d(var(--cursor-x,-20px),var(--cursor-y,-20px),0) translate(-50%,-50%) scale(1); }.menu-toggle:hover i { background:var(--accent); }.menu-toggle i { transition:background .24s cubic-bezier(.16,1,.3,1); } }
     /* Клавиатурная навигация: без этого фокус не виден нигде. */
@@ -494,6 +494,25 @@
     .manifest__n .mk__ring { stroke-dasharray:92; stroke-dashoffset:calc(92 * (1 - var(--mk,0))); opacity:.7; transform:rotate(-90deg); transform-origin:50% 50%; }
     .manifest__n .mk__ring--in { stroke-dasharray:48; stroke-dashoffset:calc(48 * (1 - var(--mk,0))); opacity:.5; }
     .manifest__n .mk__dot { fill:currentColor; stroke:none; opacity:var(--mk,0); transform:scale(var(--mk,0)); transform-origin:50% 50%; }
+    /* Вариант Б — мини-инфографика: дуга-шкала, волна, связи, кольца. */
+    .manifest__n .mk-b { display:none; }
+    .manifest.marks-b .manifest__n > svg:first-child { display:none; }
+    .manifest.marks-b .manifest__n .mk-b { display:block; }
+    .manifest__n .mk__arc { stroke-dasharray:100; stroke-dashoffset:calc(100 * (1 - var(--mk,0))); opacity:.75; }
+    .manifest__n .mk__tick { stroke-width:1.2; transform-origin:16px 22px; transform:rotate(calc(-60deg * (1 - var(--mk,0)))); opacity:var(--mk,0); }
+    .manifest__n .mk__bars path { stroke-width:1.6; stroke-linecap:round; }
+    .manifest__n .mk__bars path:nth-child(1) { d:path('M8 16v0'); transform:scaleY(var(--mk,0)); transform-origin:50% 16px; }
+    .manifest__n .mk__bars path { transform:scaleY(var(--mk,0)); transform-origin:50% 16px; }
+    .manifest__n .mk__bars path:nth-child(1) { d:path('M8 13v6'); } .manifest__n .mk__bars path:nth-child(2) { d:path('M12 9v14'); } .manifest__n .mk__bars path:nth-child(3) { d:path('M16 6v20'); } .manifest__n .mk__bars path:nth-child(4) { d:path('M20 10v12'); } .manifest__n .mk__bars path:nth-child(5) { d:path('M24 13v6'); }
+    .manifest__n .mk__net { stroke-dasharray:100; stroke-dashoffset:calc(100 * (1 - var(--mk,0))); opacity:.7; }
+    /* Заголовок: вариант 2 — буквы поднимаются из-под маски. */
+    .manifest.title-2 .manifest__title { overflow:hidden; padding-bottom:.12em; margin-bottom:-.12em; }
+    /* Переключатель вариантов (временно). */
+    .manifest__dev { position:absolute; right:var(--edge-x); top:calc(var(--edge-y) + 70px); z-index:5; display:flex; align-items:center; gap:6px; pointer-events:auto; }
+    .manifest__dev .small { margin:0 4px 0 10px; opacity:.5; }
+    .manifest__dev button { width:28px; height:28px; border:1px solid rgba(22,21,20,.25); border-radius:50%; background:transparent; color:var(--ink); font:500 11px/1 Manrope,sans-serif; cursor:pointer; }
+    .manifest__dev button.is-on { background:var(--ink); color:var(--bg-light); border-color:var(--ink); }
+    @media (max-width:780px) { .manifest__dev { display:none; } }
     .manifest__tn { margin:0 0 8px; font:500 clamp(1.188rem,.814rem + 1.04vw,1.697rem)/1.12 Manrope,Arial,sans-serif; letter-spacing:-.01em; }
     .manifest__tn .ln { display:block; overflow:hidden; padding-bottom:.14em; margin-bottom:-.14em; }
     .manifest__tn .ln__i { display:block; will-change:transform; }
@@ -673,12 +692,19 @@
            компаса: два сверху по сторонам, третий справа внизу — там, куда
            в конце приходит стрелка. -->
       <ol class="manifest__tenets" id="manifest-tenets">
-        <li class="manifest__tenet manifest__tenet--1"><span class="manifest__n" data-n="01"><svg viewBox="0 0 32 32" aria-hidden="true"><circle class="mk__ring" cx="16" cy="16" r="14.5"/><circle class="mk__dot" cx="16" cy="16" r="2.4"/></svg></span><h3 class="manifest__tn"><span class="ln"><span class="ln__i">Мыслить точно</span></span></h3><p class="manifest__td">Развивать способность видеть суть, формулировать позицию и&nbsp;выстраивать логику мысли.</p></li>
-        <li class="manifest__tenet manifest__tenet--2"><span class="manifest__n" data-n="02"><svg viewBox="0 0 32 32" aria-hidden="true"><circle class="mk__ring" cx="16" cy="16" r="14.5"/><circle class="mk__dot" cx="23.5" cy="19.5" r="2.4"/></svg></span><h3 class="manifest__tn"><span class="ln"><span class="ln__i">Говорить убедительно</span></span></h3><p class="manifest__td">Превращать мысль в&nbsp;слово, которое создаёт понимание, доверие и&nbsp;побуждает к&nbsp;действию.</p></li>
-        <li class="manifest__tenet manifest__tenet--3"><span class="manifest__n" data-n="03"><svg viewBox="0 0 32 32" aria-hidden="true"><circle class="mk__ring" cx="16" cy="16" r="14.5"/><circle class="mk__dot" cx="16" cy="11.2" r="2.2"/><circle class="mk__dot" cx="11.6" cy="19" r="2.2"/><circle class="mk__dot" cx="20.4" cy="19" r="2.2"/></svg></span><h3 class="manifest__tn"><span class="ln"><span class="ln__i">Влиять осознанно</span></span></h3><p class="manifest__td">Управлять собственным вниманием и&nbsp;присутствием, чувствовать контекст и&nbsp;менять качество коммуникации.</p></li>
+        <li class="manifest__tenet manifest__tenet--1"><span class="manifest__n" data-n="01"><svg viewBox="0 0 32 32" aria-hidden="true"><circle class="mk__ring" cx="16" cy="16" r="14.5"/><circle class="mk__dot" cx="16" cy="16" r="2.4"/></svg><svg class="mk-b" viewBox="0 0 32 32" aria-hidden="true"><path class="mk__arc" d="M6 22A11 11 0 0 1 26 22" pathLength="100"/><path class="mk__tick" d="M16 22L21 13"/><circle class="mk__dot" cx="16" cy="22" r="1.6"/></svg></span><h3 class="manifest__tn"><span class="ln"><span class="ln__i">Мыслить точно</span></span></h3><p class="manifest__td">Развивать способность видеть суть, формулировать позицию и&nbsp;выстраивать логику мысли.</p></li>
+        <li class="manifest__tenet manifest__tenet--2"><span class="manifest__n" data-n="02"><svg viewBox="0 0 32 32" aria-hidden="true"><circle class="mk__ring" cx="16" cy="16" r="14.5"/><circle class="mk__dot" cx="23.5" cy="19.5" r="2.4"/></svg><svg class="mk-b" viewBox="0 0 32 32" aria-hidden="true"><g class="mk__bars"><path d="M8 16v0"/><path d="M12 16v0"/><path d="M16 16v0"/><path d="M20 16v0"/><path d="M24 16v0"/></g></svg></span><h3 class="manifest__tn"><span class="ln"><span class="ln__i">Говорить убедительно</span></span></h3><p class="manifest__td">Превращать мысль в&nbsp;слово, которое создаёт понимание, доверие и&nbsp;побуждает к&nbsp;действию.</p></li>
+        <li class="manifest__tenet manifest__tenet--3"><span class="manifest__n" data-n="03"><svg viewBox="0 0 32 32" aria-hidden="true"><circle class="mk__ring" cx="16" cy="16" r="14.5"/><circle class="mk__dot" cx="16" cy="11.2" r="2.2"/><circle class="mk__dot" cx="11.6" cy="19" r="2.2"/><circle class="mk__dot" cx="20.4" cy="19" r="2.2"/></svg><svg class="mk-b" viewBox="0 0 32 32" aria-hidden="true"><path class="mk__net" d="M16 8L25 22H7Z" pathLength="100"/><circle class="mk__dot" cx="16" cy="8" r="1.8"/><circle class="mk__dot" cx="25" cy="22" r="1.8"/><circle class="mk__dot" cx="7" cy="22" r="1.8"/></svg></span><h3 class="manifest__tn"><span class="ln"><span class="ln__i">Влиять осознанно</span></span></h3><p class="manifest__td">Управлять собственным вниманием и&nbsp;присутствием, чувствовать контекст и&nbsp;менять качество коммуникации.</p></li>
         <!-- Четвёртый блок уравновешивает композицию. Текст — черновик, согласовать с заказчицей. -->
-        <li class="manifest__tenet manifest__tenet--4"><span class="manifest__n" data-n="I — III"><svg viewBox="0 0 32 32" aria-hidden="true"><circle class="mk__ring" cx="16" cy="16" r="14.5"/><circle class="mk__ring mk__ring--in" cx="16" cy="16" r="7.5"/><circle class="mk__dot" cx="16" cy="16" r="1.6"/></svg></span><h3 class="manifest__tn"><span class="ln"><span class="ln__i">Одна система</span></span></h3><p class="manifest__td">Принципы не&nbsp;изучаются порознь: каждая программа института работает со&nbsp;всеми тремя&nbsp;— от&nbsp;мысли к&nbsp;слову, от&nbsp;слова к&nbsp;влиянию.</p></li>
+        <li class="manifest__tenet manifest__tenet--4"><span class="manifest__n" data-n="I — III"><svg viewBox="0 0 32 32" aria-hidden="true"><circle class="mk__ring" cx="16" cy="16" r="14.5"/><circle class="mk__ring mk__ring--in" cx="16" cy="16" r="7.5"/><circle class="mk__dot" cx="16" cy="16" r="1.6"/></svg><svg class="mk-b" viewBox="0 0 32 32" aria-hidden="true"><circle class="mk__arc" cx="16" cy="16" r="13" pathLength="100"/><circle class="mk__arc" cx="16" cy="16" r="8" pathLength="100"/><circle class="mk__arc" cx="16" cy="16" r="3" pathLength="100"/></svg></span><h3 class="manifest__tn"><span class="ln"><span class="ln__i">Одна система</span></span></h3><p class="manifest__td">Принципы не&nbsp;изучаются порознь: каждая программа института работает со&nbsp;всеми тремя&nbsp;— от&nbsp;мысли к&nbsp;слову, от&nbsp;слова к&nbsp;влиянию.</p></li>
       </ol>
+      <!-- Переключатель вариантов для выбора заказчицей (на время согласования). -->
+      <div class="manifest__dev" id="manifest-dev" aria-label="Варианты анимации">
+        <span class="small">Заголовок</span>
+        <button type="button" data-title="1" title="Морфинг из размытия">1</button><button type="button" data-title="2" title="Снизу вверх из-под маски">2</button><button type="button" data-title="3" title="Буквы сходятся из разлёта">3</button><button type="button" data-title="4" title="Каскад от центра с наклоном">4</button><button type="button" data-title="5" title="Оседание из масштаба">5</button>
+        <span class="small">Знаки</span>
+        <button type="button" data-marks="a" title="Кружки с точками">А</button><button type="button" data-marks="b" title="Мини-инфографика">Б</button>
+      </div>
     </section>
   </div>
 
@@ -1149,7 +1175,7 @@
                 compass.classList.remove('is-arriving');
                 compass.classList.add('is-idle');
                 window.dispatchEvent(new Event('compass:interaction-ready'));
-              }, 650);
+              }, 1650);
             }
             // Видеопамять возвращаем ПОСЛЕ того, как прелоадер полностью
             // исчез: раньше канвас стирался мгновенно, а белый слой гас ещё
@@ -1224,9 +1250,24 @@
         });
       });
       const keys = words.filter(w => w.classList.contains('is-key'));
-      const letters = [...title.textContent].map(ch => { const l = document.createElement('span'); l.className = 'l'; l.textContent = ch; return l; });
+      // Варианты для выбора: заголовок 1–5, знаки А/Б. Выбор хранится в localStorage.
+      let titleMode = 1, marksMode = 'a';
+      try { titleMode = +(localStorage.getItem('tp-title') || 1) || 1; marksMode = localStorage.getItem('tp-marks') || 'a'; } catch (e) {}
+      const dev = document.getElementById('manifest-dev');
+      const applyModes = () => {
+        stage.className = stage.className.replace(/\btitle-\d\b|\bmarks-[ab]\b/g, '').trim() + ` title-${titleMode} marks-${marksMode}`;
+        dev?.querySelectorAll('button').forEach(b => b.classList.toggle('is-on', b.dataset.title ? +b.dataset.title === titleMode : b.dataset.marks === marksMode));
+      };
+      dev?.addEventListener('click', e => {
+        const b = e.target.closest('button'); if (!b) return;
+        if (b.dataset.title) titleMode = +b.dataset.title; else marksMode = b.dataset.marks;
+        try { localStorage.setItem('tp-title', titleMode); localStorage.setItem('tp-marks', marksMode); } catch (err) {}
+        applyModes(); request();
+      });
+      const letters = [...title.textContent].map(ch => { const l = document.createElement('span'); l.className = 'l'; l.textContent = ch; l.style.transformOrigin = '50% 100%'; return l; });
       title.textContent = ''; letters.forEach(l => title.appendChild(l));
       if (REDUCE) return;
+      applyModes();
       // Слежение героя за курсором глушится на время манифеста (capture идёт раньше его обработчика).
       hero.addEventListener('pointermove', e => { if (handoff) e.stopImmediatePropagation(); }, { capture:true });
 
@@ -1274,15 +1315,18 @@
         lastNow = now;
         if (handoff) {
           // Поворот догоняет цель с инерцией: прокрутка задаёт «куда», время — «как».
-          turnNow += (turnTarget - turnNow) * (1 - Math.exp(-dt * 3.2));
+          // Угол стрелки героя (слежение за курсором доезжает до нуля сам) вычитается:
+          // итоговое направление задаёт только прокрутка, без скачка на входе.
+          const m = /rotate\(([-\d.]+)deg\)/.exec(needle.style.transform || ''), inner = m ? parseFloat(m[1]) : 0;
+          turnNow += ((turnTarget - inner) - turnNow) * (1 - Math.exp(-dt * 1.6));
           wrap.style.setProperty('--turn', `${turnNow.toFixed(2)}deg`);
-          wrap.style.setProperty('--breath', `${(Math.sin(t * 1.25) * 1).toFixed(2)}deg`);
+          wrap.style.setProperty('--breath', `${(Math.sin(t * .9) * .6).toFixed(2)}deg`);
           if (base) base.style.transform = `rotate(${(Math.sin(t * .42) * 1.6).toFixed(2)}deg)`;
         }
         frame = requestAnimationFrame(breathe);
       };
       new IntersectionObserver(([e]) => {
-        if (e.isIntersecting) { if (!frame) { lastNow = 0; frame = requestAnimationFrame(breathe); } }
+        if (e.isIntersecting) { if (!frame) { lastNow = 0; turnNow = parseFloat(wrap.style.getPropertyValue('--turn')) || 0; frame = requestAnimationFrame(breathe); } }
         else if (frame) { cancelAnimationFrame(frame); frame = 0; }
       }).observe(track);
       const paint = () => {
@@ -1295,11 +1339,13 @@
         // и уехал бы отдельно — сдвигаем его на ту же величину.
         const exit = Math.min(0, r.bottom - innerHeight);
         const on = p > 0 && r.bottom > 0;
+        // Герой закреплён; когда лист манифеста целиком ушёл за верх, он не должен просвечивать под зоной.
+        const gone = r.bottom <= 0 ? 'hidden' : '';
+        if (hero.style.visibility !== gone) hero.style.visibility = gone;
         if (on !== handoff) {
           handoff = on; hero.classList.toggle('is-handoff', on);
           // Пока идёт манифест, стрелка героя не следит за курсором: её угол
           // задаёт только прокрутка. Синтетический pointerleave возвращает её в 0.
-          if (on) hero.dispatchEvent(new Event('pointerleave'));
           // Вне манифеста герой живёт сам: заставка управляет его прозрачностью
           // классами, и inline-стили не должны их перебивать.
           if (!on) { [compass, ...fading, stage, brand].filter(Boolean).forEach(n => { n.style.opacity = ''; }); compass.style.transform = ''; base.style.transform = ''; wrap.style.removeProperty('--turn'); wrap.style.removeProperty('--breath'); }
@@ -1357,11 +1403,23 @@
 
         // Акт 2: заголовок по буквам, принципы по одному, выноски за ними.
         letters.forEach((l, i) => {
-          const t = easeIO(clamp01((titleP - (i / letters.length) * .55) / .45));
+          const n = letters.length, mid = (n - 1) / 2;
+          let t, tr = '', bl = 0;
+          switch (titleMode) {
+            case 2: // снизу вверх из-под маски, слева направо
+              t = easeIO(clamp01((titleP - (i / n) * .5) / .5)); tr = `translate3d(0,${((1 - t) * 108).toFixed(1)}%,0)`; break;
+            case 3: // буквы сходятся из разлёта
+              t = easeIO(clamp01((titleP - .05) / .95)); tr = `translate3d(${((i - mid) * .35 * (1 - t)).toFixed(3)}em,0,0)`; bl = (1 - t) * 4; break;
+            case 4: { // каскад от центра с лёгким наклоном
+              const d = Math.abs(i - mid) / mid; t = easeIO(clamp01((titleP - d * .5) / .5)); tr = `translate3d(0,${((1 - t) * .5).toFixed(3)}em,0) rotate(${((1 - t) * -6).toFixed(2)}deg)`; break; }
+            case 5: // оседание из масштаба, все буквы разом
+              t = easeIO(clamp01(titleP)); tr = `scale(${(1.12 - .12 * t).toFixed(4)})`; bl = (1 - t) * 8; break;
+            default: // морфинг из размытия
+              t = easeIO(clamp01((titleP - (i / n) * .55) / .45)); tr = `translate3d(0,${((1 - t) * .32).toFixed(3)}em,0) scale(${(.94 + .06 * t).toFixed(4)})`; bl = (1 - t) * 7;
+          }
           l.style.opacity = (t * out).toFixed(3);
-          // Буквы проявляются из размытия и чуть собираются по масштабу — без скачка.
-          l.style.transform = `translate3d(0,${((1 - t) * .32).toFixed(3)}em,0) scale(${(.94 + .06 * t).toFixed(4)})`;
-          l.style.filter = t < .98 ? `blur(${((1 - t) * 7).toFixed(1)}px)` : '';
+          l.style.transform = tr;
+          l.style.filter = bl > .3 ? `blur(${bl.toFixed(1)}px)` : '';
         });
         tenets.forEach((t, i) => {
           const q = tenetP[i];
@@ -1382,7 +1440,7 @@
         const cw = (from, to) => from + (((to - from) % 360) + 360) % 360;   // короткий путь только по часовой
         // Покой стрелки — северо-восток (−45°): угол на точку уже учитывает это (aimAt = atan2 + 45).
         const aim = i => aimAt(cx, cy, anchors[i].x, anchors[i].y);
-        let turn = -28 * easeIO(clamp01((p - .03) / .40));
+        let turn = -22 * easeIO(clamp01((p - .03) / .42));
         if (anchors.length) {
           const first = aim(0);
           const d0 = first - turn; const dCCW = ((d0 % 360) - 360) % 360;    // к первому принципу — ближней стороной
@@ -1505,7 +1563,7 @@
       const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
       const normalizeAngle = (angle) => ((angle + 180) % 360 + 360) % 360 - 180;
       const render = () => {
-        current += (target - current) * .045;
+        current += (target - current) * .028;
         needle.style.transform = `rotate(${current.toFixed(3)}deg)`;
         frame = requestAnimationFrame(render);
       };
