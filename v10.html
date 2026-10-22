@@ -708,7 +708,40 @@
     .face__role { flex:0 1 auto; min-width:0; padding:8px 12px; border-radius:999px; background:var(--ink); color:var(--light); font:500 var(--fz-small)/1.15 Manrope,sans-serif; letter-spacing:.01em; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .faces__label { position:absolute; left:var(--edge-x); bottom:var(--edge-y); opacity:0; transition:opacity .9s var(--ease) .3s; }
     .faces__stage.is-captioned .faces__label { opacity:.6; }
+    /* Скрытые части для вариантов Б/В. */
+    .face__top,.face__who { display:none; }
+    /* ── Вариант Б (референс «Sienna Brooks»): имя сверху по центру, фото растворяется книзу,
+       внизу аватар с подписью и тёмная таблетка роли. ── */
+    .faces__ring--b .face { grid-template-rows:auto auto auto; padding:14px 12px 12px; }
+    .faces__ring--b .face > * { min-width:0; }
+    .faces__ring--b .face__top { display:grid; justify-items:center; gap:4px; padding:4px 0 8px; text-align:center; }
+    .faces__ring--b .face__top-name { font:500 clamp(1rem,.85rem + .45vw,1.3rem)/1.2 Manrope,sans-serif; letter-spacing:-.015em; }
+    .faces__ring--b .face__top-meta { display:inline-flex; align-items:center; gap:6px; opacity:.6; text-transform:none; letter-spacing:.02em; }
+    .faces__ring--b .face__photo { aspect-ratio:1 / 1; border-radius:12px; }
+    .faces__ring--b .face__photo img { -webkit-mask-image:linear-gradient(180deg,#000 62%,transparent 100%); mask-image:linear-gradient(180deg,#000 62%,transparent 100%); object-position:50% 20%; }
+    .faces__ring--b .face__photo .face__role { display:none; }
+    .faces__ring--b .face__body { display:none; }
+    .faces__ring--b .face__who { display:flex; align-items:center; gap:8px; padding:4px 2px 0; }
+    .faces__ring--b .face__who i { flex:none; width:30px; height:30px; border-radius:50%; background:var(--img) center 22%/cover; border:1px solid rgba(22,21,20,.12); }
+    .faces__ring--b .face__who-t { display:grid; line-height:1.15; min-width:0; }
+    .faces__ring--b .face__who-t b { font:500 var(--fz-small)/1.2 Manrope,sans-serif; }
+    .faces__ring--b .face__who-t .small { opacity:.55; text-transform:none; letter-spacing:.02em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .faces__ring--b .face__role--b { position:static; margin-left:auto; display:inline-block; flex:0 1 auto; max-width:48%; }
+    /* ── Вариант В (референс «Sophie Bennett», тёмная цельная): фото сверху, карточка тёмная,
+       текст светлый, таблетка-контур. ── */
+    .faces__ring--c .face { background:#111111; color:var(--light); border-color:rgba(239,234,228,.12); }
+    .faces__ring--c .face__photo { border-radius:12px; }
+    .faces__ring--c .face__photo img { -webkit-mask-image:linear-gradient(180deg,#000 72%,transparent 100%); mask-image:linear-gradient(180deg,#000 72%,transparent 100%); }
+    .faces__ring--c .face__photo .face__role { background:rgba(239,234,228,.14); color:var(--light); border:1px solid rgba(239,234,228,.3); }
+    .faces__ring--c .face__prog { border-top-color:rgba(239,234,228,.18); }
+    .faces__ring--c .face__quote { opacity:.8; }
+    .faces__dev { position:absolute; right:var(--edge-x); bottom:var(--edge-y); z-index:5; display:flex; flex-wrap:wrap; justify-content:flex-end; align-items:center; gap:8px; opacity:0; pointer-events:none; transition:opacity .6s var(--ease); }
+    .faces__stage.is-captioned .faces__dev { opacity:1; pointer-events:auto; }
+    .faces__dev .small { opacity:.5; margin-right:4px; }
+    .faces__dev button { padding:9px 14px; border:1px solid rgba(22,21,20,.25); border-radius:999px; background:transparent; color:var(--ink); font:500 var(--fz-small)/1 Manrope,sans-serif; letter-spacing:.02em; cursor:pointer; }
+    .faces__dev button.is-on { background:var(--ink); color:var(--bg-light); border-color:var(--ink); }
     @media (max-width:780px) {
+      .faces__dev { display:none; }
       .faces { margin-top:0; }   /* на телефоне манифест статичен — без наложения */
       .face { padding:8px 8px 12px; gap:12px; }
     }
@@ -736,23 +769,24 @@
     .prog__sel { display:inline-flex; align-items:center; gap:8px; }
     .prog__sel select { appearance:none; -webkit-appearance:none; border:0; border-bottom:1px solid var(--rule-c); background:transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' fill='none' stroke='%23161514'%3E%3Cpath d='M2 3.5l3 3 3-3'/%3E%3C/svg%3E") right center no-repeat; color:inherit; font:400 var(--fz-small)/1.3 Manrope,sans-serif; padding:2px 16px 2px 0; cursor:pointer; }
     .prog__count { opacity:.5; }
-    .prog__dev { display:inline-flex; align-items:center; gap:6px; margin-left:12px; }
-    .prog__dev .small { opacity:.5; margin-right:4px; }
-    .prog__dev button { width:26px; height:26px; border:1px solid rgba(22,21,20,.25); border-radius:50%; background:transparent; color:var(--ink); font:500 11px/1 Manrope,sans-serif; cursor:pointer; }
+    /* Выбор варианта карточки — на время согласования, крупно над каталогом. */
+    .prog__dev { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin:clamp(24px,3vh,36px) var(--edge-x) 0; }
+    .prog__dev .small { opacity:.5; margin-right:6px; }
+    .prog__dev button { padding:10px 16px; border:1px solid rgba(22,21,20,.25); border-radius:999px; background:transparent; color:var(--ink); font:500 var(--fz-small)/1 Manrope,sans-serif; letter-spacing:.02em; cursor:pointer; }
     .prog__dev button.is-on { background:var(--ink); color:var(--bg-light); border-color:var(--ink); }
     .prog__list { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:24px; margin:clamp(28px,4vh,44px) var(--edge-x) 0; padding:0; list-style:none; }
     /* Карточка: три варианта по референсам (переключатель в строке фильтров).
        Общая разметка, раскладку меняет класс списка. Теней нет, линия 1px. */
-    .pc { position:relative; display:grid; grid-template-rows:auto 1fr; border:1px solid rgba(22,21,20,.1); border-radius:16px; background:#FFFFFF; overflow:hidden; }
+    .pc { position:relative; display:grid; grid-template-rows:auto 1fr; border:1px solid rgba(22,21,20,.08); border-radius:24px; background:#FFFFFF; overflow:hidden; padding:8px; }
     .pc[hidden] { display:none; }
-    .pc__photo { position:relative; aspect-ratio:3 / 2; overflow:hidden; background:var(--graphite); }
+    .pc__photo { position:relative; aspect-ratio:3 / 2; overflow:hidden; border-radius:18px; background:var(--graphite); }
     .pc__photo img { display:block; width:100%; height:100%; object-fit:cover; filter:saturate(.85); }
     .pc__chips { position:absolute; left:12px; top:12px; right:118px; display:flex; flex-wrap:wrap; gap:6px; z-index:1; }
     .pc__chips span { padding:7px 11px; border-radius:999px; background:rgba(17,17,17,.42); -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); color:var(--light); font:500 var(--fz-small)/1 Manrope,sans-serif; letter-spacing:.02em; }
     .pc__seal { position:absolute; right:12px; top:12px; z-index:1; white-space:nowrap; display:inline-flex; align-items:center; gap:6px; padding:7px 10px; border-radius:999px; background:rgba(17,17,17,.42); -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); color:var(--light); font:500 var(--fz-small)/1 Manrope,sans-serif; }
     .pc__seal svg { width:12px; height:12px; fill:none; stroke:currentColor; stroke-width:1; } .pc__seal .d { fill:currentColor; stroke:none; }
     .pc__over { display:none; }
-    .pc__body { display:grid; gap:10px; padding:18px 18px 16px; align-content:start; grid-template-rows:auto auto 1fr auto; }
+    .pc__body { display:grid; gap:10px; padding:18px 14px 12px; align-content:start; grid-template-rows:auto auto 1fr auto; }
     .pc__head { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin:0; }
     .pc__tag { margin-top:2px; }
     .pc__name { color:inherit; text-decoration:none; font:500 clamp(1rem,.8rem + .45vw,1.35rem)/1.2 Manrope,sans-serif; letter-spacing:-.015em; text-wrap:balance; }
@@ -806,23 +840,30 @@
     .club__ph .small { visibility:hidden; }
     .club__ph .small { opacity:.5; }
     .club__card::after { content:''; position:absolute; inset:0; background:linear-gradient(180deg,rgba(17,17,17,.12) 0%,rgba(17,17,17,.28) 45%,rgba(17,17,17,.62) 100%); pointer-events:none; }
-    .club__copy { position:absolute; left:50%; top:16%; width:min(42%,560px); z-index:1; display:grid; gap:18px; }
-    .club__eyebrow { opacity:.75; }
-    .club__title { font:400 clamp(2rem,1.2rem + 3.4vw,4.4rem)/1.04 Anticva,Georgia,serif; text-transform:uppercase; letter-spacing:.01em; margin:0; }
-    .club__text { max-width:36ch; opacity:.86; }
-    .club__stats { position:absolute; right:4%; bottom:7%; z-index:1; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:14px; width:min(48%,640px); list-style:none; margin:0; padding:0; }
-    .club__stat { display:grid; grid-template-rows:auto auto 1fr; gap:14px; padding:22px 24px 24px; border-radius:14px; border:1px solid rgba(239,234,228,.16); background:rgba(17,17,17,.62); }
-    .club__stat-top { display:block; }
-    .club__stat-aside { display:flex; align-items:center; min-height:34px; }
-    .club__big { font:400 clamp(1.6rem,1rem + 1.6vw,2.4rem)/1 Anticva,Georgia,serif; text-transform:uppercase; }
-    .club__big--text { font-size:clamp(1.1rem,.85rem + .7vw,1.6rem); line-height:1.1; white-space:nowrap; }
-    .club__rose { width:52px; height:52px; flex:none; opacity:.85; }
+    .club__copy { position:absolute; right:7.5%; top:8%; z-index:1; text-align:right; }
+    .club__title { margin:0; font:400 clamp(2rem,.9rem + 3.6vw,4.4rem)/1.04 Anticva,Georgia,serif; text-transform:uppercase; letter-spacing:.01em; white-space:nowrap; }
+    .club__line { display:block; }
+    .club__line--last { padding-right:1.85em; }   /* «окружение» чуть левее правого края, как в макете */
+    /* Компас в зазоре: сначала слова слитно (ширина 0), потом зазор растёт и компас проявляется. */
+    .club__cmp { position:relative; display:inline-block; width:0; height:.9em; vertical-align:-.12em; margin:0; opacity:0; transition:width 1.4s var(--ease) .5s,margin 1.4s var(--ease) .5s,opacity 1s var(--ease) 1.1s; }
+    .is-in .club__cmp { width:1.56em; margin:0 .38em; opacity:1; }
+    .club__cmp img { position:absolute; left:50%; top:50%; width:1.56em; height:1.56em; transform:translate(-50%,-50%); filter:brightness(0) invert(1); }
+    .club__cmp-base { opacity:.9; }
+    .club__cmp-needle { transform:translate(-50%,-50%) rotate(var(--turn,0deg)) !important; will-change:transform; }
+    .club__text { max-width:12.5em; margin:1.5em 5.6em 0 auto; text-align:left; font:300 clamp(.9rem,.8rem + .3vw,1.06rem)/1.3 Manrope,sans-serif; letter-spacing:.01em; }
+    .club__stats { position:absolute; right:7.6%; bottom:6.5%; z-index:1; display:grid; grid-template-columns:313px 313px; align-items:end; gap:14px; list-style:none; margin:0; padding:0; }
+    .club__stat { display:grid; gap:30px; min-height:208px; padding:22px 24px 24px; border-radius:14px; border:1px solid rgba(239,234,228,.18); background:rgba(17,17,17,.28); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); align-content:start; }
+    .club__stat--tall { min-height:260px; grid-template-rows:auto 1fr auto; gap:16px; }
+    .club__stat-top { display:grid; grid-template-columns:1fr 52px; align-items:start; gap:12px; }
+    .club__big { font:400 2.4rem/1 Anticva,Georgia,serif; text-transform:uppercase; }
+    .club__big--text { font-size:1.5rem; line-height:1.3; white-space:nowrap; }
+    .club__rose { width:52px; height:52px; opacity:.85; }
     .club__rose-ticks { transform-origin:40px 40px; animation:club-rose 18s linear infinite; }
     @keyframes club-rose { to { transform:rotate(360deg); } }
-    .club__faces { display:flex; flex:none; }
-    .club__faces i { display:block; width:30px; height:30px; margin-left:-8px; border-radius:50%; border:1.5px solid rgba(239,234,228,.85); background:var(--img) center 22%/cover; }
+    .club__stat-text { margin:0; font:300 1.1rem/1.4 Manrope,sans-serif; letter-spacing:.01em; opacity:.9; }
+    .club__faces { display:flex; align-self:end; }
+    .club__faces i { display:block; width:42px; height:42px; margin-left:-16px; border-radius:50%; border:1.2px solid rgba(0,0,0,.85); background:var(--img) center 22%/cover; }
     .club__faces i:first-child { margin-left:0; }
-    .club__stat-text { margin:0; align-self:end; font-size:calc(var(--fz-text) * .92); font-weight:300; line-height:1.4; letter-spacing:.01em; opacity:.9; }
 
     /* ───────── 5. Основатель ───────── */
     .founder { display:grid; grid-template-columns:repeat(12,minmax(0,1fr)); column-gap:var(--gap); padding:clamp(90px,12vh,150px) var(--edge-x); align-items:start; }
@@ -873,9 +914,10 @@
     @media (max-width:960px) {
       .prog__list { grid-template-columns:repeat(2,minmax(0,1fr)); }
       .prog__facs { margin-left:0; }
-      .club__copy { left:8%; top:10%; width:70%; }
-      .club__stats { width:84%; right:8%; }
       .club__card { margin-inline:var(--edge-x); }
+      .club__line--last { padding-right:0; }
+      .club__text { margin-right:0; }
+      .club__stats { grid-template-columns:1fr 1fr; width:min(84%,640px); }
       .founder__photo,.founder__cap { grid-column:1 / 7; } .founder__copy { grid-column:1 / 13; grid-row:3; }
       .foot__col:nth-child(2) { grid-column:1 / 4; } .foot__col:nth-child(3) { grid-column:4 / 7; } .foot__col:nth-child(4) { grid-column:7 / 10; } .foot__col:nth-child(5) { grid-column:10 / 13; }
     }
@@ -887,19 +929,20 @@
       .pc { flex:0 0 84vw; scroll-snap-align:start; }
       .pc__body { padding-bottom:18px; }
       .pc[hidden] { display:none; }
-      .prog__dev { display:none; }
+      .prog__dev { margin-inline:var(--edge-x); }
       .prog__bar { gap:10px 16px; }
       .founder { grid-template-columns:1fr; }
       .founder__photo,.founder__cap,.founder__copy { grid-column:1; } .founder__copy { grid-row:3; }
       .founder__row { grid-template-columns:1fr; row-gap:8px; }
-      .club__card { aspect-ratio:auto; min-height:0; }
-      .club__copy,.club__stats { position:static; inset:auto; width:auto; }
-      .club__card { display:grid; gap:36px; padding:24px 20px 20px; }
-      .club__stats { grid-template-columns:1fr; }
+      .club__card { aspect-ratio:auto; min-height:0; display:grid; gap:36px; padding:24px 20px 20px; }
+      .club__copy,.club__stats { position:relative; inset:auto; width:auto; z-index:1; }
+      .club__copy { padding-top:120px; text-align:left; }
+      .club__title { white-space:normal; }
+      .club__line--last { padding-right:0; }
+      .club__text { margin:1.2em 0 0; }
+      .club__stats { grid-template-columns:1fr; width:auto; }
       .club__ph { position:absolute; }
       .club__ph .small { position:absolute; left:20px; top:20px; }
-      .club__copy,.club__stats { position:relative; z-index:1; }
-      .club__copy { padding-top:120px; }
       .contact__phrase { max-width:none; }
       .contact__compass { right:-30%; bottom:-6%; width:80vw; opacity:.35; }
       .motion .contact__compass.is-in { opacity:.35; }
@@ -980,6 +1023,7 @@
       <div class="faces__stage" id="faces-stage">
         <div class="faces__ring" id="faces-ring">
           <figure class="face" data-focus=".45" tabindex="0">
+            <figcaption class="face__top"><span class="face__top-name">Александр Ровный</span><span class="small face__top-meta"><svg class="face__rose" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7.5"/><circle cx="9" cy="9" r="4" stroke-dasharray="1 2.2"/><path d="M9 .8v2.4M9 14.8v2.4M.8 9h2.4M14.8 9h2.4"/><circle cx="9" cy="9" r="1.1" class="face__rose-dot"/></svg>директор</span></figcaption>
             <div class="face__photo"><img src="people/p1-600.jpg" srcset="people/p1-600.jpg 600w, people/p1-900.jpg 900w" sizes="(max-width:780px) 70vw, 20vw" alt="" decoding="async" draggable="false"><span class="face__role">Директор</span></div>
             <figcaption class="face__body">
               <span class="face__name">Александр Ровный<svg class="face__seal" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.6"/><circle cx="8" cy="8" r="1.5" class="face__seal-dot"/></svg></span>
@@ -987,8 +1031,10 @@
               <span class="face__prog"><span class="small">Программа</span><span>Психофизика лидера</span></span>
               <span class="face__foot"><span class="face__micro"><svg class="face__rose" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7.5"/><circle cx="9" cy="9" r="4" stroke-dasharray="1 2.2"/><path d="M9 .8v2.4M9 14.8v2.4M.8 9h2.4M14.8 9h2.4"/><circle cx="9" cy="9" r="1.1" class="face__rose-dot"/></svg><span class="small">среда единомышленников</span></span></span>
             </figcaption>
+            <div class="face__who"><i style="--img:url(people/p1-600.jpg)"></i><span class="face__who-t"><b>Александр</b><span class="small">в среде института</span></span><span class="face__role face__role--b">Директор</span></div>
           </figure>
           <figure class="face" data-focus=".45" tabindex="0">
+            <figcaption class="face__top"><span class="face__top-name">Марк Лёвин</span><span class="small face__top-meta"><svg class="face__rose" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7.5"/><circle cx="9" cy="9" r="4" stroke-dasharray="1 2.2"/><path d="M9 .8v2.4M9 14.8v2.4M.8 9h2.4M14.8 9h2.4"/><circle cx="9" cy="9" r="1.1" class="face__rose-dot"/></svg>предприниматель</span></figcaption>
             <div class="face__photo"><img src="people/p2-600.jpg" srcset="people/p2-600.jpg 600w, people/p2-900.jpg 900w" sizes="(max-width:780px) 70vw, 20vw" alt="" decoding="async" draggable="false"><span class="face__role">Предприниматель</span></div>
             <figcaption class="face__body">
               <span class="face__name">Марк Лёвин<svg class="face__seal" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.6"/><circle cx="8" cy="8" r="1.5" class="face__seal-dot"/></svg></span>
@@ -996,8 +1042,10 @@
               <span class="face__prog"><span class="small">Программа</span><span>Логика речи и сторителлинг</span></span>
               <span class="face__foot"><span class="face__micro"><svg class="face__rose" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7.5"/><circle cx="9" cy="9" r="4" stroke-dasharray="1 2.2"/><path d="M9 .8v2.4M9 14.8v2.4M.8 9h2.4M14.8 9h2.4"/><circle cx="9" cy="9" r="1.1" class="face__rose-dot"/></svg><span class="small">среда единомышленников</span></span></span>
             </figcaption>
+            <div class="face__who"><i style="--img:url(people/p2-600.jpg)"></i><span class="face__who-t"><b>Марк</b><span class="small">в среде института</span></span><span class="face__role face__role--b">Предприниматель</span></div>
           </figure>
           <figure class="face" data-focus=".45" tabindex="0">
+            <figcaption class="face__top"><span class="face__top-name">Анна Светлова</span><span class="small face__top-meta"><svg class="face__rose" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7.5"/><circle cx="9" cy="9" r="4" stroke-dasharray="1 2.2"/><path d="M9 .8v2.4M9 14.8v2.4M.8 9h2.4M14.8 9h2.4"/><circle cx="9" cy="9" r="1.1" class="face__rose-dot"/></svg>руководитель</span></figcaption>
             <div class="face__photo"><img src="people/p3-600.jpg" srcset="people/p3-600.jpg 600w, people/p3-900.jpg 900w" sizes="(max-width:780px) 70vw, 20vw" alt="" decoding="async" draggable="false"><span class="face__role">Руководитель</span></div>
             <figcaption class="face__body">
               <span class="face__name">Анна Светлова<svg class="face__seal" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.6"/><circle cx="8" cy="8" r="1.5" class="face__seal-dot"/></svg></span>
@@ -1005,8 +1053,10 @@
               <span class="face__prog"><span class="small">Программа</span><span>Голос и речь</span></span>
               <span class="face__foot"><span class="face__micro"><svg class="face__rose" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7.5"/><circle cx="9" cy="9" r="4" stroke-dasharray="1 2.2"/><path d="M9 .8v2.4M9 14.8v2.4M.8 9h2.4M14.8 9h2.4"/><circle cx="9" cy="9" r="1.1" class="face__rose-dot"/></svg><span class="small">среда единомышленников</span></span></span>
             </figcaption>
+            <div class="face__who"><i style="--img:url(people/p3-600.jpg)"></i><span class="face__who-t"><b>Анна</b><span class="small">в среде института</span></span><span class="face__role face__role--b">Руководитель</span></div>
           </figure>
           <figure class="face" data-focus=".45" tabindex="0">
+            <figcaption class="face__top"><span class="face__top-name">Илья Берг</span><span class="small face__top-meta"><svg class="face__rose" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7.5"/><circle cx="9" cy="9" r="4" stroke-dasharray="1 2.2"/><path d="M9 .8v2.4M9 14.8v2.4M.8 9h2.4M14.8 9h2.4"/><circle cx="9" cy="9" r="1.1" class="face__rose-dot"/></svg>исследователь</span></figcaption>
             <div class="face__photo"><img src="people/p4-600.jpg" srcset="people/p4-600.jpg 600w, people/p4-900.jpg 900w" sizes="(max-width:780px) 70vw, 20vw" alt="" decoding="async" draggable="false"><span class="face__role">Исследователь</span></div>
             <figcaption class="face__body">
               <span class="face__name">Илья Берг<svg class="face__seal" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.6"/><circle cx="8" cy="8" r="1.5" class="face__seal-dot"/></svg></span>
@@ -1014,8 +1064,10 @@
               <span class="face__prog"><span class="small">Программа</span><span>Креативное мышление</span></span>
               <span class="face__foot"><span class="face__micro"><svg class="face__rose" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7.5"/><circle cx="9" cy="9" r="4" stroke-dasharray="1 2.2"/><path d="M9 .8v2.4M9 14.8v2.4M.8 9h2.4M14.8 9h2.4"/><circle cx="9" cy="9" r="1.1" class="face__rose-dot"/></svg><span class="small">среда единомышленников</span></span></span>
             </figcaption>
+            <div class="face__who"><i style="--img:url(people/p4-600.jpg)"></i><span class="face__who-t"><b>Илья</b><span class="small">в среде института</span></span><span class="face__role face__role--b">Исследователь</span></div>
           </figure>
           <figure class="face" data-focus=".45" tabindex="0">
+            <figcaption class="face__top"><span class="face__top-name">Михаил Градов</span><span class="small face__top-meta"><svg class="face__rose" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7.5"/><circle cx="9" cy="9" r="4" stroke-dasharray="1 2.2"/><path d="M9 .8v2.4M9 14.8v2.4M.8 9h2.4M14.8 9h2.4"/><circle cx="9" cy="9" r="1.1" class="face__rose-dot"/></svg>архитектор</span></figcaption>
             <div class="face__photo"><img src="people/p5-600.jpg" srcset="people/p5-600.jpg 600w, people/p5-900.jpg 900w" sizes="(max-width:780px) 70vw, 20vw" alt="" decoding="async" draggable="false"><span class="face__role">Архитектор</span></div>
             <figcaption class="face__body">
               <span class="face__name">Михаил Градов<svg class="face__seal" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.6"/><circle cx="8" cy="8" r="1.5" class="face__seal-dot"/></svg></span>
@@ -1023,8 +1075,10 @@
               <span class="face__prog"><span class="small">Программа</span><span>Актёрское мастерство</span></span>
               <span class="face__foot"><span class="face__micro"><svg class="face__rose" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7.5"/><circle cx="9" cy="9" r="4" stroke-dasharray="1 2.2"/><path d="M9 .8v2.4M9 14.8v2.4M.8 9h2.4M14.8 9h2.4"/><circle cx="9" cy="9" r="1.1" class="face__rose-dot"/></svg><span class="small">среда единомышленников</span></span></span>
             </figcaption>
+            <div class="face__who"><i style="--img:url(people/p5-600.jpg)"></i><span class="face__who-t"><b>Михаил</b><span class="small">в среде института</span></span><span class="face__role face__role--b">Архитектор</span></div>
           </figure>
           <figure class="face" data-focus=".45" tabindex="0">
+            <figcaption class="face__top"><span class="face__top-name">Артём Снегирёв</span><span class="small face__top-meta"><svg class="face__rose" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7.5"/><circle cx="9" cy="9" r="4" stroke-dasharray="1 2.2"/><path d="M9 .8v2.4M9 14.8v2.4M.8 9h2.4M14.8 9h2.4"/><circle cx="9" cy="9" r="1.1" class="face__rose-dot"/></svg>продюсер</span></figcaption>
             <div class="face__photo"><img src="people/p6-600.jpg" srcset="people/p6-600.jpg 600w, people/p6-900.jpg 900w" sizes="(max-width:780px) 70vw, 20vw" alt="" decoding="async" draggable="false"><span class="face__role">Продюсер</span></div>
             <figcaption class="face__body">
               <span class="face__name">Артём Снегирёв<svg class="face__seal" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.6"/><circle cx="8" cy="8" r="1.5" class="face__seal-dot"/></svg></span>
@@ -1032,8 +1086,10 @@
               <span class="face__prog"><span class="small">Программа</span><span>Психофизика влияния</span></span>
               <span class="face__foot"><span class="face__micro"><svg class="face__rose" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7.5"/><circle cx="9" cy="9" r="4" stroke-dasharray="1 2.2"/><path d="M9 .8v2.4M9 14.8v2.4M.8 9h2.4M14.8 9h2.4"/><circle cx="9" cy="9" r="1.1" class="face__rose-dot"/></svg><span class="small">среда единомышленников</span></span></span>
             </figcaption>
+            <div class="face__who"><i style="--img:url(people/p6-600.jpg)"></i><span class="face__who-t"><b>Артём</b><span class="small">в среде института</span></span><span class="face__role face__role--b">Продюсер</span></div>
           </figure>
           <figure class="face" data-focus=".45" tabindex="0">
+            <figcaption class="face__top"><span class="face__top-name">Вера Долина</span><span class="small face__top-meta"><svg class="face__rose" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7.5"/><circle cx="9" cy="9" r="4" stroke-dasharray="1 2.2"/><path d="M9 .8v2.4M9 14.8v2.4M.8 9h2.4M14.8 9h2.4"/><circle cx="9" cy="9" r="1.1" class="face__rose-dot"/></svg>юрист, партнёр</span></figcaption>
             <div class="face__photo"><img src="people/p7-600.jpg" srcset="people/p7-600.jpg 600w, people/p7-900.jpg 900w" sizes="(max-width:780px) 70vw, 20vw" alt="" decoding="async" draggable="false"><span class="face__role">Юрист, партнёр</span></div>
             <figcaption class="face__body">
               <span class="face__name">Вера Долина<svg class="face__seal" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.6"/><circle cx="8" cy="8" r="1.5" class="face__seal-dot"/></svg></span>
@@ -1041,8 +1097,10 @@
               <span class="face__prog"><span class="small">Программа</span><span>Логика речи и сторителлинг</span></span>
               <span class="face__foot"><span class="face__micro"><svg class="face__rose" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7.5"/><circle cx="9" cy="9" r="4" stroke-dasharray="1 2.2"/><path d="M9 .8v2.4M9 14.8v2.4M.8 9h2.4M14.8 9h2.4"/><circle cx="9" cy="9" r="1.1" class="face__rose-dot"/></svg><span class="small">среда единомышленников</span></span></span>
             </figcaption>
+            <div class="face__who"><i style="--img:url(people/p7-600.jpg)"></i><span class="face__who-t"><b>Вера</b><span class="small">в среде института</span></span><span class="face__role face__role--b">Юрист, партнёр</span></div>
           </figure>
           <figure class="face" data-focus=".45" tabindex="0">
+            <figcaption class="face__top"><span class="face__top-name">Полина Март</span><span class="small face__top-meta"><svg class="face__rose" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7.5"/><circle cx="9" cy="9" r="4" stroke-dasharray="1 2.2"/><path d="M9 .8v2.4M9 14.8v2.4M.8 9h2.4M14.8 9h2.4"/><circle cx="9" cy="9" r="1.1" class="face__rose-dot"/></svg>врач</span></figcaption>
             <div class="face__photo"><img src="people/p8-600.jpg" srcset="people/p8-600.jpg 600w, people/p8-900.jpg 900w" sizes="(max-width:780px) 70vw, 20vw" alt="" decoding="async" draggable="false"><span class="face__role">Врач</span></div>
             <figcaption class="face__body">
               <span class="face__name">Полина Март<svg class="face__seal" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.6"/><circle cx="8" cy="8" r="1.5" class="face__seal-dot"/></svg></span>
@@ -1050,9 +1108,12 @@
               <span class="face__prog"><span class="small">Программа</span><span>Голос и речь</span></span>
               <span class="face__foot"><span class="face__micro"><svg class="face__rose" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7.5"/><circle cx="9" cy="9" r="4" stroke-dasharray="1 2.2"/><path d="M9 .8v2.4M9 14.8v2.4M.8 9h2.4M14.8 9h2.4"/><circle cx="9" cy="9" r="1.1" class="face__rose-dot"/></svg><span class="small">среда единомышленников</span></span></span>
             </figcaption>
+            <div class="face__who"><i style="--img:url(people/p8-600.jpg)"></i><span class="face__who-t"><b>Полина</b><span class="small">в среде института</span></span><span class="face__role face__role--b">Врач</span></div>
           </figure>
         </div>
         <p class="small faces__label" id="faces-label" aria-hidden="true">Среда единомышленников</p>
+        <!-- Выбор варианта карточки участника — на время согласования. -->
+        <div class="faces__dev" id="faces-dev"><span class="small">Вариант карточки</span><button type="button" data-face="a">А · фото, имя, мысль, роль-таблетка</button><button type="button" data-face="b">Б · имя сверху, фото растворяется, аватар и роль внизу</button><button type="button" data-face="c">В · тёмная цельная, текст на фото</button></div>
       </div>
     </section>
 
@@ -1074,8 +1135,9 @@
         </div>
         <label class="prog__sel a-fade" style="--d:180ms"><span class="small">Набор</span><select id="prog-date"><option value="">любой</option><option value="2026-10">октябрь</option><option value="2026-11">ноябрь</option><option value="2026-12">декабрь</option></select></label>
         <p class="small prog__count a-fade" style="--d:240ms"><span id="prog-n">8</span>&nbsp;программ</p>
-        <span class="prog__dev a-fade" id="prog-dev" style="--d:300ms"><span class="small">Карточка</span><button type="button" data-card="1" title="Фото сверху, чипы на фото, цена и запись внизу">1</button><button type="button" data-card="2" title="Текст сверху, фото снизу">2</button><button type="button" data-card="3" title="Название на фото, под ним три показателя">3</button></span>
+
       </div>
+      <div class="prog__dev" id="prog-dev"><span class="small">Вариант карточки</span><button type="button" data-card="1">1 · Фото сверху, цена и запись внизу</button><button type="button" data-card="2">2 · Текст сверху, фото снизу</button><button type="button" data-card="3">3 · Название на фото, три показателя</button></div>
       <ul class="prog__list prog__list--v1" id="prog-list">
         <li class="pc" data-fac="1" data-format="Мастерская" data-date="2026-11" data-in>
           <div class="pc__photo a-clip">
@@ -1213,15 +1275,20 @@
       </header>
       <div class="club__card a-fade" data-in>
         <div class="ph club__ph"><span class="small">Фото клуба · 16:10 · 2400×1500<br>вечер, стол, разговор</span></div>
+        <!-- Заголовок по макету Эли (Figma 2033:359): три строки у правого края, между «клуб»
+             и «сильное» — белый компас. Сначала слова стоят слитно, потом расходятся, и в зазоре
+             проявляется компас; стрелка мягко поворачивается, пока блок на экране. -->
         <div class="club__copy">
-          <p class="small club__eyebrow a-fade" style="--d:300ms">Пространство для тех, кто не&nbsp;ищет лёгких тем</p>
-          <h2 class="club__title a-rise" id="club-title" style="--d:360ms"><span class="ln"><span class="ln__i">Философский</span></span><span class="ln"><span class="ln__i">клуб</span></span></h2>
-          <p class="t club__text a-fade" style="--d:520ms">Закрытые встречи, ужины, дискуссии, лекции, интеллектуальные путешествия. То, что помогает развиваться в&nbsp;сильном окружении.</p>
+          <h2 class="club__title" id="club-title">
+            <span class="club__line a-fade" style="--d:200ms">Философский</span>
+            <span class="club__line a-fade" style="--d:320ms"><span>Клуб</span><span class="club__cmp" id="club-cmp" aria-hidden="true"><img class="club__cmp-base" src="compass-base.svg" alt=""><img class="club__cmp-needle" id="club-needle" src="compass-needle.svg" alt=""></span><span>сильное</span></span>
+            <span class="club__line club__line--last a-fade" style="--d:440ms">окружение</span>
+          </h2>
+          <p class="club__text a-fade" style="--d:640ms">Закрытые встречи, ужины, дискуссии, интеллектуальные путешествия.</p>
         </div>
         <ul class="club__stats">
-          <li class="club__stat a-fade" style="--d:600ms">
-            <b class="club__big">06</b>
-            <div class="club__stat-aside">
+          <li class="club__stat a-fade" style="--d:700ms">
+            <div class="club__stat-top"><b class="club__big">06</b>
               <svg class="club__rose" viewBox="0 0 80 80" aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round">
                 <circle cx="40" cy="40" r="34" stroke-width="1" stroke-dasharray="1 5" opacity=".6"/>
                 <circle cx="40" cy="40" r="22" stroke-width="1" opacity=".7"/>
@@ -1231,10 +1298,10 @@
             </div>
             <p class="club__stat-text">контекстов дискуссий: философия, культура, бизнес, наука, общество, лидерство</p>
           </li>
-          <li class="club__stat a-fade" style="--d:700ms">
+          <li class="club__stat club__stat--tall a-fade" style="--d:800ms">
             <b class="club__big club__big--text">по&nbsp;приглашению</b>
-            <div class="club__stat-aside"><span class="club__faces" aria-hidden="true"><i style="--img:url(people/p1-600.jpg)"></i><i style="--img:url(people/p2-600.jpg)"></i><i style="--img:url(people/p3-600.jpg)"></i><i style="--img:url(people/p4-600.jpg)"></i><i style="--img:url(people/p5-600.jpg)"></i></span></div>
             <p class="club__stat-text">участники&nbsp;— люди действия из&nbsp;среды института; вход после знакомства</p>
+            <span class="club__faces" aria-hidden="true"><i style="--img:url(people/p1-600.jpg)"></i><i style="--img:url(people/p2-600.jpg)"></i><i style="--img:url(people/p3-600.jpg)"></i><i style="--img:url(people/p4-600.jpg)"></i></span>
           </li>
         </ul>
       </div>
@@ -1864,7 +1931,7 @@
           // Угол стрелки героя (слежение за курсором доезжает до нуля сам) вычитается:
           // итоговое направление задаёт только прокрутка, без скачка на входе.
           const m = /rotate\(([-\d.]+)deg\)/.exec(needle.style.transform || ''), inner = m ? parseFloat(m[1]) : 0;
-          turnNow += ((turnTarget - inner) - turnNow) * (1 - Math.exp(-dt * 1.6));
+          turnNow += ((turnTarget - inner) - turnNow) * (1 - Math.exp(-dt * 1.15));
           wrap.style.setProperty('--turn', `${turnNow.toFixed(2)}deg`);
           wrap.style.setProperty('--breath', `${(Math.sin(t * .9) * .6).toFixed(2)}deg`);
           if (base) base.style.transform = `rotate(${(Math.sin(t * .42) * 1.6).toFixed(2)}deg)`;
@@ -1957,22 +2024,18 @@
         letters.forEach((l, i) => {
           const n = letters.length, mid = (n - 1) / 2;
           let t, tr = '', bl = 0;
-          switch (titleMode) {
-            case 2: // снизу вверх из-под маски, слева направо
-              t = easeIO(clamp01((titleP - (i / n) * .5) / .5)); tr = `translate3d(0,${((1 - t) * 108).toFixed(1)}%,0)`; break;
-            case 3: { // буквы летят с краёв из размытия к центру: чем ближе, тем чётче
-              const d = Math.abs(i - mid) / mid;                                  // 0 в центре → 1 у краёв
-              t = easeIO(clamp01((titleP - d * .18) / (1 - d * .18)));            // края стартуют чуть позже
-              const far = 1 - t;
-              tr = `translate3d(${((i - mid) * .55 * far).toFixed(3)}em,${(far * far * 6 * (i % 2 ? 1 : -1)).toFixed(1)}px,0) scale(${(1 + far * .12).toFixed(4)})`;
-              bl = far * (6 + 8 * d); break; }
-            case 4: { // каскад от центра с лёгким наклоном
-              const d = Math.abs(i - mid) / mid; t = easeIO(clamp01((titleP - d * .5) / .5)); tr = `translate3d(0,${((1 - t) * .5).toFixed(3)}em,0) rotate(${((1 - t) * -6).toFixed(2)}deg)`; break; }
-            case 5: // оседание из масштаба, все буквы разом
-              t = easeIO(clamp01(titleP)); tr = `scale(${(1.12 - .12 * t).toFixed(4)})`; bl = (1 - t) * 8; break;
-            default: // морфинг из размытия
-              t = easeIO(clamp01((titleP - (i / n) * .55) / .45)); tr = `translate3d(0,${((1 - t) * .32).toFixed(3)}em,0) scale(${(.94 + .06 * t).toFixed(4)})`; bl = (1 - t) * 7;
-          }
+          // Все варианты — один эффект: буквы летят с краёв из размытия к центру.
+          // 1 широкий разлёт · 2 узкий · 3 узкий, старт раньше · 4 почти без разлёта, только резкость ·
+          // 5 широкий с лёгким вертикальным рассеянием.
+          const V = { 1:{spread:.55, early:0,   scatter:0,  late:.18}, 2:{spread:.28, early:0,   scatter:0,  late:.14},
+                      3:{spread:.28, early:.12, scatter:0,  late:.12}, 4:{spread:.08, early:.08, scatter:0,  late:.06},
+                      5:{spread:.55, early:0,   scatter:10, late:.22} }[titleMode] || { spread:.28, early:.12, scatter:0, late:.12 };
+          const d = Math.abs(i - mid) / mid;
+          const tp = clamp01(titleP + (titleP > 0 ? V.early : 0));
+          t = easeIO(clamp01((tp - d * V.late) / (1 - d * V.late)));
+          const far = 1 - t;
+          tr = `translate3d(${((i - mid) * V.spread * far).toFixed(3)}em,${(far * far * V.scatter * (i % 2 ? 1 : -1)).toFixed(1)}px,0) scale(${(1 + far * .1).toFixed(4)})`;
+          bl = far * (6 + 8 * d);
           const tLeave = easeIO(clamp01((leave - .02 - (i / n) * .12) / .35));
           l.style.opacity = (t * out * (1 - tLeave)).toFixed(3);
           l.style.transform = tr + ` translate3d(0,${(-tLeave * 48).toFixed(1)}px,0)`;
@@ -2000,17 +2063,17 @@
         const cw = (from, to) => from + (((to - from) % 360) + 360) % 360;   // короткий путь только по часовой
         // Покой стрелки — северо-восток (−45°): угол на точку уже учитывает это (aimAt = atan2 + 45).
         const aim = i => aimAt(cx, cy, anchors[i].x, anchors[i].y);
-        let turn = -22 * easeIO(clamp01((p - .03) / .42));
+        let turn = -84 * easeIO(clamp01((p - .03) / .44));   // медленный дрейф через весь манифест — к «Мыслить точно» остаётся < 75°
         if (anchors.length) {
           const first = aim(0);
           const d0 = first - turn; const dCCW = ((d0 % 360) - 360) % 360;    // к первому принципу — ближней стороной
-          const approach = easeIO(clamp01((p - .45) / .14));
+          const approach = easeIO(clamp01((p - .46) / .16));
           turn = turn + (Math.abs(dCCW) < 180 ? dCCW : d0) * approach;
           const live = tenetP.map((q, i) => ({ q, i })).filter(x => x.q > 0 && x.i > 0);
           if (live.length) {
             const cur = live[live.length - 1];
             const prev = aim(cur.i - 1), target = cw(prev, aim(cur.i));
-            turn = prev + (target - prev) * easeIO(clamp01(cur.q / .9));
+            turn = prev + (target - prev) * easeIO(clamp01(cur.q));
           }
         }
         turnTarget = turn;
@@ -2407,6 +2470,12 @@
           ring.classList.toggle('is-captioned', captioned);
           stage.classList.toggle('is-captioned', captioned);
         };
+        // Вариант карточки участника (на время согласования): класс на кольце, высота пересчитывается.
+        const dev = document.getElementById('faces-dev');
+        let faceMode = 'a'; try { faceMode = localStorage.getItem('tp-face') || 'a'; } catch (e) {}
+        const applyFace = () => { ring.classList.remove('faces__ring--a', 'faces__ring--b', 'faces__ring--c'); ring.classList.add(`faces__ring--${faceMode}`); dev?.querySelectorAll('button').forEach(b => b.classList.toggle('is-on', b.dataset.face === faceMode)); };
+        dev?.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; faceMode = b.dataset.face; try { localStorage.setItem('tp-face', faceMode); } catch (err) {} applyFace(); measure(); render(); });
+        applyFace();
         const seen = watch(section, '200px');
         measure();
         jobs.push(() => {
@@ -2460,6 +2529,13 @@
         const applyCard = () => { list.className = `prog__list prog__list--v${cardMode}`; dev?.querySelectorAll('button').forEach(b => b.classList.toggle('is-on', +b.dataset.card === cardMode)); };
         dev?.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; cardMode = +b.dataset.card; try { localStorage.setItem('tp-card', cardMode); } catch (err) {} applyCard(); });
         applyCard();
+      });
+
+      // ───────── 4. Клуб: белый компас в заголовке мягко поворачивается ─────────
+      safe('club-compass', () => {
+        const needle = document.getElementById('club-needle'), card = document.querySelector('.club__card');
+        if (!needle || !card || REDUCE) return;
+        loop(card, (t) => { needle.style.setProperty('--turn', `${(Math.sin(t * .35) * 22 + Math.sin(t * .9) * 4 - 20).toFixed(2)}deg`); });
       });
 
       // ───────── 6. Контакт: стрелка компаса ведёт к действию ─────────

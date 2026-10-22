@@ -1318,7 +1318,7 @@
           // Угол стрелки героя (слежение за курсором доезжает до нуля сам) вычитается:
           // итоговое направление задаёт только прокрутка, без скачка на входе.
           const m = /rotate\(([-\d.]+)deg\)/.exec(needle.style.transform || ''), inner = m ? parseFloat(m[1]) : 0;
-          turnNow += ((turnTarget - inner) - turnNow) * (1 - Math.exp(-dt * 1.6));
+          turnNow += ((turnTarget - inner) - turnNow) * (1 - Math.exp(-dt * 1.15));
           wrap.style.setProperty('--turn', `${turnNow.toFixed(2)}deg`);
           wrap.style.setProperty('--breath', `${(Math.sin(t * .9) * .6).toFixed(2)}deg`);
           if (base) base.style.transform = `rotate(${(Math.sin(t * .42) * 1.6).toFixed(2)}deg)`;
@@ -1411,22 +1411,18 @@
         letters.forEach((l, i) => {
           const n = letters.length, mid = (n - 1) / 2;
           let t, tr = '', bl = 0;
-          switch (titleMode) {
-            case 2: // снизу вверх из-под маски, слева направо
-              t = easeIO(clamp01((titleP - (i / n) * .5) / .5)); tr = `translate3d(0,${((1 - t) * 108).toFixed(1)}%,0)`; break;
-            case 3: { // буквы летят с краёв из размытия к центру: чем ближе, тем чётче
-              const d = Math.abs(i - mid) / mid;                                  // 0 в центре → 1 у краёв
-              t = easeIO(clamp01((titleP - d * .18) / (1 - d * .18)));            // края стартуют чуть позже
-              const far = 1 - t;
-              tr = `translate3d(${((i - mid) * .55 * far).toFixed(3)}em,${(far * far * 6 * (i % 2 ? 1 : -1)).toFixed(1)}px,0) scale(${(1 + far * .12).toFixed(4)})`;
-              bl = far * (6 + 8 * d); break; }
-            case 4: { // каскад от центра с лёгким наклоном
-              const d = Math.abs(i - mid) / mid; t = easeIO(clamp01((titleP - d * .5) / .5)); tr = `translate3d(0,${((1 - t) * .5).toFixed(3)}em,0) rotate(${((1 - t) * -6).toFixed(2)}deg)`; break; }
-            case 5: // оседание из масштаба, все буквы разом
-              t = easeIO(clamp01(titleP)); tr = `scale(${(1.12 - .12 * t).toFixed(4)})`; bl = (1 - t) * 8; break;
-            default: // морфинг из размытия
-              t = easeIO(clamp01((titleP - (i / n) * .55) / .45)); tr = `translate3d(0,${((1 - t) * .32).toFixed(3)}em,0) scale(${(.94 + .06 * t).toFixed(4)})`; bl = (1 - t) * 7;
-          }
+          // Все варианты — один эффект: буквы летят с краёв из размытия к центру.
+          // 1 широкий разлёт · 2 узкий · 3 узкий, старт раньше · 4 почти без разлёта, только резкость ·
+          // 5 широкий с лёгким вертикальным рассеянием.
+          const V = { 1:{spread:.55, early:0,   scatter:0,  late:.18}, 2:{spread:.28, early:0,   scatter:0,  late:.14},
+                      3:{spread:.28, early:.12, scatter:0,  late:.12}, 4:{spread:.08, early:.08, scatter:0,  late:.06},
+                      5:{spread:.55, early:0,   scatter:10, late:.22} }[titleMode] || { spread:.28, early:.12, scatter:0, late:.12 };
+          const d = Math.abs(i - mid) / mid;
+          const tp = clamp01(titleP + (titleP > 0 ? V.early : 0));
+          t = easeIO(clamp01((tp - d * V.late) / (1 - d * V.late)));
+          const far = 1 - t;
+          tr = `translate3d(${((i - mid) * V.spread * far).toFixed(3)}em,${(far * far * V.scatter * (i % 2 ? 1 : -1)).toFixed(1)}px,0) scale(${(1 + far * .1).toFixed(4)})`;
+          bl = far * (6 + 8 * d);
           const tLeave = easeIO(clamp01((leave - .02 - (i / n) * .12) / .35));
           l.style.opacity = (t * out * (1 - tLeave)).toFixed(3);
           l.style.transform = tr + ` translate3d(0,${(-tLeave * 48).toFixed(1)}px,0)`;
@@ -1454,17 +1450,17 @@
         const cw = (from, to) => from + (((to - from) % 360) + 360) % 360;   // короткий путь только по часовой
         // Покой стрелки — северо-восток (−45°): угол на точку уже учитывает это (aimAt = atan2 + 45).
         const aim = i => aimAt(cx, cy, anchors[i].x, anchors[i].y);
-        let turn = -22 * easeIO(clamp01((p - .03) / .42));
+        let turn = -84 * easeIO(clamp01((p - .03) / .44));   // медленный дрейф через весь манифест — к «Мыслить точно» остаётся < 75°
         if (anchors.length) {
           const first = aim(0);
           const d0 = first - turn; const dCCW = ((d0 % 360) - 360) % 360;    // к первому принципу — ближней стороной
-          const approach = easeIO(clamp01((p - .45) / .14));
+          const approach = easeIO(clamp01((p - .46) / .16));
           turn = turn + (Math.abs(dCCW) < 180 ? dCCW : d0) * approach;
           const live = tenetP.map((q, i) => ({ q, i })).filter(x => x.q > 0 && x.i > 0);
           if (live.length) {
             const cur = live[live.length - 1];
             const prev = aim(cur.i - 1), target = cw(prev, aim(cur.i));
-            turn = prev + (target - prev) * easeIO(clamp01(cur.q / .9));
+            turn = prev + (target - prev) * easeIO(clamp01(cur.q));
           }
         }
         turnTarget = turn;
