@@ -763,8 +763,10 @@
     .prog__head { align-items:end; row-gap:20px; }
     .prog__head .h-sec { grid-column:1 / 13; }
     .prog__bar { display:flex; flex-wrap:wrap; align-items:center; gap:14px 28px; margin:clamp(28px,4vh,44px) var(--edge-x) 0; padding:14px 0; border-top:1px solid var(--rule-c); border-bottom:1px solid var(--rule-c); }
-    .prog__tabs { display:flex; flex-wrap:wrap; gap:4px 18px; }
-    .prog__tabs button,.prog__fac { border:0; background:transparent; color:inherit; cursor:pointer; font:500 var(--fz-small)/1.2 Manrope,sans-serif; letter-spacing:.04em; text-transform:uppercase; padding:6px 0; opacity:.5; transition:opacity .3s var(--ease); border-bottom:1px solid transparent; }
+    .prog__tabs { display:flex; flex-wrap:wrap; gap:4px 28px; }
+    .prog__sel { margin-left:auto; }
+    .prog__tabs button,.prog__fac { border:0; background:transparent; color:inherit; cursor:pointer; font:500 clamp(.85rem,.75rem + .3vw,1rem)/1.2 Manrope,sans-serif; letter-spacing:.02em; padding:8px 0; opacity:.5; transition:opacity .3s var(--ease); border-bottom:1px solid transparent; }
+    .prog__tabs button i { font-style:normal; font-family:Anticva,Georgia,serif; margin-right:8px; font-size:1.05em; }
     .prog__tabs button:hover,.prog__fac:hover { opacity:.85; }
     .prog__tabs button[aria-pressed="true"] { opacity:1; border-bottom-color:currentColor; }
     .prog__facs { display:flex; gap:6px; margin-left:auto; }
@@ -775,23 +777,28 @@
     .prog__sel select { appearance:none; -webkit-appearance:none; border:0; border-bottom:1px solid var(--rule-c); background:transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' fill='none' stroke='%23161514'%3E%3Cpath d='M2 3.5l3 3 3-3'/%3E%3C/svg%3E") right center no-repeat; color:inherit; font:400 var(--fz-small)/1.3 Manrope,sans-serif; padding:2px 16px 2px 0; cursor:pointer; }
     .prog__count { opacity:.5; }
     /* Выбор варианта карточки — на время согласования, крупно над каталогом. */
-    .prog__dev { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin:0 var(--edge-x) clamp(28px,4vh,44px); }
+    .prog__dev { display:inline-flex; flex-wrap:wrap; align-items:center; gap:10px; margin:0 var(--edge-x) clamp(28px,4vh,44px); padding:10px 14px; border:1px dashed rgba(22,21,20,.3); border-radius:14px; }
     .prog__dev .small { opacity:.5; margin-right:6px; }
     .prog__dev button { padding:10px 16px; border:1px solid rgba(22,21,20,.25); border-radius:999px; background:transparent; color:var(--ink); font:500 var(--fz-small)/1 Manrope,sans-serif; letter-spacing:.02em; cursor:pointer; }
     .prog__dev button.is-on { background:var(--ink); color:var(--bg-light); border-color:var(--ink); }
     .prog__list { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:24px; margin:clamp(28px,4vh,44px) var(--edge-x) 0; padding:0; list-style:none; }
     /* Карточка: три варианта по референсам (переключатель в строке фильтров).
        Общая разметка, раскладку меняет класс списка. Теней нет, линия 1px. */
-    .pc { position:relative; display:grid; grid-template-rows:auto 1fr; border:1px solid rgba(22,21,20,.08); border-radius:24px; background:#FFFFFF; overflow:hidden; padding:8px; }
+    .pc { position:relative; display:grid; grid-template-rows:auto 1fr; border:1px solid rgba(22,21,20,.08); border-radius:24px; background:#FFFFFF; overflow:hidden; padding:8px; transition:transform .35s var(--ease); }
+    .pc:hover { transform:translateY(-2px); }
+    .pc__link { position:absolute; inset:0; z-index:1; }
+    .pc__btn { position:relative; z-index:2; }
+    .pc__fac { display:flex; align-items:baseline; gap:8px; margin:0; opacity:.6; text-transform:none; letter-spacing:.02em; }
+    .pc__fac i { font-style:normal; font-family:Anticva,Georgia,serif; font-size:1.15em; opacity:1; }
     .pc[hidden] { display:none; }
     .pc__photo { position:relative; aspect-ratio:3 / 2; overflow:hidden; border-radius:18px; background:var(--graphite); }
     .pc__photo img { display:block; width:100%; height:100%; object-fit:cover; filter:saturate(.85); }
     .pc__chips { position:absolute; left:12px; top:12px; right:118px; display:flex; flex-wrap:wrap; gap:6px; z-index:1; }
     .pc__chips span { padding:7px 11px; border-radius:999px; background:rgba(17,17,17,.42); -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); color:var(--light); font:500 var(--fz-small)/1 Manrope,sans-serif; letter-spacing:.02em; }
-    .pc__seal { position:absolute; right:12px; top:12px; z-index:1; white-space:nowrap; display:inline-flex; align-items:center; gap:6px; padding:7px 10px; border-radius:999px; background:rgba(17,17,17,.42); -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); color:var(--light); font:500 var(--fz-small)/1 Manrope,sans-serif; }
+    .pc__seal { display:none; position:absolute; right:12px; top:12px; z-index:1; white-space:nowrap; display:inline-flex; align-items:center; gap:6px; padding:7px 10px; border-radius:999px; background:rgba(17,17,17,.42); -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); color:var(--light); font:500 var(--fz-small)/1 Manrope,sans-serif; }
     .pc__seal svg { width:12px; height:12px; fill:none; stroke:currentColor; stroke-width:1; } .pc__seal .d { fill:currentColor; stroke:none; }
     .pc__over { display:none; }
-    .pc__body { display:grid; gap:10px; padding:18px 14px 12px; align-content:start; grid-template-rows:auto auto 1fr auto; }
+    .pc__body { display:grid; gap:8px; padding:16px 14px 12px; align-content:start; grid-template-rows:auto auto auto 1fr auto; }
     .pc__head { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin:0; }
     .pc__tag { margin-top:2px; }
     .pc__name { color:inherit; text-decoration:none; font:500 clamp(1rem,.8rem + .45vw,1.35rem)/1.2 Manrope,sans-serif; letter-spacing:-.015em; text-wrap:balance; }
@@ -802,6 +809,7 @@
     .pc__stats { display:none; }
     .pc__foot { display:flex; align-items:center; justify-content:space-between; gap:10px; margin:6px 0 0; align-self:end; }
     .pc__price { font:500 clamp(1rem,.85rem + .45vw,1.25rem)/1.2 Manrope,sans-serif; letter-spacing:-.01em; }
+    .pc__price--soft { font:300 var(--fz-small)/1.3 Manrope,sans-serif; opacity:.5; text-transform:none; letter-spacing:.02em; max-width:12em; }
     .pc__btn { display:inline-flex; align-items:center; gap:10px; color:var(--light); background:var(--ink); text-decoration:none; padding:11px 10px 11px 16px; border-radius:999px; font:500 var(--fz-small)/1 Manrope,sans-serif; letter-spacing:.02em; transition:transform .25s var(--ease); }
     .pc__btn img { width:22px; height:22px; padding:5px; border-radius:50%; background:var(--light); box-sizing:border-box; }
     .pc__btn:hover { transform:translateY(-1px); }
@@ -816,7 +824,7 @@
     .prog__list--v3 .pc__over-t { display:grid; gap:2px; min-width:0; }
     .prog__list--v3 .pc__over-t b { font:500 clamp(.95rem,.85rem + .35vw,1.15rem)/1.2 Manrope,sans-serif; letter-spacing:-.01em; }
     .prog__list--v3 .pc__over-t i { font:300 var(--fz-small)/1.3 Manrope,sans-serif; font-style:normal; opacity:.75; }
-    .prog__list--v3 .pc__glass { flex:none; padding:10px 16px; border-radius:999px; background:rgba(239,234,228,.22); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); color:var(--light); text-decoration:none; font:500 var(--fz-small)/1 Manrope,sans-serif; }
+    .prog__list--v3 .pc__glass { display:none; flex:none; padding:10px 16px; border-radius:999px; background:rgba(239,234,228,.22); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); color:var(--light); text-decoration:none; font:500 var(--fz-small)/1 Manrope,sans-serif; }
     .prog__list--v3 .pc__head .pc__name,.prog__list--v3 .pc__value { display:none; }
     .prog__list--v3 .pc__head { justify-content:flex-start; }
     .prog__list--v3 .pc__meta { order:-1; opacity:.8; font-size:clamp(.8rem,.72rem + .2vw,.95rem); text-transform:none; letter-spacing:.01em; font-weight:400; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:block; }
@@ -1105,146 +1113,152 @@
          (вкладки формата: Программа / Мастерская / Мастер-класс / Онлайн / Индивидуально;
          в карточке: тип, название, стоимость, набор, запись). Данные — с theperformance.ru. -->
     <section class="prog" id="programs" data-theme="light" data-chrome="hide" aria-labelledby="prog-title">
-      <div class="prog__dev" id="prog-dev"><span class="small">Вариант карточки</span><button type="button" data-card="1">1 · Фото сверху, цена и запись внизу</button><button type="button" data-card="2">2 · Текст сверху, фото снизу</button><button type="button" data-card="3">3 · Название на фото, три показателя</button></div>
+      <div class="prog__dev" id="prog-dev"><span class="small">На согласование · вариант карточки</span><button type="button" data-card="1">1 · Фото сверху, цена и запись внизу</button><button type="button" data-card="2">2 · Текст сверху, фото снизу</button><button type="button" data-card="3">3 · Название на фото, три показателя</button></div>
       <header class="g prog__head">
         <h2 class="h-sec a-rise" id="prog-title" data-in><span class="ln"><span class="ln__i">Программы</span></span></h2>
       </header>
+      <!-- Фильтры по рекомендации UX-критика (22.10): факультет — единственная навигация,
+           формат — тихий селект справа, набор и счётчик убраны (порядок — ближайший набор первым). -->
       <div class="prog__bar" id="prog-filter" data-in>
-        <nav class="prog__tabs a-fade" aria-label="Формат">
-          <button type="button" data-format="" aria-pressed="true">Все</button><button type="button" data-format="Программа" aria-pressed="false">Программа</button><button type="button" data-format="Мастерская" aria-pressed="false">Мастерская</button><button type="button" data-format="Мастер-класс" aria-pressed="false">Мастер-класс</button><button type="button" data-format="Онлайн" aria-pressed="false">Онлайн</button><button type="button" data-format="Индивидуально" aria-pressed="false">Индивидуально</button>
+        <nav class="prog__tabs a-fade" aria-label="Факультет">
+          <button type="button" data-fac="" aria-pressed="true">Все</button><button type="button" data-fac="1" aria-pressed="false"><i>I</i>Мысль и слово</button><button type="button" data-fac="2" aria-pressed="false"><i>II</i>Психофизика</button><button type="button" data-fac="3" aria-pressed="false"><i>III</i>Лидерство</button>
         </nav>
-        <div class="prog__facs a-fade" style="--d:120ms" role="group" aria-label="Факультет">
-          <button type="button" class="prog__fac" data-fac="" aria-pressed="true">Все факультеты</button><button type="button" class="prog__fac" data-fac="1" aria-pressed="false"><i>I</i>Мысль и слово</button><button type="button" class="prog__fac" data-fac="2" aria-pressed="false"><i>II</i>Психофизика</button><button type="button" class="prog__fac" data-fac="3" aria-pressed="false"><i>III</i>Лидерство</button>
-        </div>
-        <label class="prog__sel a-fade" style="--d:180ms"><span class="small">Набор</span><select id="prog-date"><option value="">любой</option><option value="2026-10">октябрь</option><option value="2026-11">ноябрь</option><option value="2026-12">декабрь</option></select></label>
-        <p class="small prog__count a-fade" style="--d:240ms"><span id="prog-n">8</span>&nbsp;программ</p>
+        <label class="prog__sel a-fade" style="--d:120ms"><span class="small">Формат</span><select id="prog-format"><option value="">любой</option><option>Программа</option><option>Мастерская</option><option>Мастер-класс</option><option>Онлайн</option><option>Индивидуально</option></select></label>
+      </div>
 
       </div>
       <ul class="prog__list prog__list--v1" id="prog-list">
-        <li class="pc" data-fac="1" data-format="Мастерская" data-date="2026-11" data-in>
-          <div class="pc__photo a-clip">
-            <img src="programs/golos-900.jpg" alt="" loading="lazy" decoding="async">
-            <span class="pc__chips"><span>Мастерская</span><span>I · Мысль и слово</span></span>
-            <span class="pc__seal" aria-hidden="true"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5"/><circle cx="8" cy="8" r="1.4" class="d"/></svg>ноябрь</span>
-            <span class="pc__over"><span class="pc__over-t"><b>Голос и речь</b><i>от 5 недель · 5 ч/нед</i></span><a class="pc__glass" href="https://theperformance.ru/workshop/golos-i-rech/" target="_blank" rel="noopener">Подробнее</a></span>
-          </div>
-          <div class="pc__body">
-            <p class="pc__head"><a class="pc__name" href="https://theperformance.ru/workshop/golos-i-rech/" target="_blank" rel="noopener">Голос и речь</a><span class="pc__tag">набор: ноябрь</span></p>
-            <p class="small pc__meta"><span>от 5 недель · 5 ч/нед</span><span>В. Мархасев</span></p>
-            <p class="pc__value">Дыхание, тембр, дикция: голос, который держит внимание без усилия.</p>
-            <p class="pc__stats"><span><b>от 5 недель</b><i>длительность</i></span><span><b>ноябрь</b><i>набор</i></span><span><b>по запросу</b><i>стоимость</i></span></p>
-            <p class="pc__foot"><b class="pc__price">по запросу</b><a class="pc__btn" href="https://t.me/theperformance_assistant" target="_blank" rel="noopener">Записаться<img src="figma-arrow.svg" alt=""></a></p>
-          </div>
-        </li>
-        <li class="pc" data-fac="1" data-format="Онлайн" data-date="2026-11" data-in>
-          <div class="pc__photo a-clip">
-            <img src="programs/logika-900.jpg" alt="" loading="lazy" decoding="async">
-            <span class="pc__chips"><span>Онлайн</span><span>I · Мысль и слово</span></span>
-            <span class="pc__seal" aria-hidden="true"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5"/><circle cx="8" cy="8" r="1.4" class="d"/></svg>ноябрь</span>
-            <span class="pc__over"><span class="pc__over-t"><b>Логика речи и сторителлинг</b><i>5–12 недель · 5 ч/нед</i></span><a class="pc__glass" href="https://theperformance.ru/courses/" target="_blank" rel="noopener">Подробнее</a></span>
-          </div>
-          <div class="pc__body">
-            <p class="pc__head"><a class="pc__name" href="https://theperformance.ru/courses/" target="_blank" rel="noopener">Логика речи и сторителлинг</a><span class="pc__tag">набор: ноябрь</span></p>
-            <p class="small pc__meta"><span>5–12 недель · 5 ч/нед</span></p>
-            <p class="pc__value">Структура мысли и история, которую слушают до конца. Занятия в Zoom.</p>
-            <p class="pc__stats"><span><b>5–12 недель</b><i>длительность</i></span><span><b>ноябрь</b><i>набор</i></span><span><b>по запросу</b><i>стоимость</i></span></p>
-            <p class="pc__foot"><b class="pc__price">по запросу</b><a class="pc__btn" href="https://t.me/theperformance_assistant" target="_blank" rel="noopener">Записаться<img src="figma-arrow.svg" alt=""></a></p>
-          </div>
-        </li>
-        <li class="pc" data-fac="1" data-format="Мастерская" data-date="2026-12" data-in>
-          <div class="pc__photo a-clip">
-            <img src="programs/kreativ-900.jpg" alt="" loading="lazy" decoding="async">
-            <span class="pc__chips"><span>Мастерская</span><span>I · Мысль и слово</span></span>
-            <span class="pc__seal" aria-hidden="true"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5"/><circle cx="8" cy="8" r="1.4" class="d"/></svg>декабрь</span>
-            <span class="pc__over"><span class="pc__over-t"><b>Креативное мышление</b><i>от 5 недель</i></span><a class="pc__glass" href="https://theperformance.ru/workshop/kreativnoe-myshlenie/" target="_blank" rel="noopener">Подробнее</a></span>
-          </div>
-          <div class="pc__body">
-            <p class="pc__head"><a class="pc__name" href="https://theperformance.ru/workshop/kreativnoe-myshlenie/" target="_blank" rel="noopener">Креативное мышление</a><span class="pc__tag">набор: декабрь</span></p>
-            <p class="small pc__meta"><span>от 5 недель</span></p>
-            <p class="pc__value">Нестандартные решения и импровизация в мысли — до того, как она станет словом.</p>
-            <p class="pc__stats"><span><b>от 5 недель</b><i>длительность</i></span><span><b>декабрь</b><i>набор</i></span><span><b>по запросу</b><i>стоимость</i></span></p>
-            <p class="pc__foot"><b class="pc__price">по запросу</b><a class="pc__btn" href="https://t.me/theperformance_assistant" target="_blank" rel="noopener">Записаться<img src="figma-arrow.svg" alt=""></a></p>
-          </div>
-        </li>
-        <li class="pc" data-fac="2" data-format="Программа" data-date="2026-11" data-in>
-          <div class="pc__photo a-clip">
-            <img src="programs/lider-900.jpg" alt="" loading="lazy" decoding="async">
-            <span class="pc__chips"><span>Программа</span><span>II · Психофизика</span></span>
-            <span class="pc__seal" aria-hidden="true"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5"/><circle cx="8" cy="8" r="1.4" class="d"/></svg>ноябрь</span>
-            <span class="pc__over"><span class="pc__over-t"><b>Психофизика лидера</b><i>до 3 месяцев · с 19:30</i></span><a class="pc__glass" href="https://theperformance.ru/courses/" target="_blank" rel="noopener">Подробнее</a></span>
-          </div>
-          <div class="pc__body">
-            <p class="pc__head"><a class="pc__name" href="https://theperformance.ru/courses/" target="_blank" rel="noopener">Психофизика лидера</a><span class="pc__tag">набор: ноябрь</span></p>
-            <p class="small pc__meta"><span>до 3 месяцев · с 19:30</span><span>С. Шенталинский</span></p>
-            <p class="pc__value">Школа Станиславского для руководителя: тело, внимание, присутствие.</p>
-            <p class="pc__stats"><span><b>до 3 месяцев</b><i>длительность</i></span><span><b>ноябрь</b><i>набор</i></span><span><b>по запросу</b><i>стоимость</i></span></p>
-            <p class="pc__foot"><b class="pc__price">по запросу</b><a class="pc__btn" href="https://t.me/theperformance_assistant" target="_blank" rel="noopener">Записаться<img src="figma-arrow.svg" alt=""></a></p>
-          </div>
-        </li>
         <li class="pc" data-fac="2" data-format="Мастер-класс" data-date="2026-10" data-in>
+          <a class="pc__link" href="https://theperformance.ru/courses/masterklas/praktikum-psihofizika-vliyaniya/" target="_blank" rel="noopener" aria-label="Психофизика влияния: подробнее"></a>
           <div class="pc__photo a-clip">
             <img src="programs/vliyanie-900.jpg" alt="" loading="lazy" decoding="async">
-            <span class="pc__chips"><span>Мастер-класс</span><span>II · Психофизика</span></span>
-            <span class="pc__seal" aria-hidden="true"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5"/><circle cx="8" cy="8" r="1.4" class="d"/></svg>29 октября</span>
-            <span class="pc__over"><span class="pc__over-t"><b>Психофизика влияния</b><i>1 вечер · 19:00</i></span><a class="pc__glass" href="https://theperformance.ru/courses/masterklas/praktikum-psihofizika-vliyaniya/" target="_blank" rel="noopener">Подробнее</a></span>
+            <span class="pc__chips"><span>Мастер-класс</span></span>
+            <span class="pc__over"><span class="pc__over-t"><b>Психофизика влияния</b><i>1 вечер · 19:00</i></span></span>
           </div>
           <div class="pc__body">
-            <p class="pc__head"><a class="pc__name" href="https://theperformance.ru/courses/masterklas/praktikum-psihofizika-vliyaniya/" target="_blank" rel="noopener">Психофизика влияния</a><span class="pc__tag">набор: 29 октября</span></p>
-            <p class="small pc__meta"><span>1 вечер · 19:00</span><span>С. Шенталинский</span></p>
+            <p class="small pc__fac"><i>II</i>Психофизика</p>
+            <p class="pc__head"><span class="pc__name">Психофизика влияния</span><span class="pc__tag">старт 29 октября</span></p>
             <p class="pc__value">Практикум по актёрскому мастерству: один вечер, чтобы почувствовать присутствие.</p>
+            <p class="small pc__meta">1 вечер · 19:00 · С. Шенталинский</p>
             <p class="pc__stats"><span><b>1 вечер</b><i>длительность</i></span><span><b>29 октября</b><i>набор</i></span><span><b>25 000 ₽</b><i>стоимость</i></span></p>
             <p class="pc__foot"><b class="pc__price">25 000 ₽</b><a class="pc__btn" href="https://t.me/theperformance_assistant" target="_blank" rel="noopener">Записаться<img src="figma-arrow.svg" alt=""></a></p>
           </div>
         </li>
-        <li class="pc" data-fac="2" data-format="Мастерская" data-date="2026-12" data-in>
+        <li class="pc" data-fac="1" data-format="Мастерская" data-date="2026-11" data-in>
+          <a class="pc__link" href="https://theperformance.ru/workshop/golos-i-rech/" target="_blank" rel="noopener" aria-label="Голос и речь: подробнее"></a>
           <div class="pc__photo a-clip">
-            <img src="programs/akter-900.jpg" alt="" loading="lazy" decoding="async">
-            <span class="pc__chips"><span>Мастерская</span><span>II · Психофизика</span></span>
-            <span class="pc__seal" aria-hidden="true"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5"/><circle cx="8" cy="8" r="1.4" class="d"/></svg>декабрь</span>
-            <span class="pc__over"><span class="pc__over-t"><b>Актёрское мастерство</b><i>от 5 недель</i></span><a class="pc__glass" href="https://theperformance.ru/workshop/akterskoe-masterstvo/" target="_blank" rel="noopener">Подробнее</a></span>
+            <img src="programs/golos-900.jpg" alt="" loading="lazy" decoding="async">
+            <span class="pc__chips"><span>Мастерская</span></span>
+            <span class="pc__over"><span class="pc__over-t"><b>Голос и речь</b><i>от 5 недель · 5 ч/нед</i></span></span>
           </div>
           <div class="pc__body">
-            <p class="pc__head"><a class="pc__name" href="https://theperformance.ru/workshop/akterskoe-masterstvo/" target="_blank" rel="noopener">Актёрское мастерство</a><span class="pc__tag">набор: декабрь</span></p>
-            <p class="small pc__meta"><span>от 5 недель</span></p>
-            <p class="pc__value">Контакт, импровизация и поведение в сложных коммуникациях через актёрский тренинг.</p>
-            <p class="pc__stats"><span><b>от 5 недель</b><i>длительность</i></span><span><b>декабрь</b><i>набор</i></span><span><b>по запросу</b><i>стоимость</i></span></p>
-            <p class="pc__foot"><b class="pc__price">по запросу</b><a class="pc__btn" href="https://t.me/theperformance_assistant" target="_blank" rel="noopener">Записаться<img src="figma-arrow.svg" alt=""></a></p>
+            <p class="small pc__fac"><i>I</i>Мысль и слово</p>
+            <p class="pc__head"><span class="pc__name">Голос и речь</span><span class="pc__tag">набор в ноябре</span></p>
+            <p class="pc__value">Дыхание, тембр, дикция: голос, который держит внимание без усилия.</p>
+            <p class="small pc__meta">от 5 недель · 5 ч/нед · В. Мархасев</p>
+            <p class="pc__stats"><span><b>от 5 недель</b><i>длительность</i></span><span><b>в ноябре</b><i>набор</i></span><span><b>по запросу</b><i>стоимость</i></span></p>
+            <p class="pc__foot"><span class="small pc__price pc__price--soft">стоимость после встречи с продюсером</span><a class="pc__btn" href="https://t.me/theperformance_assistant" target="_blank" rel="noopener">Записаться<img src="figma-arrow.svg" alt=""></a></p>
+          </div>
+        </li>
+        <li class="pc" data-fac="1" data-format="Онлайн" data-date="2026-11" data-in>
+          <a class="pc__link" href="https://theperformance.ru/courses/" target="_blank" rel="noopener" aria-label="Логика речи и сторителлинг: подробнее"></a>
+          <div class="pc__photo a-clip">
+            <img src="programs/logika-900.jpg" alt="" loading="lazy" decoding="async">
+            <span class="pc__chips"><span>Онлайн</span></span>
+            <span class="pc__over"><span class="pc__over-t"><b>Логика речи и сторителлинг</b><i>5–12 недель · 5 ч/нед</i></span></span>
+          </div>
+          <div class="pc__body">
+            <p class="small pc__fac"><i>I</i>Мысль и слово</p>
+            <p class="pc__head"><span class="pc__name">Логика речи и сторителлинг</span><span class="pc__tag">набор в ноябре</span></p>
+            <p class="pc__value">Структура мысли и история, которую слушают до конца. Занятия в Zoom.</p>
+            <p class="small pc__meta">5–12 недель · 5 ч/нед</p>
+            <p class="pc__stats"><span><b>5–12 недель</b><i>длительность</i></span><span><b>в ноябре</b><i>набор</i></span><span><b>по запросу</b><i>стоимость</i></span></p>
+            <p class="pc__foot"><span class="small pc__price pc__price--soft">стоимость после встречи с продюсером</span><a class="pc__btn" href="https://t.me/theperformance_assistant" target="_blank" rel="noopener">Записаться<img src="figma-arrow.svg" alt=""></a></p>
+          </div>
+        </li>
+        <li class="pc" data-fac="2" data-format="Программа" data-date="2026-11" data-in>
+          <a class="pc__link" href="https://theperformance.ru/courses/" target="_blank" rel="noopener" aria-label="Психофизика лидера: подробнее"></a>
+          <div class="pc__photo a-clip">
+            <img src="programs/lider-900.jpg" alt="" loading="lazy" decoding="async">
+            <span class="pc__chips"><span>Программа</span></span>
+            <span class="pc__over"><span class="pc__over-t"><b>Психофизика лидера</b><i>до 3 месяцев · с 19:30</i></span></span>
+          </div>
+          <div class="pc__body">
+            <p class="small pc__fac"><i>II</i>Психофизика</p>
+            <p class="pc__head"><span class="pc__name">Психофизика лидера</span><span class="pc__tag">набор в ноябре</span></p>
+            <p class="pc__value">Школа Станиславского для руководителя: тело, внимание, присутствие.</p>
+            <p class="small pc__meta">до 3 месяцев · с 19:30 · С. Шенталинский</p>
+            <p class="pc__stats"><span><b>до 3 месяцев</b><i>длительность</i></span><span><b>в ноябре</b><i>набор</i></span><span><b>по запросу</b><i>стоимость</i></span></p>
+            <p class="pc__foot"><span class="small pc__price pc__price--soft">стоимость после встречи с продюсером</span><a class="pc__btn" href="https://t.me/theperformance_assistant" target="_blank" rel="noopener">Записаться<img src="figma-arrow.svg" alt=""></a></p>
           </div>
         </li>
         <li class="pc" data-fac="3" data-format="Программа" data-date="2026-11" data-in>
+          <a class="pc__link" href="https://theperformance.ru/korporativnoe-obuchenie/" target="_blank" rel="noopener" aria-label="Корпоративная программа: подробнее"></a>
           <div class="pc__photo a-clip">
             <img src="programs/korp-900.jpg" alt="" loading="lazy" decoding="async">
-            <span class="pc__chips"><span>Программа</span><span>III · Лидерство</span></span>
-            <span class="pc__seal" aria-hidden="true"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5"/><circle cx="8" cy="8" r="1.4" class="d"/></svg>открыт</span>
-            <span class="pc__over"><span class="pc__over-t"><b>Корпоративная программа</b><i>≈100 часов · модульно</i></span><a class="pc__glass" href="https://theperformance.ru/korporativnoe-obuchenie/" target="_blank" rel="noopener">Подробнее</a></span>
+            <span class="pc__chips"><span>Программа</span></span>
+            <span class="pc__over"><span class="pc__over-t"><b>Корпоративная программа</b><i>≈100 часов · модульно</i></span></span>
           </div>
           <div class="pc__body">
-            <p class="pc__head"><a class="pc__name" href="https://theperformance.ru/korporativnoe-obuchenie/" target="_blank" rel="noopener">Корпоративная программа</a><span class="pc__tag">набор: открыт</span></p>
-            <p class="small pc__meta"><span>≈100 часов · модульно</span></p>
+            <p class="small pc__fac"><i>III</i>Лидерство</p>
+            <p class="pc__head"><span class="pc__name">Корпоративная программа</span><span class="pc__tag">набор открыт</span></p>
             <p class="pc__value">Публичные выступления и деловые коммуникации для команды, под задачи компании.</p>
+            <p class="small pc__meta">≈100 часов · модульно</p>
             <p class="pc__stats"><span><b>≈100 часов</b><i>длительность</i></span><span><b>открыт</b><i>набор</i></span><span><b>по запросу</b><i>стоимость</i></span></p>
-            <p class="pc__foot"><b class="pc__price">по запросу</b><a class="pc__btn" href="https://t.me/theperformance_assistant" target="_blank" rel="noopener">Записаться<img src="figma-arrow.svg" alt=""></a></p>
+            <p class="pc__foot"><span class="small pc__price pc__price--soft">стоимость после встречи с продюсером</span><a class="pc__btn" href="https://t.me/theperformance_assistant" target="_blank" rel="noopener">Записаться<img src="figma-arrow.svg" alt=""></a></p>
           </div>
         </li>
         <li class="pc" data-fac="3" data-format="Индивидуально" data-date="2026-11" data-in>
+          <a class="pc__link" href="https://theperformance.ru/korporativnoe-obuchenie/" target="_blank" rel="noopener" aria-label="Публичная роль руководителя: подробнее"></a>
           <div class="pc__photo a-clip">
             <img src="programs/rukovod-900.jpg" alt="" loading="lazy" decoding="async">
-            <span class="pc__chips"><span>Индивидуально</span><span>III · Лидерство</span></span>
-            <span class="pc__seal" aria-hidden="true"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5"/><circle cx="8" cy="8" r="1.4" class="d"/></svg>открыт</span>
-            <span class="pc__over"><span class="pc__over-t"><b>Публичная роль руководителя</b><i>по запросу</i></span><a class="pc__glass" href="https://theperformance.ru/korporativnoe-obuchenie/" target="_blank" rel="noopener">Подробнее</a></span>
+            <span class="pc__chips"><span>Индивидуально</span></span>
+            <span class="pc__over"><span class="pc__over-t"><b>Публичная роль руководителя</b><i></i></span></span>
           </div>
           <div class="pc__body">
-            <p class="pc__head"><a class="pc__name" href="https://theperformance.ru/korporativnoe-obuchenie/" target="_blank" rel="noopener">Публичная роль руководителя</a><span class="pc__tag">набор: открыт</span></p>
-            <p class="small pc__meta"><span>по запросу</span></p>
+            <p class="small pc__fac"><i>III</i>Лидерство</p>
+            <p class="pc__head"><span class="pc__name">Публичная роль руководителя</span><span class="pc__tag">набор открыт</span></p>
             <p class="pc__value">Индивидуальная работа над стратегическими выступлениями и лидерской коммуникацией.</p>
-            <p class="pc__stats"><span><b>по запросу</b><i>длительность</i></span><span><b>открыт</b><i>набор</i></span><span><b>по запросу</b><i>стоимость</i></span></p>
-            <p class="pc__foot"><b class="pc__price">по запросу</b><a class="pc__btn" href="https://t.me/theperformance_assistant" target="_blank" rel="noopener">Записаться<img src="figma-arrow.svg" alt=""></a></p>
+            <p class="small pc__meta"></p>
+            <p class="pc__stats"><span><b></b><i>длительность</i></span><span><b>открыт</b><i>набор</i></span><span><b>по запросу</b><i>стоимость</i></span></p>
+            <p class="pc__foot"><span class="small pc__price pc__price--soft">стоимость после встречи с продюсером</span><a class="pc__btn" href="https://t.me/theperformance_assistant" target="_blank" rel="noopener">Записаться<img src="figma-arrow.svg" alt=""></a></p>
           </div>
         </li>
-        <li class="pc" data-fac="2" data-format="Мастер-класс" data-date="2026-10" data-archive hidden><p class="pc__name">Психофизика влияния · 22 октября</p></li>
+        <li class="pc" data-fac="1" data-format="Мастерская" data-date="2026-12" data-in>
+          <a class="pc__link" href="https://theperformance.ru/workshop/kreativnoe-myshlenie/" target="_blank" rel="noopener" aria-label="Креативное мышление: подробнее"></a>
+          <div class="pc__photo a-clip">
+            <img src="programs/kreativ-900.jpg" alt="" loading="lazy" decoding="async">
+            <span class="pc__chips"><span>Мастерская</span></span>
+            <span class="pc__over"><span class="pc__over-t"><b>Креативное мышление</b><i>от 5 недель</i></span></span>
+          </div>
+          <div class="pc__body">
+            <p class="small pc__fac"><i>I</i>Мысль и слово</p>
+            <p class="pc__head"><span class="pc__name">Креативное мышление</span><span class="pc__tag">набор в декабре</span></p>
+            <p class="pc__value">Нестандартные решения и импровизация в мысли — до того, как она станет словом.</p>
+            <p class="small pc__meta">от 5 недель</p>
+            <p class="pc__stats"><span><b>от 5 недель</b><i>длительность</i></span><span><b>в декабре</b><i>набор</i></span><span><b>по запросу</b><i>стоимость</i></span></p>
+            <p class="pc__foot"><span class="small pc__price pc__price--soft">стоимость после встречи с продюсером</span><a class="pc__btn" href="https://t.me/theperformance_assistant" target="_blank" rel="noopener">Записаться<img src="figma-arrow.svg" alt=""></a></p>
+          </div>
+        </li>
+        <li class="pc" data-fac="2" data-format="Мастерская" data-date="2026-12" data-in>
+          <a class="pc__link" href="https://theperformance.ru/workshop/akterskoe-masterstvo/" target="_blank" rel="noopener" aria-label="Актёрское мастерство: подробнее"></a>
+          <div class="pc__photo a-clip">
+            <img src="programs/akter-900.jpg" alt="" loading="lazy" decoding="async">
+            <span class="pc__chips"><span>Мастерская</span></span>
+            <span class="pc__over"><span class="pc__over-t"><b>Актёрское мастерство</b><i>от 5 недель</i></span></span>
+          </div>
+          <div class="pc__body">
+            <p class="small pc__fac"><i>II</i>Психофизика</p>
+            <p class="pc__head"><span class="pc__name">Актёрское мастерство</span><span class="pc__tag">набор в декабре</span></p>
+            <p class="pc__value">Контакт, импровизация и поведение в сложных коммуникациях через актёрский тренинг.</p>
+            <p class="small pc__meta">от 5 недель</p>
+            <p class="pc__stats"><span><b>от 5 недель</b><i>длительность</i></span><span><b>в декабре</b><i>набор</i></span><span><b>по запросу</b><i>стоимость</i></span></p>
+            <p class="pc__foot"><span class="small pc__price pc__price--soft">стоимость после встречи с продюсером</span><a class="pc__btn" href="https://t.me/theperformance_assistant" target="_blank" rel="noopener">Записаться<img src="figma-arrow.svg" alt=""></a></p>
+          </div>
+        </li>
       </ul>
       <p class="t prog__empty" id="prog-empty" hidden>По этим условиям наборов сейчас нет. Снимите часть фильтров или <a href="https://t.me/theperformance_assistant">напишите нам</a>&nbsp;— подберём программу.</p>
-      <p class="small prog__note a-fade" data-in>Программы и&nbsp;фотографии взяты с&nbsp;theperformance.ru и&nbsp;разложены по&nbsp;факультетам. Зачислению предшествует 30-минутная встреча с&nbsp;продюсером; стоимость уточняется там же. LEVITAN&nbsp;— цифровая практика, появится отдельно.</p>
+      <p class="small prog__note a-fade" data-in>Стоимость и зачисление&nbsp;— после 30-минутной встречи с&nbsp;продюсером.</p>
     </section>
 
     <!-- 4. Философский клуб — культурная среда как отдельный раздел (не факультет).
@@ -2349,7 +2363,7 @@
 
       // ───────── Шапка зоны: цвет по блоку под ней ─────────
       safe('chrome', () => {
-        const shell = document.querySelector('#zone-chrome');
+        const shell = document.querySelector('#zone-chrome'), heroEl = document.querySelector('.hero');
         const blocks = [...zone.querySelectorAll('[data-theme]')];
         if (!shell) return;
         const manifest = document.getElementById('manifest-track');
@@ -2372,7 +2386,9 @@
             const box = block.getBoundingClientRect();
             if (box.top <= 56 && box.bottom > 56) { theme = block.dataset.theme; hide = block.dataset.chrome === 'hide'; break; }
           }
-          shell.classList.toggle('is-hidden', hide);
+          // Пока виден первый экран (он закреплён под манифестом), его кнопка уже на месте — шапка зоны молчит.
+          const heroShown = heroEl && heroEl.style.visibility !== 'hidden';
+          shell.classList.toggle('is-hidden', hide || heroShown);
           const dark = theme === 'dark';
           if (dark !== onDark) { onDark = dark; shell.classList.toggle('chrome--dark', !dark); }
         });
@@ -2486,10 +2502,10 @@
         const list = document.getElementById('prog-list');
         if (!list) return;
         const cards = [...list.querySelectorAll('.pc:not([data-archive])')];
-        const facBtns = [...document.querySelectorAll('.prog__fac')];
-        const fmtBtns = [...document.querySelectorAll('.prog__tabs button')];
+        const facBtns = [...document.querySelectorAll('.prog__tabs button')];
+        const fmtBtns = [];
         const sectors = [];
-        const fmt = null, date = document.getElementById('prog-date');
+        const fmt = document.getElementById('prog-format'), date = null;
         const count = document.getElementById('prog-n'), empty = document.getElementById('prog-empty');
         const state = { fac:'', format:'', date:'' };
         const plural = n => n % 10 === 1 && n % 100 !== 11 ? 'программа' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 'программы' : 'программ';

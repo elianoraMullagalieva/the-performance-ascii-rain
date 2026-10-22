@@ -1727,7 +1727,7 @@
 
       // ───────── Шапка зоны: цвет по блоку под ней ─────────
       safe('chrome', () => {
-        const shell = document.querySelector('#zone-chrome');
+        const shell = document.querySelector('#zone-chrome'), heroEl = document.querySelector('.hero');
         const blocks = [...zone.querySelectorAll('[data-theme]')];
         if (!shell) return;
         const manifest = document.getElementById('manifest-track');
@@ -1750,7 +1750,9 @@
             const box = block.getBoundingClientRect();
             if (box.top <= 56 && box.bottom > 56) { theme = block.dataset.theme; hide = block.dataset.chrome === 'hide'; break; }
           }
-          shell.classList.toggle('is-hidden', hide);
+          // Пока виден первый экран (он закреплён под манифестом), его кнопка уже на месте — шапка зоны молчит.
+          const heroShown = heroEl && heroEl.style.visibility !== 'hidden';
+          shell.classList.toggle('is-hidden', hide || heroShown);
           const dark = theme === 'dark';
           if (dark !== onDark) { onDark = dark; shell.classList.toggle('chrome--dark', !dark); }
         });
