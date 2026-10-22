@@ -659,19 +659,23 @@
       .peers__cue-tip { animation:none !important; }
     }
 
-    /* v11: выключатель меню на первом экране. Без меню — бургер у кнопки «Запросить участие». */
-    .menu-switch { position:absolute; z-index:4; left:var(--edge-x); top:50%; display:flex; align-items:center; gap:10px; transform:translateY(-50%) rotate(-90deg); transform-origin:left center; margin-top:60px; cursor:pointer; user-select:none; font:300 11px/1 Onest,Manrope,sans-serif; letter-spacing:.08em; text-transform:uppercase; color:var(--ink); opacity:.7; }
-    .menu-switch i { display:inline-block; width:30px; height:16px; border:1px solid var(--ink); border-radius:999px; position:relative; }
-    .menu-switch i::after { content:''; position:absolute; top:2px; left:2px; width:10px; height:10px; border-radius:50%; background:var(--ink); transition:transform .3s cubic-bezier(.16,1,.3,1); }
-    html.no-menu .menu-switch i::after { transform:translateX(14px); }
+    .review { position:fixed; z-index:40; left:var(--edge-x); top:42%; display:grid; gap:10px; padding:12px 14px; border:1px solid rgba(22,21,20,.2); border-radius:14px; background:rgba(241,236,236,.92); font:500 11px/1 Manrope,sans-serif; letter-spacing:.04em; color:var(--ink); }
+    .review__row { display:flex; align-items:center; gap:6px; }
+    .review__row--menu,.review__row--marks { display:none; }
+    html:not(.in-manifest) .review__row--menu { display:flex; }
+    html.philosophy-ready .review__row--marks { display:flex; }
+    html.in-manifest:not(.philosophy-ready) .review { display:none; }
+    .review__row .small { width:44px; opacity:.5; font-size:10px; letter-spacing:.08em; text-transform:uppercase; }
+    .review button { padding:7px 10px; border:1px solid rgba(22,21,20,.25); border-radius:999px; background:transparent; color:var(--ink); font:inherit; cursor:pointer; }
+    .review button.is-on { background:var(--ink); color:var(--bg-light); border-color:var(--ink); }
     .menu-burger { display:none; position:absolute; z-index:4; top:calc(var(--edge-y) + 12px); right:calc(var(--edge-x) + 224px + 18px); flex-direction:column; gap:6px; width:26px; padding:0; border:0; background:transparent; cursor:pointer; }
     .menu-burger i { display:block; width:26px; height:1px; background:var(--ink); }
     .menu-burger i:nth-child(2) { width:16px; margin-left:auto; }
     html.no-menu .hero .menu { display:none; }
     html.no-menu .menu-burger { display:flex; }
     html.no-menu .hero.menu-open .menu { position:absolute; z-index:5; top:calc(var(--edge-y) + 64px); right:var(--edge-x); left:auto; display:grid; grid-template-columns:repeat(2,minmax(140px,1fr)); width:auto; gap:22px 36px; padding:22px 26px; background:rgba(241,236,236,.97); border:1px solid rgba(22,21,20,.25); transform:none; }
-    .hero.is-handoff .menu-switch,.hero.is-handoff .menu-burger { opacity:0; pointer-events:none; transition:opacity .4s; }
-    @media (max-width:960px) { .menu-switch,.menu-burger { display:none !important; } }
+    .hero.is-handoff .menu-burger { opacity:0; pointer-events:none; }
+    @media (max-width:960px) { .review,.menu-burger { display:none !important; } }
   </style>
 </head>
 <body>
@@ -683,8 +687,7 @@
   <main class="hero">
     <button class="menu-toggle" type="button" aria-label="Открыть меню" aria-expanded="false"><i></i><i></i><i></i></button>
     <a class="brand" href="#" aria-label="The Performance — на главную"><img class="brand__art" src="HERO/10%20%E2%80%94%20EYE/%D0%9B%D0%9E%D0%93%D0%9E%D0%9B%D0%9E%D0%93%D0%9E.svg" alt=""></a>
-        <label class="menu-switch" id="menu-switch"><span>меню</span><i></i><span>без меню</span></label>
-    <button class="menu-burger" id="menu-burger" type="button" aria-label="Открыть меню" aria-expanded="false"><i></i><i></i><i></i></button>
+        <button class="menu-burger" id="menu-burger" type="button" aria-label="Открыть меню" aria-expanded="false"><i></i><i></i><i></i></button>
     <nav class="menu" aria-label="Основная навигация"><div class="menu__group"><b>Институт</b><a class="active" href="#">Манифест</a><a href="#">Методология</a></div><div class="menu__group"><b>Развитие</b><a href="#">Направления</a><a href="#">Пути</a></div><div class="menu__group"><b>Пространство</b><a href="#">События</a><a href="#">Истории</a></div><div class="menu__group"><b>Медиа</b><a href="#">Публикации</a><a href="#">FAQ</a></div></nav>
     <button class="cta" type="button"><span class="cta__label cta__label--desktop">Запросить участие</span><span class="cta__label cta__label--mobile">Участие</span><img class="cta__arrow" src="figma-arrow.svg" alt="" aria-hidden="true"></button>
     <section class="copy" aria-labelledby="hero-title"><p class="eyebrow">The Performance&nbsp;&nbsp;—&nbsp;&nbsp;Est. 2016</p><h1 class="title" id="hero-title"><span class="title__line title__line--primary"><span class="side-note side-note--left"><span>Видеть</span><span>иначе</span></span><span class="title__word">Институт</span><span class="side-note side-note--right"><span>Говорить</span><span>убедительно</span></span></span><span class="title__line title__line--secondary">Культуры <br class="mobile-only">влияния</span></h1></section>
@@ -716,11 +719,6 @@
         <!-- Четвёртый блок уравновешивает композицию. Текст — черновик, согласовать с заказчицей. -->
         <li class="manifest__tenet manifest__tenet--4"><span class="manifest__n" data-n="I — III"><svg viewBox="0 0 32 32" aria-hidden="true"><circle class="mk__ring" cx="16" cy="16" r="14.5"/><circle class="mk__ring mk__ring--in" cx="16" cy="16" r="7.5"/><circle class="mk__dot" cx="16" cy="16" r="1.6"/></svg><svg class="mk-b" viewBox="0 0 32 32" aria-hidden="true"><circle class="mk__arc" cx="16" cy="16" r="13" pathLength="100"/><circle class="mk__arc" cx="16" cy="16" r="8" pathLength="100"/><circle class="mk__arc" cx="16" cy="16" r="3" pathLength="100"/></svg></span><h3 class="manifest__tn"><span class="ln"><span class="ln__i">Одна система</span></span></h3><p class="manifest__td">Принципы не&nbsp;изучаются порознь: каждая программа института работает со&nbsp;всеми тремя&nbsp;— от&nbsp;мысли к&nbsp;слову, от&nbsp;слова к&nbsp;влиянию.</p></li>
       </ol>
-      <!-- Переключатель вариантов для выбора заказчицей (на время согласования). -->
-      <div class="manifest__dev" id="manifest-dev" aria-label="Выбор знака">
-        <span class="small">Выберите знак</span>
-        <button type="button" data-marks="a" title="Кружки с точками">А</button><button type="button" data-marks="b" title="Мини-инфографика">Б</button>
-      </div>
     </section>
   </div>
 
@@ -1226,13 +1224,12 @@
       // Варианты для выбора: заголовок 1–5, знаки А/Б. Выбор хранится в localStorage.
       const titleMode = 3; let marksMode = 'a';                       // заголовок — утверждённый вариант 3
       try { marksMode = localStorage.getItem('tp-marks') || 'a'; } catch (e) {}
-      const dev = document.getElementById('manifest-dev');
       const applyModes = () => {
         stage.className = stage.className.replace(/\btitle-\d\b|\bmarks-[ab]\b/g, '').trim() + ` title-${titleMode} marks-${marksMode}`;
-        dev?.querySelectorAll('button').forEach(b => b.classList.toggle('is-on', b.dataset.title ? +b.dataset.title === titleMode : b.dataset.marks === marksMode));
+        document.querySelectorAll('button[data-marks]').forEach(b => b.classList.toggle('is-on', b.dataset.marks === marksMode));
       };
-      dev?.addEventListener('click', e => {
-        const b = e.target.closest('button'); if (!b) return;
+      document.addEventListener('click', e => {
+        const b = e.target.closest('button[data-marks]'); if (!b) return;
         if (b.dataset.marks) marksMode = b.dataset.marks;
         try { localStorage.setItem('tp-marks', marksMode); } catch (err) {}
         applyModes(); request();
@@ -1321,6 +1318,7 @@
         const cLeave = easeIO(clamp01((leave - .05) / .45));
         if (on !== handoff) {
           handoff = on; hero.classList.toggle('is-handoff', on);
+          root.classList.toggle('in-manifest', on);   // панель согласования: строка «Меню» только на первом экране
           // Пока идёт манифест, стрелка героя не следит за курсором: её угол
           // задаёт только прокрутка. Синтетический pointerleave возвращает её в 0.
           // Вне манифеста герой живёт сам: заставка управляет его прозрачностью
@@ -1338,6 +1336,8 @@
         const drop = easeIO(clamp01((p - .44) / .12));              // компас опускается в центр
         let titleP = clamp01((p - .48) / .17);                      // заголовок: стартует вместе со спуском компаса…
         const tenetP = tenets.map((t, i) => clamp01((p - (.60 + i * .07)) / .11));
+        // «Философия» собрана целиком — можно показывать выбор знака.
+        root.classList.toggle('philosophy-ready', on && tenetP[tenetP.length - 1] >= 1 && leave < .05);
         const out = 1;                                              // блок не гаснет: уходит листом
         // Угловая подпись гаснет на выходе: иначе она проезжает по логотипу героя.
         stage.style.setProperty('--corners', (clamp01((p - .09) / .03) * clamp01(1 + exit / 140)).toFixed(3));
@@ -1755,15 +1755,18 @@
       flush();
     })();
   </script>
+  <div class="review" id="review" aria-label="Варианты на согласование">
+    <div class="review__row review__row--menu"><span class="small">Меню</span><button type="button" data-menu="on">с меню</button><button type="button" data-menu="off">без меню</button></div>
+    <div class="review__row review__row--marks"><span class="small">Знак</span><button type="button" data-marks="a">А</button><button type="button" data-marks="b">Б</button></div>
+  </div>
 
   <script>
-    // v11: выключатель «меню / без меню» (запоминается) и бургер рядом с кнопкой.
+    // Панель согласования: меню с/без (запоминается), бургер у кнопки.
     (() => {
-      const root = document.documentElement, hero = document.querySelector('.hero');
-      const sw = document.getElementById('menu-switch'), burger = document.getElementById('menu-burger');
+      const root = document.documentElement, hero = document.querySelector('.hero'), burger = document.getElementById('menu-burger');
       let off = false; try { off = localStorage.getItem('tp-nomenu') === '1'; } catch (e) {}
-      const apply = () => { root.classList.toggle('no-menu', off); if (!off) hero.classList.remove('menu-open'); };
-      sw?.addEventListener('click', () => { off = !off; try { localStorage.setItem('tp-nomenu', off ? '1' : '0'); } catch (e) {} apply(); });
+      const apply = () => { root.classList.toggle('no-menu', off); if (!off) hero.classList.remove('menu-open'); document.querySelectorAll('button[data-menu]').forEach(b => b.classList.toggle('is-on', (b.dataset.menu === 'off') === off)); };
+      document.addEventListener('click', e => { const b = e.target.closest('button[data-menu]'); if (!b) return; off = b.dataset.menu === 'off'; try { localStorage.setItem('tp-nomenu', off ? '1' : '0'); } catch (err) {} apply(); });
       burger?.addEventListener('click', () => { const open = hero.classList.toggle('menu-open'); burger.setAttribute('aria-expanded', String(open)); });
       apply();
     })();
