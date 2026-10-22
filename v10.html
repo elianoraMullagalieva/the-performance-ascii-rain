@@ -726,7 +726,8 @@
     .faces__ring--b .face__who-t { display:grid; line-height:1.15; min-width:0; }
     .faces__ring--b .face__who-t b { font:500 var(--fz-small)/1.2 Manrope,sans-serif; }
     .faces__ring--b .face__who-t .small { opacity:.55; text-transform:none; letter-spacing:.02em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .faces__ring--b .face__role--b { position:static; margin-left:auto; display:inline-block; flex:0 1 auto; max-width:48%; }
+    .faces__ring--b .face__role--b { display:none; }   /* роль уже под именем сверху */
+    .faces__ring--b .face__who-t .small { white-space:normal; overflow:visible; }
     /* ── Вариант В (референс «Sophie Bennett», тёмная цельная): фото сверху, карточка тёмная,
        текст светлый, таблетка-контур. ── */
     .faces__ring--c .face { background:#111111; color:var(--light); border-color:rgba(239,234,228,.12); }
