@@ -447,6 +447,8 @@
        заголовок и меню и поднимает компас, без холостого хода. */
     /* Длина трека: содержание кончается на 88% пути, дальше — не больше ~45vh
        холостого хода, и лист уезжает вверх вместе с компасом. */
+    /* Дорожка лежит поверх первого экрана и не должна перехватывать курсор (переключатели — auto). */
+    .manifest-track { pointer-events:none; }
     .manifest-track { position:relative; z-index:2; height:730vh; height:730svh; margin-top:-100vh; margin-top:-100svh; }
     /* Сцена прозрачна и не ловит курсор: под ней первый экран со своей шапкой. */
     .manifest { position:sticky; top:0; height:100vh; height:100svh; overflow:hidden; background:transparent; color:var(--ink); pointer-events:none; }
@@ -699,10 +701,8 @@
         <li class="manifest__tenet manifest__tenet--4"><span class="manifest__n" data-n="I — III"><svg viewBox="0 0 32 32" aria-hidden="true"><circle class="mk__ring" cx="16" cy="16" r="14.5"/><circle class="mk__ring mk__ring--in" cx="16" cy="16" r="7.5"/><circle class="mk__dot" cx="16" cy="16" r="1.6"/></svg><svg class="mk-b" viewBox="0 0 32 32" aria-hidden="true"><circle class="mk__arc" cx="16" cy="16" r="13" pathLength="100"/><circle class="mk__arc" cx="16" cy="16" r="8" pathLength="100"/><circle class="mk__arc" cx="16" cy="16" r="3" pathLength="100"/></svg></span><h3 class="manifest__tn"><span class="ln"><span class="ln__i">Одна система</span></span></h3><p class="manifest__td">Принципы не&nbsp;изучаются порознь: каждая программа института работает со&nbsp;всеми тремя&nbsp;— от&nbsp;мысли к&nbsp;слову, от&nbsp;слова к&nbsp;влиянию.</p></li>
       </ol>
       <!-- Переключатель вариантов для выбора заказчицей (на время согласования). -->
-      <div class="manifest__dev" id="manifest-dev" aria-label="Варианты анимации">
-        <span class="small">Заголовок</span>
-        <button type="button" data-title="1" title="Морфинг из размытия">1</button><button type="button" data-title="2" title="Снизу вверх из-под маски">2</button><button type="button" data-title="3" title="Буквы сходятся из разлёта">3</button><button type="button" data-title="4" title="Каскад от центра с наклоном">4</button><button type="button" data-title="5" title="Оседание из масштаба">5</button>
-        <span class="small">Знаки</span>
+      <div class="manifest__dev" id="manifest-dev" aria-label="Выбор знака">
+        <span class="small">Выберите знак</span>
         <button type="button" data-marks="a" title="Кружки с точками">А</button><button type="button" data-marks="b" title="Мини-инфографика">Б</button>
       </div>
     </section>
@@ -1251,8 +1251,8 @@
       });
       const keys = words.filter(w => w.classList.contains('is-key'));
       // Варианты для выбора: заголовок 1–5, знаки А/Б. Выбор хранится в localStorage.
-      let titleMode = 3, marksMode = 'a';
-      try { titleMode = +(localStorage.getItem('tp-title') || 3) || 3; marksMode = localStorage.getItem('tp-marks') || 'a'; } catch (e) {}
+      const titleMode = 3; let marksMode = 'a';                       // заголовок — утверждённый вариант 3
+      try { marksMode = localStorage.getItem('tp-marks') || 'a'; } catch (e) {}
       const dev = document.getElementById('manifest-dev');
       const applyModes = () => {
         stage.className = stage.className.replace(/\btitle-\d\b|\bmarks-[ab]\b/g, '').trim() + ` title-${titleMode} marks-${marksMode}`;
@@ -1260,8 +1260,8 @@
       };
       dev?.addEventListener('click', e => {
         const b = e.target.closest('button'); if (!b) return;
-        if (b.dataset.title) titleMode = +b.dataset.title; else marksMode = b.dataset.marks;
-        try { localStorage.setItem('tp-title', titleMode); localStorage.setItem('tp-marks', marksMode); } catch (err) {}
+        if (b.dataset.marks) marksMode = b.dataset.marks;
+        try { localStorage.setItem('tp-marks', marksMode); } catch (err) {}
         applyModes(); request();
       });
       const letters = [...title.textContent].map(ch => { const l = document.createElement('span'); l.className = 'l'; l.textContent = ch; l.style.transformOrigin = '50% 100%'; return l; });
