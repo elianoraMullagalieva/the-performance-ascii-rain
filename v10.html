@@ -650,32 +650,39 @@
   <style id="rest-styles">
 
     /* ───────── 1. Среда — «кольцо → ряд» ─────────
-       Карточки стоят в 0,0 и двигаются только transform; на кольце они
-       квадратные (clip-path по фото), в ряду — 3:4 с подписью под фото.
-       Высоту дорожки пишет скрипт (--faces-run). */
-    .faces { position:relative; height:var(--faces-run,420vh); }
+       Карточка стоит в 0,0 и двигается только transform; на кольце clip-path
+       оставляет от неё квадрат фото, в ряду клип раскрывается до всей карточки.
+       Высоту дорожки и ширину карточки пишет скрипт. Теней нет — тонкая линия. */
+    /* Дорожка начинается на экран раньше: кольцо собирается, пока лист «Философии»
+       ещё уезжает, — пустого экрана между блоками нет. */
+    .faces { position:relative; height:var(--faces-run,420vh); margin-top:-100vh; margin-top:-100svh; }
     .faces__stage { position:sticky; top:0; height:100vh; height:100svh; overflow:hidden; }
     .faces__ring { position:absolute; inset:0; visibility:hidden; }
     .faces__ring.is-on { visibility:visible; }
-    .face { position:absolute; left:0; top:0; margin:0; width:var(--card-w,300px); height:var(--card-h,400px); opacity:0; transform-origin:50% 50%; will-change:transform,opacity; }
-    .face img { display:block; width:100%; height:100%; object-fit:cover; border-radius:14px; background:var(--graphite); }
-    /* Подпись под карточкой: имя, роль, мысль — тем же Manrope, что и весь текст. */
-    .face__cap { position:absolute; left:0; right:0; top:calc(100% + 14px); display:grid; gap:4px; pointer-events:none; }
-    .face__name { font:400 clamp(.95rem,.82rem + .36vw,1.2rem)/1.15 Anticva,Georgia,serif; letter-spacing:.03em; text-transform:uppercase; }
-    .face__role { opacity:.55; }
-    .face__quote { margin-top:8px; padding-top:10px; border-top:1px solid var(--rule-c); font:300 var(--fz-text)/1.42 Manrope,sans-serif; letter-spacing:.01em; text-wrap:pretty; }
-    .face__cap > span { opacity:0; transform:translate3d(0,.6em,0); transition:opacity .3s var(--ease),transform .3s var(--ease),filter .3s var(--ease); }
-    .faces__ring.is-row .face__cap > span { filter:blur(6px); }
-    .faces__ring.is-captioned .face__cap > span { opacity:1; transform:none; filter:none; transition-duration:.9s; transition-delay:calc(var(--slot,0) * 100ms + var(--line,0) * 70ms); }
-    .face__cap > span:nth-child(2) { --line:1; } .face__cap > span:nth-child(3) { --line:2; }
-    /* Подпись сцены — внизу слева, как угловые слова манифеста; появляется с рядом. */
+    .face { position:absolute; left:0; top:0; margin:0; width:var(--card-w,260px); box-sizing:border-box; padding:10px 10px 14px; display:grid; gap:14px; border-radius:14px; border:1px solid rgba(22,21,20,.12); background:var(--light); color:var(--ink); opacity:0; transform-origin:50% 50%; will-change:transform,opacity,clip-path; }
+    .face:focus-visible { outline:1px solid var(--ink); outline-offset:3px; }
+    .face__photo { aspect-ratio:1 / 1.04; border-radius:10px; overflow:hidden; background:var(--graphite); }
+    .face__photo img { display:block; width:100%; height:100%; object-fit:cover; object-position:50% 12%; }
+    .face__body { display:grid; gap:8px; padding:0 6px; }
+    .face__name { display:inline-flex; align-items:center; gap:7px; font:500 clamp(.95rem,.8rem + .42vw,1.2rem)/1.2 Manrope,sans-serif; letter-spacing:-.015em; }
+    .face__seal { width:14px; height:14px; flex:none; fill:none; stroke:currentColor; stroke-width:1; opacity:.8; }
+    .face__seal-dot { fill:currentColor; stroke:none; }
+    .face__quote { font:300 var(--fz-small)/1.4 Manrope,sans-serif; font-size:clamp(.8rem,.72rem + .2vw,.9rem); letter-spacing:.005em; opacity:.62; text-wrap:pretty; min-height:2.8em; display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; overflow:hidden; }
+    .face__foot { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:6px; }
+    .face__micro { display:inline-flex; align-items:center; gap:6px; opacity:.6; }
+    .face__micro .small { text-transform:none; letter-spacing:.02em; }
+    .face__rose { width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:1; transform-origin:50% 50%; animation:face-rose 16s linear infinite; }
+    .face__rose-dot { fill:currentColor; stroke:none; }
+    @keyframes face-rose { to { transform:rotate(360deg); } }
+    .face__role { flex:0 1 auto; min-width:0; padding:8px 12px; border-radius:999px; background:var(--ink); color:var(--light); font:500 var(--fz-small)/1.15 Manrope,sans-serif; letter-spacing:.01em; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .faces__label { position:absolute; left:var(--edge-x); bottom:var(--edge-y); opacity:0; transition:opacity .9s var(--ease) .3s; }
     .faces__stage.is-captioned .faces__label { opacity:.6; }
     @media (max-width:780px) {
-      .face__quote { display:none; }
+      .face { padding:8px 8px 12px; gap:12px; }
     }
     @media (prefers-reduced-motion:reduce) {
-      .face__cap > span,.faces__label { transition:none; }
+      .face__rose { animation:none; }
+      .faces__label { transition:none; }
     }
 
     /* ───────── 3. Программы ─────────
@@ -893,20 +900,77 @@
          подпись под портретом в журнале, текст не ложится на лицо. Восемь
          человек — восемь карточек, без повторов. -->
     <!-- 1. Среда единомышленников — «кольцо → ряд» (по коду Sur(face), прислан Эли 22.10).
-         Без заголовка: сразу после «Философии» портреты летают кольцом и растут,
-         затем выстраиваются в ряд, и только тогда появляются имя, роль, мысль.
-         Дорожка — высота прокрутки; всё видимое живёт в прилипшей сцене. -->
+         Без заголовка: после «Философии» карточки летают кольцом (видно только квадрат
+         фото), растут, выстраиваются в ряд и раскрываются целиком. Карточка — по второму
+         референсу Эли (22.10, цельная): фото сверху, имя со знаком, короткая мысль,
+         внизу мини-компас и тёмная таблетка с родом деятельности. Теней нет. -->
     <section class="faces" id="peers" data-theme="light" aria-label="Среда единомышленников">
       <div class="faces__stage" id="faces-stage">
         <div class="faces__ring" id="faces-ring">
-          <figure class="face" data-focus=".2"><img src="people/p1-600.jpg" srcset="people/p1-600.jpg 600w, people/p1-900.jpg 900w" sizes="(max-width:780px) 72vw, 25vw" alt="" decoding="async" draggable="false"><figcaption class="face__cap"><span class="face__name">Александр Ровный</span><span class="small face__role">Генеральный директор</span><span class="face__quote">«Самое трудное — замолчать вовремя. Здесь учат паузе как инструменту»</span></figcaption></figure>
-          <figure class="face" data-focus=".2"><img src="people/p2-600.jpg" srcset="people/p2-600.jpg 600w, people/p2-900.jpg 900w" sizes="(max-width:780px) 72vw, 25vw" alt="" decoding="async" draggable="false"><figcaption class="face__cap"><span class="face__name">Марк Лёвин</span><span class="small face__role">Предприниматель, основатель бренда</span><span class="face__quote">«Я перестал готовить речь и начал готовить мысль. Слова приходят сами»</span></figcaption></figure>
-          <figure class="face" data-focus=".2"><img src="people/p3-600.jpg" srcset="people/p3-600.jpg 600w, people/p3-900.jpg 900w" sizes="(max-width:780px) 72vw, 25vw" alt="" decoding="async" draggable="false"><figcaption class="face__cap"><span class="face__name">Анна Светлова</span><span class="small face__role">Руководитель направления</span><span class="face__quote">«Аргумент работает, когда его слышат, а не когда он верен»</span></figcaption></figure>
-          <figure class="face" data-focus=".2"><img src="people/p4-600.jpg" srcset="people/p4-600.jpg 600w, people/p4-900.jpg 900w" sizes="(max-width:780px) 72vw, 25vw" alt="" decoding="async" draggable="false"><figcaption class="face__cap"><span class="face__name">Илья Берг</span><span class="small face__role">Исследователь, преподаватель</span><span class="face__quote">«Я думал, что говорю понятно. Оказалось, понятно — это когда меняется решение собеседника»</span></figcaption></figure>
-          <figure class="face" data-focus=".2"><img src="people/p5-600.jpg" srcset="people/p5-600.jpg 600w, people/p5-900.jpg 900w" sizes="(max-width:780px) 72vw, 25vw" alt="" decoding="async" draggable="false"><figcaption class="face__cap"><span class="face__name">Михаил Градов</span><span class="small face__role">Архитектор</span><span class="face__quote">«Присутствие — это не громкость. Это точность внимания»</span></figcaption></figure>
-          <figure class="face" data-focus=".2"><img src="people/p6-600.jpg" srcset="people/p6-600.jpg 600w, people/p6-900.jpg 900w" sizes="(max-width:780px) 72vw, 25vw" alt="" decoding="async" draggable="false"><figcaption class="face__cap"><span class="face__name">Артём Снегирёв</span><span class="small face__role">Продюсер</span><span class="face__quote">«Влияние начинается там, где я беру ответственность за сказанное»</span></figcaption></figure>
-          <figure class="face" data-focus=".2"><img src="people/p7-600.jpg" srcset="people/p7-600.jpg 600w, people/p7-900.jpg 900w" sizes="(max-width:780px) 72vw, 25vw" alt="" decoding="async" draggable="false"><figcaption class="face__cap"><span class="face__name">Вера Долина</span><span class="small face__role">Юрист, партнёр</span><span class="face__quote">«Переговоры выигрывает не тот, кто говорит больше, а тот, кто точнее формулирует»</span></figcaption></figure>
-          <figure class="face" data-focus=".2"><img src="people/p8-600.jpg" srcset="people/p8-600.jpg 600w, people/p8-900.jpg 900w" sizes="(max-width:780px) 72vw, 25vw" alt="" decoding="async" draggable="false"><figcaption class="face__cap"><span class="face__name">Полина Март</span><span class="small face__role">Врач, руководитель клиники</span><span class="face__quote">«Я научилась слышать вопрос до того, как его задали»</span></figcaption></figure>
+          <figure class="face" data-focus=".08" tabindex="0">
+            <div class="face__photo"><img src="people/p1-600.jpg" srcset="people/p1-600.jpg 600w, people/p1-900.jpg 900w" sizes="(max-width:780px) 70vw, 20vw" alt="" decoding="async" draggable="false"></div>
+            <figcaption class="face__body">
+              <span class="face__name">Александр Ровный<svg class="face__seal" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.6"/><circle cx="8" cy="8" r="1.5" class="face__seal-dot"/></svg></span>
+              <span class="face__quote">«Самое трудное — замолчать вовремя»</span>
+              <span class="face__foot"><span class="face__micro"><svg class="face__rose" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7.5"/><circle cx="9" cy="9" r="4" stroke-dasharray="1 2.2"/><path d="M9 .8v2.4M9 14.8v2.4M.8 9h2.4M14.8 9h2.4"/><circle cx="9" cy="9" r="1.1" class="face__rose-dot"/></svg><span class="small">среда</span></span><span class="face__role">Директор</span></span>
+            </figcaption>
+          </figure>
+          <figure class="face" data-focus=".08" tabindex="0">
+            <div class="face__photo"><img src="people/p2-600.jpg" srcset="people/p2-600.jpg 600w, people/p2-900.jpg 900w" sizes="(max-width:780px) 70vw, 20vw" alt="" decoding="async" draggable="false"></div>
+            <figcaption class="face__body">
+              <span class="face__name">Марк Лёвин<svg class="face__seal" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.6"/><circle cx="8" cy="8" r="1.5" class="face__seal-dot"/></svg></span>
+              <span class="face__quote">«Готовлю не речь, а мысль — слова приходят сами»</span>
+              <span class="face__foot"><span class="face__micro"><svg class="face__rose" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7.5"/><circle cx="9" cy="9" r="4" stroke-dasharray="1 2.2"/><path d="M9 .8v2.4M9 14.8v2.4M.8 9h2.4M14.8 9h2.4"/><circle cx="9" cy="9" r="1.1" class="face__rose-dot"/></svg><span class="small">среда</span></span><span class="face__role">Предприниматель</span></span>
+            </figcaption>
+          </figure>
+          <figure class="face" data-focus=".08" tabindex="0">
+            <div class="face__photo"><img src="people/p3-600.jpg" srcset="people/p3-600.jpg 600w, people/p3-900.jpg 900w" sizes="(max-width:780px) 70vw, 20vw" alt="" decoding="async" draggable="false"></div>
+            <figcaption class="face__body">
+              <span class="face__name">Анна Светлова<svg class="face__seal" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.6"/><circle cx="8" cy="8" r="1.5" class="face__seal-dot"/></svg></span>
+              <span class="face__quote">«Аргумент работает, когда его слышат, а не когда он верен»</span>
+              <span class="face__foot"><span class="face__micro"><svg class="face__rose" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7.5"/><circle cx="9" cy="9" r="4" stroke-dasharray="1 2.2"/><path d="M9 .8v2.4M9 14.8v2.4M.8 9h2.4M14.8 9h2.4"/><circle cx="9" cy="9" r="1.1" class="face__rose-dot"/></svg><span class="small">среда</span></span><span class="face__role">Руководитель</span></span>
+            </figcaption>
+          </figure>
+          <figure class="face" data-focus=".08" tabindex="0">
+            <div class="face__photo"><img src="people/p4-600.jpg" srcset="people/p4-600.jpg 600w, people/p4-900.jpg 900w" sizes="(max-width:780px) 70vw, 20vw" alt="" decoding="async" draggable="false"></div>
+            <figcaption class="face__body">
+              <span class="face__name">Илья Берг<svg class="face__seal" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.6"/><circle cx="8" cy="8" r="1.5" class="face__seal-dot"/></svg></span>
+              <span class="face__quote">«Понятно — это когда меняется решение собеседника»</span>
+              <span class="face__foot"><span class="face__micro"><svg class="face__rose" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7.5"/><circle cx="9" cy="9" r="4" stroke-dasharray="1 2.2"/><path d="M9 .8v2.4M9 14.8v2.4M.8 9h2.4M14.8 9h2.4"/><circle cx="9" cy="9" r="1.1" class="face__rose-dot"/></svg><span class="small">среда</span></span><span class="face__role">Исследователь</span></span>
+            </figcaption>
+          </figure>
+          <figure class="face" data-focus=".08" tabindex="0">
+            <div class="face__photo"><img src="people/p5-600.jpg" srcset="people/p5-600.jpg 600w, people/p5-900.jpg 900w" sizes="(max-width:780px) 70vw, 20vw" alt="" decoding="async" draggable="false"></div>
+            <figcaption class="face__body">
+              <span class="face__name">Михаил Градов<svg class="face__seal" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.6"/><circle cx="8" cy="8" r="1.5" class="face__seal-dot"/></svg></span>
+              <span class="face__quote">«Присутствие — не громкость, а точность внимания»</span>
+              <span class="face__foot"><span class="face__micro"><svg class="face__rose" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7.5"/><circle cx="9" cy="9" r="4" stroke-dasharray="1 2.2"/><path d="M9 .8v2.4M9 14.8v2.4M.8 9h2.4M14.8 9h2.4"/><circle cx="9" cy="9" r="1.1" class="face__rose-dot"/></svg><span class="small">среда</span></span><span class="face__role">Архитектор</span></span>
+            </figcaption>
+          </figure>
+          <figure class="face" data-focus=".08" tabindex="0">
+            <div class="face__photo"><img src="people/p6-600.jpg" srcset="people/p6-600.jpg 600w, people/p6-900.jpg 900w" sizes="(max-width:780px) 70vw, 20vw" alt="" decoding="async" draggable="false"></div>
+            <figcaption class="face__body">
+              <span class="face__name">Артём Снегирёв<svg class="face__seal" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.6"/><circle cx="8" cy="8" r="1.5" class="face__seal-dot"/></svg></span>
+              <span class="face__quote">«Влияние начинается с ответственности за сказанное»</span>
+              <span class="face__foot"><span class="face__micro"><svg class="face__rose" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7.5"/><circle cx="9" cy="9" r="4" stroke-dasharray="1 2.2"/><path d="M9 .8v2.4M9 14.8v2.4M.8 9h2.4M14.8 9h2.4"/><circle cx="9" cy="9" r="1.1" class="face__rose-dot"/></svg><span class="small">среда</span></span><span class="face__role">Продюсер</span></span>
+            </figcaption>
+          </figure>
+          <figure class="face" data-focus=".08" tabindex="0">
+            <div class="face__photo"><img src="people/p7-600.jpg" srcset="people/p7-600.jpg 600w, people/p7-900.jpg 900w" sizes="(max-width:780px) 70vw, 20vw" alt="" decoding="async" draggable="false"></div>
+            <figcaption class="face__body">
+              <span class="face__name">Вера Долина<svg class="face__seal" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.6"/><circle cx="8" cy="8" r="1.5" class="face__seal-dot"/></svg></span>
+              <span class="face__quote">«Выигрывает тот, кто точнее формулирует»</span>
+              <span class="face__foot"><span class="face__micro"><svg class="face__rose" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7.5"/><circle cx="9" cy="9" r="4" stroke-dasharray="1 2.2"/><path d="M9 .8v2.4M9 14.8v2.4M.8 9h2.4M14.8 9h2.4"/><circle cx="9" cy="9" r="1.1" class="face__rose-dot"/></svg><span class="small">среда</span></span><span class="face__role">Юрист, партнёр</span></span>
+            </figcaption>
+          </figure>
+          <figure class="face" data-focus=".08" tabindex="0">
+            <div class="face__photo"><img src="people/p8-600.jpg" srcset="people/p8-600.jpg 600w, people/p8-900.jpg 900w" sizes="(max-width:780px) 70vw, 20vw" alt="" decoding="async" draggable="false"></div>
+            <figcaption class="face__body">
+              <span class="face__name">Полина Март<svg class="face__seal" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.6"/><circle cx="8" cy="8" r="1.5" class="face__seal-dot"/></svg></span>
+              <span class="face__quote">«Слышать вопрос до того, как его задали»</span>
+              <span class="face__foot"><span class="face__micro"><svg class="face__rose" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7.5"/><circle cx="9" cy="9" r="4" stroke-dasharray="1 2.2"/><path d="M9 .8v2.4M9 14.8v2.4M.8 9h2.4M14.8 9h2.4"/><circle cx="9" cy="9" r="1.1" class="face__rose-dot"/></svg><span class="small">среда</span></span><span class="face__role">Врач</span></span>
+            </figcaption>
+          </figure>
         </div>
         <p class="small faces__label" id="faces-label" aria-hidden="true">Среда единомышленников</p>
       </div>
@@ -951,7 +1015,7 @@
         </div>
         <div class="prog__more a-fade" style="--d:440ms">
           <label class="prog__sel"><span class="small">Формат</span><select id="prog-format"><option value="">Любой</option><option>Курс</option><option>Мастерская</option><option>Интенсив</option><option>Индивидуально</option></select></label>
-          <label class="prog__sel"><span class="small">Набор</span><select id="prog-date"><option value="">Любая дата</option><option value="2026-11">Ноябрь</option><option value="2026-12">Декабрь</option><option value="2027-01">Январь</option><option value="2027-02">Февраль</option></select></label>
+          <label class="prog__sel"><span class="small">Набор</span><select id="prog-date"><option value="">Любая дата</option><option value="2026-10">Октябрь</option><option value="2026-11">Ноябрь</option><option value="2026-12">Декабрь</option></select></label>
           <p class="small prog__count"><span id="prog-n">7</span>&nbsp;программ</p>
         </div>
       </div>
@@ -959,83 +1023,83 @@
       <!-- Единая карточка: фото, название, факультет, ценность, формат, длительность,
            ближайший набор, стоимость, ссылка. Завершённые — data-archive, не показываются. -->
       <ul class="g prog__list" id="prog-list">
-        <li class="card" data-fac="1" data-format="Курс" data-date="2026-11" data-in>
-          <a class="card__shot a-clip" href="#"><div class="ph"><span class="small">Фото · 4:5 · 1200×1500<br>голос, запись, микрофон как инструмент</span></div></a>
+        <li class="card" data-fac="1" data-format="Мастерская" data-date="2026-11" data-in>
+          <a class="card__shot a-clip" href="https://theperformance.ru/workshop/golos-i-rech/" target="_blank" rel="noopener"><div class="ph"><span class="small">Фото · 4:5<br>голос, микрофон, запись</span></div></a>
           <div class="card__body">
             <p class="small card__fac">I&nbsp;·&nbsp;Культура мысли и слова</p>
-            <h3 class="card__name a-fade" style="--d:120ms">Перформанс.Речь</h3>
-            <p class="t card__value a-fade" style="--d:200ms">Речь, которая развивает интеллект, а&nbsp;не&nbsp;украшает его: логика, точность, голос.</p>
-            <dl class="card__meta a-fade" style="--d:280ms"><dt>Формат</dt><dd>Курс</dd><dt>Длительность</dt><dd>8 недель</dd><dt>Ближайший набор</dt><dd>Ноябрь 2026</dd><dt>Стоимость</dt><dd>уточняется</dd></dl>
-            <a class="card__link a-fade" style="--d:360ms" href="#">Подробнее о программе <img src="figma-arrow.svg" alt=""></a>
+            <h3 class="card__name a-fade" style="--d:120ms">Голос и&nbsp;речь</h3>
+            <p class="t card__value a-fade" style="--d:200ms">Дыхание, тембр, дикция: голос, который держит внимание зала без усилия.</p>
+            <dl class="card__meta a-fade" style="--d:280ms"><dt>Формат</dt><dd>Мастерская</dd><dt>Длительность</dt><dd>от 5 недель</dd><dt>Ближайший набор</dt><dd>ноябрь 2026</dd><dt>Преподаватель</dt><dd>В. Мархасев</dd><dt>Стоимость</dt><dd>по запросу</dd></dl>
+            <a class="card__link a-fade" style="--d:360ms" href="https://theperformance.ru/workshop/golos-i-rech/" target="_blank" rel="noopener">Подробнее о программе <img src="figma-arrow.svg" alt=""></a>
+          </div>
+        </li>
+        <li class="card" data-fac="1" data-format="Курс" data-date="2026-11" data-in>
+          <a class="card__shot a-clip" href="https://theperformance.ru/courses/" target="_blank" rel="noopener"><div class="ph"><span class="small">Фото · 4:5<br>лист, перо, рукопись</span></div></a>
+          <div class="card__body">
+            <p class="small card__fac">I&nbsp;·&nbsp;Культура мысли и слова</p>
+            <h3 class="card__name a-fade" style="--d:120ms">Логика речи и&nbsp;сторителлинг</h3>
+            <p class="t card__value a-fade" style="--d:200ms">Структура мысли и история, которую слушают до&nbsp;конца. Единственный формат с&nbsp;онлайн-занятиями.</p>
+            <dl class="card__meta a-fade" style="--d:280ms"><dt>Формат</dt><dd>Курс</dd><dt>Длительность</dt><dd>5–12 недель · ≈5 ч/нед</dd><dt>Ближайший набор</dt><dd>ноябрь 2026</dd><dt>Стоимость</dt><dd>по запросу</dd></dl>
+            <a class="card__link a-fade" style="--d:360ms" href="https://theperformance.ru/courses/" target="_blank" rel="noopener">Подробнее о программе <img src="figma-arrow.svg" alt=""></a>
           </div>
         </li>
         <li class="card" data-fac="1" data-format="Мастерская" data-date="2026-12" data-in>
-          <a class="card__shot a-clip" href="#"><div class="ph"><span class="small">Фото · 4:5<br>лист бумаги, перо, рукопись</span></div></a>
+          <a class="card__shot a-clip" href="https://theperformance.ru/workshop/kreativnoe-myshlenie/" target="_blank" rel="noopener"><div class="ph"><span class="small">Фото · 4:5<br>стол, эскизы, свет</span></div></a>
           <div class="card__body">
             <p class="small card__fac">I&nbsp;·&nbsp;Культура мысли и слова</p>
-            <h3 class="card__name a-fade" style="--d:120ms">Перформанс.Левитан</h3>
-            <p class="t card__value a-fade" style="--d:200ms">Сторителлинг и&nbsp;тембр: история, которую слушают до&nbsp;конца.</p>
-            <dl class="card__meta a-fade" style="--d:280ms"><dt>Формат</dt><dd>Мастерская</dd><dt>Длительность</dt><dd>4 встречи</dd><dt>Ближайший набор</dt><dd>Декабрь 2026</dd><dt>Стоимость</dt><dd>уточняется</dd></dl>
-            <a class="card__link a-fade" style="--d:360ms" href="#">Подробнее о программе <img src="figma-arrow.svg" alt=""></a>
+            <h3 class="card__name a-fade" style="--d:120ms">Креативное мышление</h3>
+            <p class="t card__value a-fade" style="--d:200ms">Нестандартные решения и&nbsp;живая импровизация в&nbsp;мысли — до того, как она станет словом.</p>
+            <dl class="card__meta a-fade" style="--d:280ms"><dt>Формат</dt><dd>Мастерская</dd><dt>Длительность</dt><dd>от 5 недель</dd><dt>Ближайший набор</dt><dd>декабрь 2026</dd><dt>Стоимость</dt><dd>по запросу</dd></dl>
+            <a class="card__link a-fade" style="--d:360ms" href="https://theperformance.ru/workshop/kreativnoe-myshlenie/" target="_blank" rel="noopener">Подробнее о программе <img src="figma-arrow.svg" alt=""></a>
           </div>
         </li>
-        <li class="card" data-fac="2" data-format="Интенсив" data-date="2026-11" data-in>
-          <a class="card__shot a-clip" href="#"><div class="ph"><span class="small">Фото · 4:5<br>сцена, свет, пустой зал</span></div></a>
+        <li class="card" data-fac="2" data-format="Курс" data-date="2026-11" data-in>
+          <a class="card__shot a-clip" href="https://theperformance.ru/courses/" target="_blank" rel="noopener"><div class="ph"><span class="small">Фото · 4:5<br>сцена, свет, пустой зал</span></div></a>
           <div class="card__body">
             <p class="small card__fac">II&nbsp;·&nbsp;Психофизика влияния</p>
-            <h3 class="card__name a-fade" style="--d:120ms">Перформанс.Акт</h3>
-            <p class="t card__value a-fade" style="--d:200ms">Физическое раскрепощение и&nbsp;работа со&nbsp;сложной сценической аудиторией.</p>
-            <dl class="card__meta a-fade" style="--d:280ms"><dt>Формат</dt><dd>Интенсив</dd><dt>Длительность</dt><dd>3 дня</dd><dt>Ближайший набор</dt><dd>Ноябрь 2026</dd><dt>Стоимость</dt><dd>уточняется</dd></dl>
-            <a class="card__link a-fade" style="--d:360ms" href="#">Подробнее о программе <img src="figma-arrow.svg" alt=""></a>
+            <h3 class="card__name a-fade" style="--d:120ms">Психофизика лидера</h3>
+            <p class="t card__value a-fade" style="--d:200ms">Актёрская школа Станиславского для руководителя: тело, внимание, присутствие в&nbsp;сложной коммуникации.</p>
+            <dl class="card__meta a-fade" style="--d:280ms"><dt>Формат</dt><dd>Курс</dd><dt>Длительность</dt><dd>до 3 месяцев · ≈5 ч/нед, с&nbsp;19:30</dd><dt>Ближайший набор</dt><dd>ноябрь 2026</dd><dt>Преподаватель</dt><dd>С. Шенталинский</dd><dt>Стоимость</dt><dd>по запросу</dd></dl>
+            <a class="card__link a-fade" style="--d:360ms" href="https://theperformance.ru/courses/" target="_blank" rel="noopener">Подробнее о программе <img src="figma-arrow.svg" alt=""></a>
           </div>
         </li>
-        <li class="card" data-fac="2" data-format="Курс" data-date="2027-01" data-in>
-          <a class="card__shot a-clip" href="#"><div class="ph"><span class="small">Фото · 4:5<br>руки, жест, крупный план</span></div></a>
+        <li class="card" data-fac="2" data-format="Интенсив" data-date="2026-10" data-in>
+          <a class="card__shot a-clip" href="https://theperformance.ru/courses/masterklas/praktikum-psihofizika-vliyaniya/" target="_blank" rel="noopener"><div class="ph"><span class="small">Фото · 4:5<br>репетиция, крупный план</span></div></a>
           <div class="card__body">
             <p class="small card__fac">II&nbsp;·&nbsp;Психофизика влияния</p>
-            <h3 class="card__name a-fade" style="--d:120ms">Перформанс.Психофизика</h3>
-            <p class="t card__value a-fade" style="--d:200ms">Невербальные сигналы, внимание и&nbsp;присутствие в&nbsp;любой коммуникации.</p>
-            <dl class="card__meta a-fade" style="--d:280ms"><dt>Формат</dt><dd>Курс</dd><dt>Длительность</dt><dd>6 недель</dd><dt>Ближайший набор</dt><dd>Январь 2027</dd><dt>Стоимость</dt><dd>уточняется</dd></dl>
-            <a class="card__link a-fade" style="--d:360ms" href="#">Подробнее о программе <img src="figma-arrow.svg" alt=""></a>
+            <h3 class="card__name a-fade" style="--d:120ms">Психофизика влияния</h3>
+            <p class="t card__value a-fade" style="--d:200ms">Практикум по&nbsp;актёрскому мастерству: один вечер, чтобы почувствовать, как работает присутствие.</p>
+            <dl class="card__meta a-fade" style="--d:280ms"><dt>Формат</dt><dd>Интенсив</dd><dt>Длительность</dt><dd>1 вечер · 19:00</dd><dt>Ближайший набор</dt><dd>29 октября 2026</dd><dt>Преподаватель</dt><dd>С. Шенталинский</dd><dt>Стоимость</dt><dd>по запросу</dd></dl>
+            <a class="card__link a-fade" style="--d:360ms" href="https://theperformance.ru/courses/masterklas/praktikum-psihofizika-vliyaniya/" target="_blank" rel="noopener">Подробнее о программе <img src="figma-arrow.svg" alt=""></a>
           </div>
         </li>
         <li class="card" data-fac="2" data-format="Мастерская" data-date="2026-12" data-in>
-          <a class="card__shot a-clip" href="#"><div class="ph"><span class="small">Фото · 4:5<br>стол, два стула, разговор</span></div></a>
+          <a class="card__shot a-clip" href="https://theperformance.ru/workshop/akterskoe-masterstvo/" target="_blank" rel="noopener"><div class="ph"><span class="small">Фото · 4:5<br>руки, жест, движение</span></div></a>
           <div class="card__body">
             <p class="small card__fac">II&nbsp;·&nbsp;Психофизика влияния</p>
-            <h3 class="card__name a-fade" style="--d:120ms">Перформанс.Присутствие</h3>
-            <p class="t card__value a-fade" style="--d:200ms">Контакт и&nbsp;импровизация: как оставаться собой в&nbsp;сложном разговоре.</p>
-            <dl class="card__meta a-fade" style="--d:280ms"><dt>Формат</dt><dd>Мастерская</dd><dt>Длительность</dt><dd>5 встреч</dd><dt>Ближайший набор</dt><dd>Декабрь 2026</dd><dt>Стоимость</dt><dd>уточняется</dd></dl>
-            <a class="card__link a-fade" style="--d:360ms" href="#">Подробнее о программе <img src="figma-arrow.svg" alt=""></a>
+            <h3 class="card__name a-fade" style="--d:120ms">Актёрское мастерство</h3>
+            <p class="t card__value a-fade" style="--d:200ms">Контакт, импровизация и&nbsp;поведение в&nbsp;сложных коммуникациях — через актёрский тренинг.</p>
+            <dl class="card__meta a-fade" style="--d:280ms"><dt>Формат</dt><dd>Мастерская</dd><dt>Длительность</dt><dd>от 5 недель</dd><dt>Ближайший набор</dt><dd>декабрь 2026</dd><dt>Стоимость</dt><dd>по запросу</dd></dl>
+            <a class="card__link a-fade" style="--d:360ms" href="https://theperformance.ru/workshop/akterskoe-masterstvo/" target="_blank" rel="noopener">Подробнее о программе <img src="figma-arrow.svg" alt=""></a>
           </div>
         </li>
-        <li class="card" data-fac="2" data-format="Индивидуально" data-date="2026-11" data-in>
-          <a class="card__shot a-clip" href="#"><div class="ph"><span class="small">Фото · 4:5<br>деталь костюма, фактура ткани</span></div></a>
-          <div class="card__body">
-            <p class="small card__fac">II&nbsp;·&nbsp;Психофизика влияния</p>
-            <h3 class="card__name a-fade" style="--d:120ms">Перформанс.Стиль &amp;&nbsp;Этикет</h3>
-            <p class="t card__value a-fade" style="--d:200ms">Этические рамки и&nbsp;персональный стиль как часть влияния.</p>
-            <dl class="card__meta a-fade" style="--d:280ms"><dt>Формат</dt><dd>Индивидуально</dd><dt>Длительность</dt><dd>по запросу</dd><dt>Ближайший набор</dt><dd>Открыт</dd><dt>Стоимость</dt><dd>уточняется</dd></dl>
-            <a class="card__link a-fade" style="--d:360ms" href="#">Подробнее о программе <img src="figma-arrow.svg" alt=""></a>
-          </div>
-        </li>
-        <li class="card" data-fac="3" data-format="Курс" data-date="2027-02" data-in>
-          <a class="card__shot a-clip" href="#"><div class="ph"><span class="small">Фото · 4:5<br>трибуна, пустая, свет сбоку</span></div></a>
+        <li class="card" data-fac="3" data-format="Индивидуально" data-date="2026-11" data-in>
+          <a class="card__shot a-clip" href="https://theperformance.ru/korporativnoe-obuchenie/" target="_blank" rel="noopener"><div class="ph"><span class="small">Фото · 4:5<br>трибуна, свет сбоку</span></div></a>
           <div class="card__body">
             <p class="small card__fac">III&nbsp;·&nbsp;Публичное лидерство</p>
-            <h3 class="card__name a-fade" style="--d:120ms">Перформанс.Влияние</h3>
-            <p class="t card__value a-fade" style="--d:200ms">Стратегические выступления и&nbsp;публичная роль руководителя.</p>
-            <dl class="card__meta a-fade" style="--d:280ms"><dt>Формат</dt><dd>Курс</dd><dt>Длительность</dt><dd>10 недель</dd><dt>Ближайший набор</dt><dd>Февраль 2027</dd><dt>Стоимость</dt><dd>уточняется</dd></dl>
-            <a class="card__link a-fade" style="--d:360ms" href="#">Подробнее о программе <img src="figma-arrow.svg" alt=""></a>
+            <h3 class="card__name a-fade" style="--d:120ms">Корпоративная программа</h3>
+            <p class="t card__value a-fade" style="--d:200ms">Публичные выступления и&nbsp;деловые коммуникации для команды: модульная программа под задачи компании.</p>
+            <dl class="card__meta a-fade" style="--d:280ms"><dt>Формат</dt><dd>Индивидуально</dd><dt>Длительность</dt><dd>≈100 часов, модульно</dd><dt>Ближайший набор</dt><dd>открыт</dd><dt>Стоимость</dt><dd>по запросу</dd></dl>
+            <a class="card__link a-fade" style="--d:360ms" href="https://theperformance.ru/korporativnoe-obuchenie/" target="_blank" rel="noopener">Подробнее о программе <img src="figma-arrow.svg" alt=""></a>
           </div>
         </li>
-        <!-- Пример завершённой программы: в каталоге не показывается, хранится в архиве. -->
-        <li class="card" data-fac="1" data-format="Интенсив" data-date="2026-05" data-archive hidden>
-          <div class="card__body"><p class="small card__fac">I</p><h3 class="card__name">Перформанс.Голос</h3></div>
+        <!-- Завершённое: в каталоге не показывается, хранится в архиве. -->
+        <li class="card" data-fac="2" data-format="Интенсив" data-date="2026-10" data-archive hidden>
+          <div class="card__body"><p class="small card__fac">II</p><h3 class="card__name">Психофизика влияния · 22 октября</h3></div>
         </li>
       </ul>
       <p class="t prog__empty" id="prog-empty" hidden>По этим условиям наборов сейчас нет. Снимите часть фильтров или <a href="https://t.me/theperformance_assistant">напишите нам</a>&nbsp;— подберём программу.</p>
-      <p class="small prog__levitan a-fade" data-in>LEVITAN&nbsp;— цифровая практика внутри программ и&nbsp;самостоятельный продукт экосистемы. Появится в&nbsp;каталоге отдельно.</p>
+      <p class="small prog__levitan a-fade" data-in>Программы взяты с&nbsp;текущего сайта theperformance.ru и&nbsp;разложены по&nbsp;факультетам; даты набора и&nbsp;стоимость&nbsp;— уточняются у&nbsp;продюсера (30-минутная встреча перед зачислением). LEVITAN&nbsp;— цифровая практика, появится в&nbsp;каталоге отдельно.</p>
     </section>
 
     <!-- 4. Философский клуб — культурная среда как отдельный раздел (не факультет).
@@ -1208,7 +1272,7 @@
       // Перетекание сферы в компас идёт в прежнем темпе: ускорение вдвое
       // спасало не время загрузки (его держали ассеты), а только красоту —
       // и читалось как дёрганое.
-      const TRANSITION = 4500;
+      const TRANSITION = 2800;
       const BG = 0xF1ECEC;
       const INK = '#2B2B29';
       const preloader = document.querySelector('.preloader');
@@ -1506,7 +1570,7 @@
           const handoff = ease(clamp01((e - .70) / .14));
           compass.style.opacity = String(handoff);
           compassNeedle.style.opacity = String(ease(clamp01((e - .80) / .12)));
-          if (!contentRevealStarted && e >= .32) {
+          if (!contentRevealStarted && e >= .44) {
             contentRevealStarted = true;
             hero.classList.add('is-revealing');
             requestAnimationFrame(() => hero.classList.add('is-revealed'));
@@ -2121,67 +2185,75 @@
       // ───────── 1. Среда — «кольцо → ряд» (порт lib/faces.js из Sur(face)) ─────────
       // Состояние выводится из позиции дорожки каждый кадр (назад отыгрывает
       // само); вращение кольца — по времени, только пока сцена на экране.
+      // На кольце clip-path оставляет от карточки квадрат фото; в ряду клип
+      // раскрывается, и карточка показывается целиком.
       safe('faces', () => {
         const section = document.getElementById('peers'), stage = document.getElementById('faces-stage'), ring = document.getElementById('faces-ring');
         if (!section || !stage || !ring) return;
         const cards = [...ring.querySelectorAll('.face')], N = cards.length;
         if (!N) return;
-        const imgs = cards.map(el => el.querySelector('img'));
+        const photos = cards.map(el => el.querySelector('.face__photo'));
         const focus = cards.map(el => Math.min(1, Math.max(0, parseFloat(el.dataset.focus || '.5'))));
         const GUTTER = 24, GAP = 16, SPIN = 4, RING_R = .40, RING_SIDE = .15, G0 = .55;
-        // Такты в высотах экрана от момента, когда сцена прилипла.
-        const B = { appear:[.05, .3], grow:[.05, 2.05], spinStop:[1.8, 2.05], fold:[2.05, 2.85], tail:.2 };
+        const B = { appear:[0, .35], grow:[0, 1.7], spinStop:[1.45, 1.7], fold:[1.7, 2.4], tail:.15 };
         const rad = d => d * Math.PI / 180, mix = (a, b, t) => a + (b - a) * t;
         const smooth = (a, b, x) => { const t = clamp01((x - a) / (b - a)); return t * t * (3 - 2 * t); };
-        const geo = {}; let slots = cards.map((_, i) => i), unwrap = new Array(N).fill(0), spin = 0, travel = 0, captioned = false, lastFold = -1;
+        const geo = {}; let slots = cards.map((_, i) => i), unwrap = new Array(N).fill(0), spin = 0, travel = 0, captioned = false;
         const measure = () => {
           const W = document.documentElement.clientWidth, H = innerHeight, mobile = NARROW.matches;
-          let cw = mobile ? W * .72 : (W - 2 * GUTTER - 3 * GAP) / 4, ch = cw * 4 / 3;
-          const maxH = H * (mobile ? .5 : .5);
-          if (ch > maxH) { ch = maxH; cw = ch * 3 / 4; }
+          let cw = mobile ? W * .7 : (W - 2 * GUTTER - 4 * GAP) / 5;
+          ring.style.setProperty('--card-w', `${cw.toFixed(1)}px`);
+          // Высота карточки и место фото в ней — из разметки (transform на offset* не влияет).
+          cards.forEach(el => { el.style.transform = ''; });
+          // Все карточки одной высоты — по самой высокой.
+          cards.forEach(el => { el.style.minHeight = ''; });
+          const ch = Math.max(...cards.map(el => el.offsetHeight)); cards.forEach(el => { el.style.minHeight = `${ch}px`; });
+          const ph = photos[0];
+          const pr = { l:ph.offsetLeft, t:ph.offsetTop, w:ph.offsetWidth, h:ph.offsetHeight };
           const Bb = Math.min(H, W * 1.25);
-          Object.assign(geo, { W, H, cx:W / 2, cy:H / 2, cw, ch, R1:RING_R * Bb, side1:RING_SIDE * Bb, clip0:(ch - cw) / 2, rowY:H * (mobile ? .42 : .44), slot:j => GUTTER + j * (cw + GAP) + cw / 2 });
+          Object.assign(geo, { W, H, cx:W / 2, cy:H / 2, cw, ch, pr, R1:RING_R * Bb, side1:RING_SIDE * Bb, rowY:H * .5, slot:j => GUTTER + j * (cw + GAP) + cw / 2 });
           const rowW = N * cw + (N - 1) * GAP;
           travel = Math.max(0, rowW - (W - 2 * GUTTER));
-          ring.style.setProperty('--card-w', `${cw.toFixed(1)}px`); ring.style.setProperty('--card-h', `${ch.toFixed(1)}px`);
           section.style.setProperty('--faces-run', `${((B.fold[1] + travel / H + B.tail) * 100 + 100).toFixed(1)}vh`);
         };
         const pose = (i, pH) => {
           const g = mix(G0, 1, span(pH, B.grow[0], B.grow[1])), theta = i * (360 / N) + spin, R = geo.R1 * g;
-          return { x:geo.cx + R * Math.cos(rad(theta)), y:geo.cy + R * Math.sin(rad(theta)), r:theta + 90, s:geo.side1 * g / geo.cw, o:REDUCE ? 1 : span(pH, B.appear[0], B.appear[1]) };
+          return { x:geo.cx + R * Math.cos(rad(theta)), y:geo.cy + R * Math.sin(rad(theta)), r:theta + 90, s:geo.side1 * g / geo.pr.w, o:REDUCE ? 1 : span(pH, B.appear[0], B.appear[1]) };
         };
         let pH = 0;
         const render = () => {
+          if (!geo.pr) return;
           const foldRaw = REDUCE ? 1 : span(pH, B.fold[0], B.fold[1]);
           const strip = span(pH, B.fold[1], B.fold[1] + travel / geo.H), shift = travel * strip;
           const poses = cards.map((_, i) => pose(i, pH));
           if (foldRaw <= 0) {
-            // Порядок ряда — по x на кольце: карточки едут к ближним местам.
             const byX = poses.map((_, i) => i).sort((a, b) => poses[a].x - poses[b].x);
             byX.forEach((ci, slot) => { slots[ci] = slot; });
             unwrap = poses.map(p => 360 * Math.round(p.r / 360));
           }
           const e = easeInOut(foldRaw), eX = easeInOut(span(foldRaw, 0, .6)), eY = easeInOut(span(foldRaw, .4, 1));
+          const { cw, ch, pr } = geo;
           let visible = false;
           cards.forEach((el, i) => {
             const p = poses[i];
+            // Квадрат фото: сторона = ширина фото, положение по высоте — по фокусу.
+            const side = pr.w, inTop = (pr.h - side) * focus[i];
+            const sq = { l:pr.l, t:pr.t + inTop, r:cw - pr.l - pr.w, b:ch - (pr.t + inTop + side) };
+            const dx = (sq.l + side / 2) - cw / 2, dy = (sq.t + side / 2) - ch / 2;   // центр квадрата относительно центра карточки
             const x = mix(p.x, geo.slot(slots[i]) - shift, eX), y = mix(p.y, geo.rowY, eY), r = mix(p.r - unwrap[i], 0, eX), s = mix(p.s, 1, e), o = Math.max(p.o, e);
-            const inset = 2 * geo.clip0 * (1 - e), top = inset * focus[i], bottom = inset - top;
-            const c = (top - bottom) / 2 * s, a = rad(r), ox = -c * Math.sin(a), oy = c * Math.cos(a);
+            // Якорь: пока карточка свёрнута до квадрата, в точку кольца встаёт центр квадрата.
+            const a = rad(r), k = 1 - e, ox = (dx * Math.cos(a) - dy * Math.sin(a)) * s * k, oy = (dx * Math.sin(a) + dy * Math.cos(a)) * s * k;
             if (o > 0) visible = true;
-            el.style.transform = `translate3d(${(x - ox - geo.cw / 2).toFixed(1)}px,${(y - oy - geo.ch / 2).toFixed(1)}px,0) rotate(${r.toFixed(2)}deg) scale(${s.toFixed(4)})`;
+            el.style.transform = `translate3d(${(x - ox - cw / 2).toFixed(1)}px,${(y - oy - ch / 2).toFixed(1)}px,0) rotate(${r.toFixed(2)}deg) scale(${s.toFixed(4)})`;
             el.style.opacity = o.toFixed(3);
-            const clip = `inset(${top.toFixed(1)}px 0px ${bottom.toFixed(1)}px round 14px)`;
-            if (imgs[i].__clip !== clip) { imgs[i].__clip = clip; imgs[i].style.clipPath = clip; }
+            const clip = `inset(${(sq.t * k).toFixed(1)}px ${(sq.r * k).toFixed(1)}px ${(sq.b * k).toFixed(1)}px ${(sq.l * k).toFixed(1)}px round ${(14 * k + 14 * e).toFixed(1)}px)`;
+            if (el.__clip !== clip) { el.__clip = clip; el.style.clipPath = clip; }
             const z = String(16 - slots[i]); if (el.style.zIndex !== z) el.style.zIndex = z;
-            el.style.setProperty('--slot', slots[i]);
           });
           ring.classList.toggle('is-on', visible);
           captioned = foldRaw >= .98;
-          ring.classList.toggle('is-row', foldRaw >= .9);
           ring.classList.toggle('is-captioned', captioned);
           stage.classList.toggle('is-captioned', captioned);
-          lastFold = foldRaw;
         };
         const seen = watch(section, '200px');
         measure();
@@ -2194,7 +2266,7 @@
         addEventListener('resize', () => { measure(); render(); }, { passive:true });
         if (!REDUCE) loop(stage, (t, dt) => {
           const speed = SPIN * (1 - smooth(B.spinStop[0], B.spinStop[1], pH));
-          if (pH <= B.appear[0] || speed <= 0) return;
+          if (pH <= 0 || speed <= 0) return;
           spin += dt * speed; render();
         });
         render();

@@ -802,7 +802,7 @@
       // Перетекание сферы в компас идёт в прежнем темпе: ускорение вдвое
       // спасало не время загрузки (его держали ассеты), а только красоту —
       // и читалось как дёрганое.
-      const TRANSITION = 4500;
+      const TRANSITION = 2800;
       const BG = 0xF1ECEC;
       const INK = '#2B2B29';
       const preloader = document.querySelector('.preloader');
@@ -1100,7 +1100,7 @@
           const handoff = ease(clamp01((e - .70) / .14));
           compass.style.opacity = String(handoff);
           compassNeedle.style.opacity = String(ease(clamp01((e - .80) / .12)));
-          if (!contentRevealStarted && e >= .32) {
+          if (!contentRevealStarted && e >= .44) {
             contentRevealStarted = true;
             hero.classList.add('is-revealing');
             requestAnimationFrame(() => hero.classList.add('is-revealed'));
