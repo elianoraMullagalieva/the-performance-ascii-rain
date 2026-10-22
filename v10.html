@@ -792,30 +792,34 @@
     /* ───────── 4. Философский клуб ─────────
        Одна фотокарта во всю ширину. Текст светлый на фото; плашки — стекло
        (размытие 10px, два элемента). До фото клуба — тёмная заглушка. */
-    .club { padding:clamp(70px,9vh,120px) 0 clamp(90px,12vh,150px); }
-    .club__head { display:flex; padding-inline:var(--edge-x); margin-bottom:28px; }
-    .club__label { opacity:.6; }
-    .club__card { position:relative; margin-inline:var(--edge-x); aspect-ratio:16 / 10; min-height:560px; border-radius:14px; overflow:hidden; color:var(--light); }
+    /* Блок шире сетки (поля 12px): кнопка шапки и логотип оказываются внутри тёмной карты,
+       поэтому секция тёмная — шапка переключается в светлую. Без clip-path и стекла:
+       в Chromium такой слой пропадал при обратной прокрутке. */
+    .club { padding:clamp(70px,9vh,120px) 0 clamp(90px,12vh,150px); background:var(--bg-light); }
+    .club__head { display:flex; padding-inline:var(--edge-x); margin-bottom:22px; }
+    .club__label { opacity:.6; color:var(--ink); }
+    .club__card { position:relative; margin-inline:12px; aspect-ratio:16 / 9.6; min-height:600px; border-radius:14px; overflow:hidden; color:var(--light); }
     .club__ph { position:absolute; inset:0; align-items:flex-start; background:#1b1917 url(club/club.jpg) center/cover no-repeat; }
     .club__ph .small { visibility:hidden; }
     .club__ph .small { opacity:.5; }
     .club__card::after { content:''; position:absolute; inset:0; background:linear-gradient(180deg,rgba(17,17,17,.12) 0%,rgba(17,17,17,.28) 45%,rgba(17,17,17,.62) 100%); pointer-events:none; }
-    .club__copy { position:absolute; left:50%; top:12%; width:min(44%,560px); z-index:1; display:grid; gap:18px; }
+    .club__copy { position:absolute; left:50%; top:16%; width:min(42%,560px); z-index:1; display:grid; gap:18px; }
     .club__eyebrow { opacity:.75; }
     .club__title { font:400 clamp(2rem,1.2rem + 3.4vw,4.4rem)/1.04 Anticva,Georgia,serif; text-transform:uppercase; letter-spacing:.01em; margin:0; }
     .club__text { max-width:36ch; opacity:.86; }
-    .club__stats { position:absolute; right:4%; bottom:6%; z-index:1; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:14px; width:min(50%,640px); list-style:none; margin:0; padding:0; }
-    .club__stat { display:grid; gap:34px; padding:22px 24px 24px; border-radius:14px; border:1px solid rgba(239,234,228,.18); background:rgba(17,17,17,.28); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); }
-    .club__stat-top { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:start; gap:12px; }
+    .club__stats { position:absolute; right:4%; bottom:7%; z-index:1; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:14px; width:min(48%,640px); list-style:none; margin:0; padding:0; }
+    .club__stat { display:grid; grid-template-rows:auto auto 1fr; gap:14px; padding:22px 24px 24px; border-radius:14px; border:1px solid rgba(239,234,228,.16); background:rgba(17,17,17,.62); }
+    .club__stat-top { display:block; }
+    .club__stat-aside { display:flex; align-items:center; min-height:34px; }
     .club__big { font:400 clamp(1.6rem,1rem + 1.6vw,2.4rem)/1 Anticva,Georgia,serif; text-transform:uppercase; }
-    .club__big--text { font-size:clamp(1rem,.8rem + .6vw,1.3rem); line-height:1.1; }
+    .club__big--text { font-size:clamp(1.1rem,.85rem + .7vw,1.6rem); line-height:1.1; white-space:nowrap; }
     .club__rose { width:52px; height:52px; flex:none; opacity:.85; }
     .club__rose-ticks { transform-origin:40px 40px; animation:club-rose 18s linear infinite; }
     @keyframes club-rose { to { transform:rotate(360deg); } }
     .club__faces { display:flex; flex:none; }
-    .club__faces i { display:block; width:27px; height:27px; margin-left:-8px; border-radius:50%; border:1.5px solid rgba(239,234,228,.85); background:var(--img) center/cover; }
+    .club__faces i { display:block; width:30px; height:30px; margin-left:-8px; border-radius:50%; border:1.5px solid rgba(239,234,228,.85); background:var(--img) center 22%/cover; }
     .club__faces i:first-child { margin-left:0; }
-    .club__stat-text { margin:0; font-size:calc(var(--fz-text) * .92); font-weight:300; line-height:1.4; letter-spacing:.01em; opacity:.9; }
+    .club__stat-text { margin:0; align-self:end; font-size:calc(var(--fz-text) * .92); font-weight:300; line-height:1.4; letter-spacing:.01em; opacity:.9; }
 
     /* ───────── 5. Основатель ───────── */
     .founder { display:grid; grid-template-columns:repeat(12,minmax(0,1fr)); column-gap:var(--gap); padding:clamp(90px,12vh,150px) var(--edge-x); align-items:start; }
@@ -868,6 +872,7 @@
       .prog__facs { margin-left:0; }
       .club__copy { left:8%; top:10%; width:70%; }
       .club__stats { width:84%; right:8%; }
+      .club__card { margin-inline:var(--edge-x); }
       .founder__photo,.founder__cap { grid-column:1 / 7; } .founder__copy { grid-column:1 / 13; grid-row:3; }
       .foot__col:nth-child(2) { grid-column:1 / 4; } .foot__col:nth-child(3) { grid-column:4 / 7; } .foot__col:nth-child(4) { grid-column:7 / 10; } .foot__col:nth-child(5) { grid-column:10 / 13; }
     }
@@ -1198,11 +1203,11 @@
          Композиция по референсу Эли (22.10): фотокарта во всю ширину, текст справа
          сверху, две стеклянные плашки внизу справа. Фото клуба делает заказчица:
          горизонталь 16:10, не меньше 2400×1500; пока — заглушка. -->
-    <section class="club" id="culture" data-theme="light" aria-labelledby="club-title">
+    <section class="club" id="culture" data-theme="dark" aria-labelledby="club-title">
       <header class="g club__head">
         <p class="small club__label a-fade" data-in>Философский клуб&nbsp;&nbsp;—&nbsp;&nbsp;закрытое сообщество</p>
       </header>
-      <div class="club__card a-clip" data-in>
+      <div class="club__card a-fade" data-in>
         <div class="ph club__ph"><span class="small">Фото клуба · 16:10 · 2400×1500<br>вечер, стол, разговор</span></div>
         <div class="club__copy">
           <p class="small club__eyebrow a-fade" style="--d:300ms">Пространство для тех, кто не&nbsp;ищет лёгких тем</p>
@@ -1211,7 +1216,8 @@
         </div>
         <ul class="club__stats">
           <li class="club__stat a-fade" style="--d:600ms">
-            <div class="club__stat-top"><b class="club__big">06</b>
+            <b class="club__big">06</b>
+            <div class="club__stat-aside">
               <svg class="club__rose" viewBox="0 0 80 80" aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round">
                 <circle cx="40" cy="40" r="34" stroke-width="1" stroke-dasharray="1 5" opacity=".6"/>
                 <circle cx="40" cy="40" r="22" stroke-width="1" opacity=".7"/>
@@ -1222,9 +1228,8 @@
             <p class="club__stat-text">контекстов дискуссий: философия, культура, бизнес, наука, общество, лидерство</p>
           </li>
           <li class="club__stat a-fade" style="--d:700ms">
-            <div class="club__stat-top"><b class="club__big club__big--text">по<br>приглашению</b>
-              <span class="club__faces" aria-hidden="true"><i style="--img:url(people/p1-600.jpg)"></i><i style="--img:url(people/p2-600.jpg)"></i><i style="--img:url(people/p3-600.jpg)"></i><i style="--img:url(people/p4-600.jpg)"></i><i style="--img:url(people/p5-600.jpg)"></i></span>
-            </div>
+            <b class="club__big club__big--text">по&nbsp;приглашению</b>
+            <div class="club__stat-aside"><span class="club__faces" aria-hidden="true"><i style="--img:url(people/p1-600.jpg)"></i><i style="--img:url(people/p2-600.jpg)"></i><i style="--img:url(people/p3-600.jpg)"></i><i style="--img:url(people/p4-600.jpg)"></i><i style="--img:url(people/p5-600.jpg)"></i></span></div>
             <p class="club__stat-text">участники&nbsp;— люди действия из&nbsp;среды института; вход после знакомства</p>
           </li>
         </ul>
