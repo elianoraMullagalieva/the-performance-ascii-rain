@@ -700,7 +700,7 @@
     .face__prog > span:last-child { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .face__prog .small { opacity:.5; }
     .face__foot { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:2px; }
-    .face__micro { display:inline-flex; align-items:center; gap:6px; opacity:.6; }
+    .face__micro { display:inline-flex; align-items:center; gap:6px; opacity:.6; min-width:0; overflow:hidden; }
     .face__micro .small { text-transform:none; letter-spacing:.02em; white-space:nowrap; }
     .face__rose { width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:1; transform-origin:50% 50%; animation:face-rose 16s linear infinite; }
     .face__rose-dot { fill:currentColor; stroke:none; }
@@ -2348,7 +2348,8 @@
         const geo = {}; let slots = cards.map((_, i) => i), unwrap = new Array(N).fill(0), spin = 0, travel = 0, captioned = false;
         const measure = () => {
           const W = document.documentElement.clientWidth, H = innerHeight, mobile = NARROW.matches;
-          let cw = mobile ? W * .72 : (W - 2 * GUTTER - 4 * GAP) / 5;
+          const perRow = W < 1180 ? 4 : 5;                     // на планшете 4 в ряд, иначе карточки слишком узкие
+          let cw = mobile ? W * .72 : (W - 2 * GUTTER - (perRow - 1) * GAP) / perRow;
           cw = Math.min(cw, (H * .86) / 2.05);   // карточка не выше 86% экрана
           ring.style.setProperty('--card-w', `${cw.toFixed(1)}px`);
           // Высота карточки и место фото в ней — из разметки (transform на offset* не влияет).
