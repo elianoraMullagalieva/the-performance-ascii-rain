@@ -590,6 +590,8 @@
     .zone__chrome .chrome__cta { background:var(--void); text-decoration:none; transition:background .4s var(--ease),color .4s var(--ease),border-color .4s var(--ease); }
     .zone__chrome.chrome--dark .chrome__cta { background:var(--bg-light); }
     .zone__chrome.is-in .chrome__cta { pointer-events:auto; }
+    /* На блоках с data-chrome="hide" шапка (логотип и кнопка) убирается — меньше визуального шума. */
+    .zone__chrome.is-hidden { opacity:0 !important; pointer-events:none !important; transition:opacity .4s var(--ease); }
     /* Минимальный кегль 12px: у кнопки закрытых блоков он падает до 9px. */
     .zone__chrome .chrome__cta { font-size:clamp(.75rem,.62rem + .3vw,.8125rem); }
     @media (max-width:960px) { .zone__chrome .chrome__cta { height:40px; } }
@@ -668,12 +670,12 @@
       .peers__cue-tip { animation:none !important; }
     }
 
-    .review { position:fixed; z-index:40; left:var(--edge-x); top:42%; display:grid; gap:10px; padding:12px 14px; border:1px solid rgba(22,21,20,.2); border-radius:14px; background:rgba(241,236,236,.92); font:500 11px/1 Manrope,sans-serif; letter-spacing:.04em; color:var(--ink); }
+    .review { position:fixed; z-index:40; left:var(--edge-x); top:118px; display:grid; gap:10px; padding:12px 14px; border:1px solid rgba(22,21,20,.2); border-radius:14px; background:rgba(241,236,236,.92); font:500 11px/1 Manrope,sans-serif; letter-spacing:.04em; color:var(--ink); }
     .review__row { display:flex; align-items:center; gap:6px; }
     .review__row--menu,.review__row--marks { display:none; }
-    html:not(.in-manifest) .review__row--menu { display:flex; }
+    html:not(.past-hero) .review__row--menu { display:flex; }
     html.philosophy-ready .review__row--marks { display:flex; }
-    html.in-manifest:not(.philosophy-ready) .review { display:none; }
+    html.past-hero:not(.philosophy-ready) .review { display:none; }
     .review__row .small { width:44px; opacity:.5; font-size:10px; letter-spacing:.08em; text-transform:uppercase; }
     .review button { padding:7px 10px; border:1px solid rgba(22,21,20,.25); border-radius:999px; background:transparent; color:var(--ink); font:inherit; cursor:pointer; }
     .review button.is-on { background:var(--ink); color:var(--bg-light); border-color:var(--ink); }
@@ -704,33 +706,41 @@
     .faces__stage { position:sticky; top:0; height:100vh; height:100svh; overflow:hidden; }
     .faces__ring { position:absolute; inset:0; visibility:hidden; }
     .faces__ring.is-on { visibility:visible; }
-    .face { position:absolute; left:0; top:0; margin:0; width:var(--card-w,260px); box-sizing:border-box; padding:14px 12px 12px; display:grid; grid-template-rows:auto auto auto; gap:10px; border-radius:14px; border:1px solid rgba(22,21,20,.1); background:#FFFFFF; color:var(--ink); opacity:0; transform-origin:50% 50%; will-change:transform,opacity,clip-path; text-align:left; }
+    .face { position:absolute; left:0; top:0; margin:0; width:var(--card-w,260px); box-sizing:border-box; padding:14px 12px 14px; display:grid; grid-template-rows:auto auto auto; gap:12px; border-radius:14px; border:1px solid rgba(22,21,20,.1); background:#FFFFFF; color:var(--ink); opacity:0; transform-origin:50% 50%; will-change:transform,opacity,clip-path; text-align:left; }
     .face > * { min-width:0; }
     .face:focus-visible { outline:1px solid var(--ink); outline-offset:3px; }
-    .face__head { display:grid; gap:6px; padding:2px 4px 4px; }
-    .face__n { font:500 clamp(1rem,.85rem + .45vw,1.3rem)/1.2 Manrope,sans-serif; letter-spacing:-.015em; }
-    .face__q { font:300 clamp(.82rem,.74rem + .22vw,.95rem)/1.4 Manrope,sans-serif; letter-spacing:.005em; opacity:.72; text-wrap:pretty; }
+    .face__head { display:grid; gap:6px; padding:2px 4px 2px; }
+    .face__n { font:500 clamp(1.15rem,.95rem + .55vw,1.5rem)/1.15 Manrope,sans-serif; letter-spacing:-.02em; }
+    /* Мысль: декоративная кавычка Anticva, висящая слева. */
+    .face__q { position:relative; padding-left:.95em; font:300 clamp(.84rem,.76rem + .22vw,.97rem)/1.4 Manrope,sans-serif; letter-spacing:.005em; opacity:.78; text-wrap:pretty; }
+    .face__q::before { content:'\201E'; position:absolute; left:-.02em; top:-.18em; font:400 2.1em/1 Anticva,Georgia,serif; opacity:.45; }
     .face__pos { font:300 var(--fz-small)/1.3 Manrope,sans-serif; letter-spacing:.01em; opacity:.6; }
-    .face__pos-pill { justify-self:start; padding:7px 11px; border-radius:999px; background:var(--ink); color:var(--light); font:500 var(--fz-small)/1 Manrope,sans-serif; letter-spacing:.01em; white-space:nowrap; max-width:100%; overflow:hidden; text-overflow:ellipsis; }
-    .face__photo { position:relative; aspect-ratio:1 / 1.02; border-radius:12px; overflow:hidden; background:var(--graphite); }
-    .face__photo img { display:block; width:100%; height:100%; object-fit:cover; object-position:50% 14%; -webkit-mask-image:linear-gradient(180deg,#000 64%,transparent 100%); mask-image:linear-gradient(180deg,#000 64%,transparent 100%); }
-    /* Пилюля программы — справа внизу на фото; на кольце не видна. */
-    .face__prog-pill { position:absolute; right:8px; bottom:8px; padding:6px 10px; border-radius:999px; border:1px solid rgba(22,21,20,.22); background:rgba(255,255,255,.72); color:var(--ink); font:500 .72rem/1 Manrope,sans-serif; letter-spacing:.02em; white-space:nowrap; opacity:var(--open,1); }
-    .face__who { display:flex; align-items:flex-start; gap:9px; padding:2px 4px 0; }
-    .face__who i { flex:none; width:32px; height:32px; border-radius:50%; background:var(--img) center 22%/cover; border:1px solid rgba(22,21,20,.12); }
-    .face__who-t { display:grid; gap:2px; min-width:0; }
-    .face__who-t .face__n { font-size:clamp(.9rem,.8rem + .3vw,1.05rem); }
-    /* Вариант 1: мысль сверху, внизу имя + должность. */
-    .faces__ring--1 .face__n--top,.faces__ring--1 .face__pos-pill,.faces__ring--1 .face__q--bottom { display:none; }
+    .face__pos-pill { display:none; }
+    .face__photo { position:relative; aspect-ratio:1 / 1.04; border-radius:12px; overflow:hidden; background:var(--graphite); }
+    .face__photo img { display:block; width:100%; height:100%; object-fit:cover; object-position:50% 14%; -webkit-mask-image:linear-gradient(180deg,#000 66%,transparent 100%); mask-image:linear-gradient(180deg,#000 66%,transparent 100%); }
+    /* Стеклянные плашки внизу фото: затемнённое стекло с размытием, как у Apple. На кольце не видны. */
+    .face__pills { position:absolute; left:8px; right:8px; bottom:8px; display:flex; flex-direction:column; align-items:flex-start; gap:6px; opacity:var(--open,1); }
+    .face__pill { padding:7px 11px; border-radius:999px; border:1px solid rgba(255,255,255,.22); background:rgba(17,17,17,.32); -webkit-backdrop-filter:blur(12px) saturate(1.2); backdrop-filter:blur(12px) saturate(1.2); color:#FFFFFF; font:500 .76rem/1 Manrope,sans-serif; letter-spacing:.02em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; box-shadow:inset 0 1px 0 rgba(255,255,255,.12); }
+    .face__pill { max-width:100%; }
+    .faces__ring--1 .face__pills { align-items:flex-end; }
+    .face__who { display:flex; align-items:flex-start; gap:10px; padding:2px 4px 0; }
+    .face__who i { flex:none; width:34px; height:34px; border-radius:50%; background:var(--img) center 22%/cover; border:1px solid rgba(22,21,20,.12); }
+    .face__who-t { display:grid; gap:3px; min-width:0; }
+    .face__who-t .face__n { font-size:clamp(.95rem,.85rem + .3vw,1.1rem); }
+    /* Вариант 1: мысль сверху (ближе к фото), внизу имя + должность; на фото — только программа. */
+    .faces__ring--1 .face { gap:10px; }
+    .faces__ring--1 .face__n--top,.faces__ring--1 .face__q--bottom,.faces__ring--1 .face__pill--pos { display:none; }
+    .faces__ring--1 .face__head { padding-bottom:0; }
     .faces__ring--1 .face__q--top { display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:3; overflow:hidden; height:calc(3 * 1.4em); }
-    /* Вариант 2: имя + пилюля должности сверху, внизу мысль. */
+    .faces__ring--1 .face__who { padding-top:6px; }
+    /* Вариант 2: сверху только имя; на фото две стеклянные плашки — должность и программа; внизу аватар + мысль. */
+    .faces__ring--2 .face { gap:14px; }
     .faces__ring--2 .face__q--top,.faces__ring--2 .face__n--bottom,.faces__ring--2 .face__pos { display:none; }
-    .faces__ring--2 .face__head { grid-template-columns:1fr; gap:8px; }
+    .faces__ring--2 .face__head { grid-template-columns:1fr; padding:4px 4px 0; }
     .faces__ring--2 .face__n--top { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .faces__ring--2 .face__q--bottom { display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:4; overflow:hidden; height:calc(4 * 1.4em); }
-    .faces__ring--2 .face__who { align-items:flex-start; }
-    .faces__label { position:absolute; left:var(--edge-x); bottom:var(--edge-y); opacity:0; transition:opacity .9s var(--ease) .3s; }
-    .faces__stage.is-captioned .faces__label { opacity:.6; }
+    .faces__ring--2 .face__who { padding-top:6px; }
+    .faces__label { display:none; }
     .faces__dev { position:absolute; right:var(--edge-x); bottom:var(--edge-y); z-index:5; display:flex; flex-wrap:wrap; justify-content:flex-end; align-items:center; gap:8px; opacity:0; pointer-events:none; transition:opacity .6s var(--ease); }
     .faces__stage.is-captioned .faces__dev { opacity:1; pointer-events:auto; }
     .faces__dev .small { opacity:.5; margin-right:4px; }
@@ -751,8 +761,7 @@
        четыре карточки в ряд, фото 3:2, короткие поля, запись. Воздух умеренный. */
     .prog { padding:clamp(70px,9vh,110px) 0 clamp(60px,8vh,90px); }
     .prog__head { align-items:end; row-gap:20px; }
-    .prog__head .h-sec { grid-column:1 / 7; }
-    .prog__intro { grid-column:7 / 11; max-width:44ch; }
+    .prog__head .h-sec { grid-column:1 / 13; }
     .prog__bar { display:flex; flex-wrap:wrap; align-items:center; gap:14px 28px; margin:clamp(28px,4vh,44px) var(--edge-x) 0; padding:14px 0; border-top:1px solid var(--rule-c); border-bottom:1px solid var(--rule-c); }
     .prog__tabs { display:flex; flex-wrap:wrap; gap:4px 18px; }
     .prog__tabs button,.prog__fac { border:0; background:transparent; color:inherit; cursor:pointer; font:500 var(--fz-small)/1.2 Manrope,sans-serif; letter-spacing:.04em; text-transform:uppercase; padding:6px 0; opacity:.5; transition:opacity .3s var(--ease); border-bottom:1px solid transparent; }
@@ -766,7 +775,7 @@
     .prog__sel select { appearance:none; -webkit-appearance:none; border:0; border-bottom:1px solid var(--rule-c); background:transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' fill='none' stroke='%23161514'%3E%3Cpath d='M2 3.5l3 3 3-3'/%3E%3C/svg%3E") right center no-repeat; color:inherit; font:400 var(--fz-small)/1.3 Manrope,sans-serif; padding:2px 16px 2px 0; cursor:pointer; }
     .prog__count { opacity:.5; }
     /* Выбор варианта карточки — на время согласования, крупно над каталогом. */
-    .prog__dev { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin:clamp(24px,3vh,36px) var(--edge-x) 0; }
+    .prog__dev { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin:0 var(--edge-x) clamp(28px,4vh,44px); }
     .prog__dev .small { opacity:.5; margin-right:6px; }
     .prog__dev button { padding:10px 16px; border:1px solid rgba(22,21,20,.25); border-radius:999px; background:transparent; color:var(--ink); font:500 var(--fz-small)/1 Manrope,sans-serif; letter-spacing:.02em; cursor:pointer; }
     .prog__dev button.is-on { background:var(--ink); color:var(--bg-light); border-color:var(--ink); }
@@ -1003,9 +1012,9 @@
          Карточки одинаковые и прямые: фото 3:4 сверху, подпись под ним — как
          подпись под портретом в журнале, текст не ложится на лицо. Восемь
          человек — восемь карточек, без повторов. -->
-    <!-- 1. Среда единомышленников — «кольцо → ряд» (по коду Sur(face), прислан Эли 22.10).
-         Без заголовка: после «Философии» карточки летают кольцом (видно только квадрат
-         фото), растут, выстраиваются в ряд и раскрываются целиком. Карточка — по референсу «Sienna Brooks»
+    <!-- 1. Среда единомышленников — кольцо → ряд (по коду Sur(face), прислан Эли 22.10).
+         Без заголовка: после Философии карточки летают кольцом (видно только квадрат
+         фото), растут, выстраиваются в ряд и раскрываются целиком. Карточка — по референсу Sienna Brooks
          (белая, фото растворяется книзу, всё по левому краю), два варианта по словам Эли (22.10):
          1 — мысль сверху, внизу аватар + имя + должность, на фото пилюля программы;
          2 — имя + пилюля должности сверху, внизу аватар + мысль. Должности условные. -->
@@ -1014,75 +1023,75 @@
         <div class="faces__ring" id="faces-ring">
           <figure class="face" data-focus=".45" tabindex="0">
             <div class="face__head">
-              <span class="face__q face__q--top">«Самое трудное — замолчать вовремя. Здесь учат паузе как инструменту»</span>
+              <span class="face__q face__q--top">Самое трудное — замолчать вовремя. Здесь учат паузе как инструменту</span>
               <span class="face__n face__n--top">Александр Ровный</span>
               <span class="face__pos-pill">Генеральный директор</span>
             </div>
-            <div class="face__photo"><img src="people/p1-600.jpg" srcset="people/p1-600.jpg 600w, people/p1-900.jpg 900w" sizes="(max-width:780px) 70vw, 20vw" alt="" decoding="async" draggable="false"><span class="face__prog-pill" title="Психофизика лидера">Психофизика</span></div>
-            <div class="face__who"><i style="--img:url(people/p1-600.jpg)"></i><span class="face__who-t"><b class="face__n face__n--bottom">Александр Ровный</b><span class="face__pos">Генеральный директор, промышленная группа</span><span class="face__q face__q--bottom">«Самое трудное — замолчать вовремя. Здесь учат паузе как инструменту»</span></span></div>
+            <div class="face__photo"><img src="people/p1-600.jpg" srcset="people/p1-600.jpg 600w, people/p1-900.jpg 900w" sizes="(max-width:780px) 70vw, 20vw" alt="" decoding="async" draggable="false"><span class="face__pills"><span class="face__pill face__pill--pos">Генеральный директор</span><span class="face__pill face__pill--prog" title="Психофизика лидера">Психофизика</span></span></div>
+            <div class="face__who"><i style="--img:url(people/p1-600.jpg)"></i><span class="face__who-t"><b class="face__n face__n--bottom">Александр Ровный</b><span class="face__pos">Генеральный директор, промышленная группа</span><span class="face__q face__q--bottom">Самое трудное — замолчать вовремя. Здесь учат паузе как инструменту</span></span></div>
           </figure>
           <figure class="face" data-focus=".45" tabindex="0">
             <div class="face__head">
-              <span class="face__q face__q--top">«Я перестал готовить речь и начал готовить мысль. Слова приходят сами»</span>
+              <span class="face__q face__q--top">Я перестал готовить речь и начал готовить мысль. Слова приходят сами</span>
               <span class="face__n face__n--top">Марк Лёвин</span>
               <span class="face__pos-pill">Предприниматель</span>
             </div>
-            <div class="face__photo"><img src="people/p2-600.jpg" srcset="people/p2-600.jpg 600w, people/p2-900.jpg 900w" sizes="(max-width:780px) 70vw, 20vw" alt="" decoding="async" draggable="false"><span class="face__prog-pill" title="Логика речи и сторителлинг">Логика речи</span></div>
-            <div class="face__who"><i style="--img:url(people/p2-600.jpg)"></i><span class="face__who-t"><b class="face__n face__n--bottom">Марк Лёвин</b><span class="face__pos">Предприниматель, основатель бренда</span><span class="face__q face__q--bottom">«Я перестал готовить речь и начал готовить мысль. Слова приходят сами»</span></span></div>
+            <div class="face__photo"><img src="people/p2-600.jpg" srcset="people/p2-600.jpg 600w, people/p2-900.jpg 900w" sizes="(max-width:780px) 70vw, 20vw" alt="" decoding="async" draggable="false"><span class="face__pills"><span class="face__pill face__pill--pos">Предприниматель</span><span class="face__pill face__pill--prog" title="Логика речи и сторителлинг">Логика речи</span></span></div>
+            <div class="face__who"><i style="--img:url(people/p2-600.jpg)"></i><span class="face__who-t"><b class="face__n face__n--bottom">Марк Лёвин</b><span class="face__pos">Предприниматель, основатель бренда</span><span class="face__q face__q--bottom">Я перестал готовить речь и начал готовить мысль. Слова приходят сами</span></span></div>
           </figure>
           <figure class="face" data-focus=".45" tabindex="0">
             <div class="face__head">
-              <span class="face__q face__q--top">«Аргумент работает, когда его слышат, а не когда он верен»</span>
+              <span class="face__q face__q--top">Аргумент работает, когда его слышат, а не когда он верен</span>
               <span class="face__n face__n--top">Анна Светлова</span>
               <span class="face__pos-pill">Руководитель направления</span>
             </div>
-            <div class="face__photo"><img src="people/p3-600.jpg" srcset="people/p3-600.jpg 600w, people/p3-900.jpg 900w" sizes="(max-width:780px) 70vw, 20vw" alt="" decoding="async" draggable="false"><span class="face__prog-pill" title="Голос и речь">Голос и речь</span></div>
-            <div class="face__who"><i style="--img:url(people/p3-600.jpg)"></i><span class="face__who-t"><b class="face__n face__n--bottom">Анна Светлова</b><span class="face__pos">Руководитель направления, Газпром</span><span class="face__q face__q--bottom">«Аргумент работает, когда его слышат, а не когда он верен»</span></span></div>
+            <div class="face__photo"><img src="people/p3-600.jpg" srcset="people/p3-600.jpg 600w, people/p3-900.jpg 900w" sizes="(max-width:780px) 70vw, 20vw" alt="" decoding="async" draggable="false"><span class="face__pills"><span class="face__pill face__pill--pos">Руководитель направления</span><span class="face__pill face__pill--prog" title="Голос и речь">Голос и речь</span></span></div>
+            <div class="face__who"><i style="--img:url(people/p3-600.jpg)"></i><span class="face__who-t"><b class="face__n face__n--bottom">Анна Светлова</b><span class="face__pos">Руководитель направления, Газпром</span><span class="face__q face__q--bottom">Аргумент работает, когда его слышат, а не когда он верен</span></span></div>
           </figure>
           <figure class="face" data-focus=".45" tabindex="0">
             <div class="face__head">
-              <span class="face__q face__q--top">«Понятно — это когда меняется решение собеседника»</span>
+              <span class="face__q face__q--top">Понятно — это когда меняется решение собеседника</span>
               <span class="face__n face__n--top">Илья Берг</span>
               <span class="face__pos-pill">Лектор</span>
             </div>
-            <div class="face__photo"><img src="people/p4-600.jpg" srcset="people/p4-600.jpg 600w, people/p4-900.jpg 900w" sizes="(max-width:780px) 70vw, 20vw" alt="" decoding="async" draggable="false"><span class="face__prog-pill" title="Креативное мышление">Креатив</span></div>
-            <div class="face__who"><i style="--img:url(people/p4-600.jpg)"></i><span class="face__who-t"><b class="face__n face__n--bottom">Илья Берг</b><span class="face__pos">Лектор, НИУ ВШЭ</span><span class="face__q face__q--bottom">«Понятно — это когда меняется решение собеседника»</span></span></div>
+            <div class="face__photo"><img src="people/p4-600.jpg" srcset="people/p4-600.jpg 600w, people/p4-900.jpg 900w" sizes="(max-width:780px) 70vw, 20vw" alt="" decoding="async" draggable="false"><span class="face__pills"><span class="face__pill face__pill--pos">Лектор</span><span class="face__pill face__pill--prog" title="Креативное мышление">Креатив</span></span></div>
+            <div class="face__who"><i style="--img:url(people/p4-600.jpg)"></i><span class="face__who-t"><b class="face__n face__n--bottom">Илья Берг</b><span class="face__pos">Лектор, НИУ ВШЭ</span><span class="face__q face__q--bottom">Понятно — это когда меняется решение собеседника</span></span></div>
           </figure>
           <figure class="face" data-focus=".45" tabindex="0">
             <div class="face__head">
-              <span class="face__q face__q--top">«Присутствие — это не громкость. Это точность внимания к человеку напротив»</span>
+              <span class="face__q face__q--top">Присутствие — это не громкость. Это точность внимания к человеку напротив</span>
               <span class="face__n face__n--top">Михаил Градов</span>
               <span class="face__pos-pill">Архитектор</span>
             </div>
-            <div class="face__photo"><img src="people/p5-600.jpg" srcset="people/p5-600.jpg 600w, people/p5-900.jpg 900w" sizes="(max-width:780px) 70vw, 20vw" alt="" decoding="async" draggable="false"><span class="face__prog-pill" title="Актёрское мастерство">Актёрское</span></div>
-            <div class="face__who"><i style="--img:url(people/p5-600.jpg)"></i><span class="face__who-t"><b class="face__n face__n--bottom">Михаил Градов</b><span class="face__pos">Архитектор, партнёр бюро</span><span class="face__q face__q--bottom">«Присутствие — это не громкость. Это точность внимания к человеку напротив»</span></span></div>
+            <div class="face__photo"><img src="people/p5-600.jpg" srcset="people/p5-600.jpg 600w, people/p5-900.jpg 900w" sizes="(max-width:780px) 70vw, 20vw" alt="" decoding="async" draggable="false"><span class="face__pills"><span class="face__pill face__pill--pos">Архитектор</span><span class="face__pill face__pill--prog" title="Актёрское мастерство">Актёрское</span></span></div>
+            <div class="face__who"><i style="--img:url(people/p5-600.jpg)"></i><span class="face__who-t"><b class="face__n face__n--bottom">Михаил Градов</b><span class="face__pos">Архитектор, партнёр бюро</span><span class="face__q face__q--bottom">Присутствие — это не громкость. Это точность внимания к человеку напротив</span></span></div>
           </figure>
           <figure class="face" data-focus=".45" tabindex="0">
             <div class="face__head">
-              <span class="face__q face__q--top">«Влияние начинается там, где я беру ответственность за каждое слово»</span>
+              <span class="face__q face__q--top">Влияние начинается там, где я беру ответственность за каждое слово</span>
               <span class="face__n face__n--top">Артём Снегирёв</span>
               <span class="face__pos-pill">Продюсер</span>
             </div>
-            <div class="face__photo"><img src="people/p6-600.jpg" srcset="people/p6-600.jpg 600w, people/p6-900.jpg 900w" sizes="(max-width:780px) 70vw, 20vw" alt="" decoding="async" draggable="false"><span class="face__prog-pill" title="Психофизика влияния">Психофизика</span></div>
-            <div class="face__who"><i style="--img:url(people/p6-600.jpg)"></i><span class="face__who-t"><b class="face__n face__n--bottom">Артём Снегирёв</b><span class="face__pos">Продюсер, кино и телевидение</span><span class="face__q face__q--bottom">«Влияние начинается там, где я беру ответственность за каждое слово»</span></span></div>
+            <div class="face__photo"><img src="people/p6-600.jpg" srcset="people/p6-600.jpg 600w, people/p6-900.jpg 900w" sizes="(max-width:780px) 70vw, 20vw" alt="" decoding="async" draggable="false"><span class="face__pills"><span class="face__pill face__pill--pos">Продюсер</span><span class="face__pill face__pill--prog" title="Психофизика влияния">Психофизика</span></span></div>
+            <div class="face__who"><i style="--img:url(people/p6-600.jpg)"></i><span class="face__who-t"><b class="face__n face__n--bottom">Артём Снегирёв</b><span class="face__pos">Продюсер, кино и телевидение</span><span class="face__q face__q--bottom">Влияние начинается там, где я беру ответственность за каждое слово</span></span></div>
           </figure>
           <figure class="face" data-focus=".45" tabindex="0">
             <div class="face__head">
-              <span class="face__q face__q--top">«Переговоры выигрывает не тот, кто говорит больше, а тот, кто точнее формулирует»</span>
+              <span class="face__q face__q--top">Переговоры выигрывает не тот, кто говорит больше, а тот, кто точнее формулирует</span>
               <span class="face__n face__n--top">Вера Долина</span>
               <span class="face__pos-pill">Партнёр юридической фирмы</span>
             </div>
-            <div class="face__photo"><img src="people/p7-600.jpg" srcset="people/p7-600.jpg 600w, people/p7-900.jpg 900w" sizes="(max-width:780px) 70vw, 20vw" alt="" decoding="async" draggable="false"><span class="face__prog-pill" title="Логика речи и сторителлинг">Логика речи</span></div>
-            <div class="face__who"><i style="--img:url(people/p7-600.jpg)"></i><span class="face__who-t"><b class="face__n face__n--bottom">Вера Долина</b><span class="face__pos">Партнёр юридической фирмы</span><span class="face__q face__q--bottom">«Переговоры выигрывает не тот, кто говорит больше, а тот, кто точнее формулирует»</span></span></div>
+            <div class="face__photo"><img src="people/p7-600.jpg" srcset="people/p7-600.jpg 600w, people/p7-900.jpg 900w" sizes="(max-width:780px) 70vw, 20vw" alt="" decoding="async" draggable="false"><span class="face__pills"><span class="face__pill face__pill--pos">Партнёр юридической фирмы</span><span class="face__pill face__pill--prog" title="Логика речи и сторителлинг">Логика речи</span></span></div>
+            <div class="face__who"><i style="--img:url(people/p7-600.jpg)"></i><span class="face__who-t"><b class="face__n face__n--bottom">Вера Долина</b><span class="face__pos">Партнёр юридической фирмы</span><span class="face__q face__q--bottom">Переговоры выигрывает не тот, кто говорит больше, а тот, кто точнее формулирует</span></span></div>
           </figure>
           <figure class="face" data-focus=".45" tabindex="0">
             <div class="face__head">
-              <span class="face__q face__q--top">«Я научилась слышать вопрос до того, как его задали»</span>
+              <span class="face__q face__q--top">Я научилась слышать вопрос до того, как его задали</span>
               <span class="face__n face__n--top">Полина Март</span>
               <span class="face__pos-pill">Врач</span>
             </div>
-            <div class="face__photo"><img src="people/p8-600.jpg" srcset="people/p8-600.jpg 600w, people/p8-900.jpg 900w" sizes="(max-width:780px) 70vw, 20vw" alt="" decoding="async" draggable="false"><span class="face__prog-pill" title="Голос и речь">Голос и речь</span></div>
-            <div class="face__who"><i style="--img:url(people/p8-600.jpg)"></i><span class="face__who-t"><b class="face__n face__n--bottom">Полина Март</b><span class="face__pos">Врач, руководитель клиники</span><span class="face__q face__q--bottom">«Я научилась слышать вопрос до того, как его задали»</span></span></div>
+            <div class="face__photo"><img src="people/p8-600.jpg" srcset="people/p8-600.jpg 600w, people/p8-900.jpg 900w" sizes="(max-width:780px) 70vw, 20vw" alt="" decoding="async" draggable="false"><span class="face__pills"><span class="face__pill face__pill--pos">Врач</span><span class="face__pill face__pill--prog" title="Голос и речь">Голос и речь</span></span></div>
+            <div class="face__who"><i style="--img:url(people/p8-600.jpg)"></i><span class="face__who-t"><b class="face__n face__n--bottom">Полина Март</b><span class="face__pos">Врач, руководитель клиники</span><span class="face__q face__q--bottom">Я научилась слышать вопрос до того, как его задали</span></span></div>
           </figure>
         </div>
         <p class="small faces__label" id="faces-label" aria-hidden="true">Среда единомышленников</p>
@@ -1095,10 +1104,10 @@
     <!-- 3. Программы — по архитектуре письма заказчицы и по логике старого сайта
          (вкладки формата: Программа / Мастерская / Мастер-класс / Онлайн / Индивидуально;
          в карточке: тип, название, стоимость, набор, запись). Данные — с theperformance.ru. -->
-    <section class="prog" id="programs" data-theme="light" aria-labelledby="prog-title">
+    <section class="prog" id="programs" data-theme="light" data-chrome="hide" aria-labelledby="prog-title">
+      <div class="prog__dev" id="prog-dev"><span class="small">Вариант карточки</span><button type="button" data-card="1">1 · Фото сверху, цена и запись внизу</button><button type="button" data-card="2">2 · Текст сверху, фото снизу</button><button type="button" data-card="3">3 · Название на фото, три показателя</button></div>
       <header class="g prog__head">
         <h2 class="h-sec a-rise" id="prog-title" data-in><span class="ln"><span class="ln__i">Программы</span></span></h2>
-        <p class="t prog__intro a-fade" data-in style="--d:200ms">Три факультета, одна система. Формат&nbsp;— способ участия: программа, мастерская, мастер-класс, онлайн, индивидуальная работа.</p>
       </header>
       <div class="prog__bar" id="prog-filter" data-in>
         <nav class="prog__tabs a-fade" aria-label="Формат">
@@ -1111,7 +1120,6 @@
         <p class="small prog__count a-fade" style="--d:240ms"><span id="prog-n">8</span>&nbsp;программ</p>
 
       </div>
-      <div class="prog__dev" id="prog-dev"><span class="small">Вариант карточки</span><button type="button" data-card="1">1 · Фото сверху, цена и запись внизу</button><button type="button" data-card="2">2 · Текст сверху, фото снизу</button><button type="button" data-card="3">3 · Название на фото, три показателя</button></div>
       <ul class="prog__list prog__list--v1" id="prog-list">
         <li class="pc" data-fac="1" data-format="Мастерская" data-date="2026-11" data-in>
           <div class="pc__photo a-clip">
@@ -1862,6 +1870,7 @@
       wrap.className = 'needle-wrap';
       needle.replaceWith(wrap); wrap.appendChild(needle);
       // Выноски от лимба к принципам.
+      const root = document.documentElement;
       const NS = 'http://www.w3.org/2000/svg';
       // Выносок к принципам больше нет (Эли, 22.10): стрелка сама показывает на принцип.
       const leads = [];
@@ -1953,7 +1962,7 @@
         let titleP = clamp01((p - .48) / .17);                      // заголовок: стартует вместе со спуском компаса…
         const tenetP = tenets.map((t, i) => clamp01((p - (.60 + i * .07)) / .11));
         // «Философия» собрана целиком — можно показывать выбор знака.
-        root.classList.toggle('philosophy-ready', on && tenetP[tenetP.length - 1] >= 1 && leave < .05);
+        root.classList.toggle('philosophy-ready', on && tenetP[tenetP.length - 1] >= .75 && leave < .05);
         const out = 1;                                              // блок не гаснет: уходит листом
         // Угловая подпись гаснет на выходе: иначе она проезжает по логотипу героя.
         stage.style.setProperty('--corners', (clamp01((p - .09) / .03) * clamp01(1 + exit / 140)).toFixed(3));
@@ -2358,11 +2367,12 @@
             lastY = y;
             if (goingDown !== down) { down = goingDown; shell.classList.toggle('is-down', goingDown); }
           }
-          let theme = 'light';
+          let theme = 'light', hide = false;
           for (const block of blocks) {
             const box = block.getBoundingClientRect();
-            if (box.top <= 56 && box.bottom > 56) { theme = block.dataset.theme; break; }
+            if (box.top <= 56 && box.bottom > 56) { theme = block.dataset.theme; hide = block.dataset.chrome === 'hide'; break; }
           }
+          shell.classList.toggle('is-hidden', hide);
           const dark = theme === 'dark';
           if (dark !== onDark) { onDark = dark; shell.classList.toggle('chrome--dark', !dark); }
         });
@@ -2564,6 +2574,9 @@
       document.addEventListener('click', e => { const b = e.target.closest('button[data-menu]'); if (!b) return; off = b.dataset.menu === 'off'; try { localStorage.setItem('tp-nomenu', off ? '1' : '0'); } catch (err) {} apply(); });
       burger?.addEventListener('click', () => { const open = hero.classList.toggle('menu-open'); burger.setAttribute('aria-expanded', String(open)); });
       apply();
+      // Строка «Меню» — только пока виден первый экран.
+      const onScroll = () => root.classList.toggle('past-hero', scrollY > innerHeight * .55);
+      addEventListener('scroll', onScroll, { passive:true }); onScroll();
     })();
   </script>
 </body>

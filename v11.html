@@ -581,6 +581,8 @@
     .zone__chrome .chrome__cta { background:var(--void); text-decoration:none; transition:background .4s var(--ease),color .4s var(--ease),border-color .4s var(--ease); }
     .zone__chrome.chrome--dark .chrome__cta { background:var(--bg-light); }
     .zone__chrome.is-in .chrome__cta { pointer-events:auto; }
+    /* На блоках с data-chrome="hide" шапка (логотип и кнопка) убирается — меньше визуального шума. */
+    .zone__chrome.is-hidden { opacity:0 !important; pointer-events:none !important; transition:opacity .4s var(--ease); }
     /* Минимальный кегль 12px: у кнопки закрытых блоков он падает до 9px. */
     .zone__chrome .chrome__cta { font-size:clamp(.75rem,.62rem + .3vw,.8125rem); }
     @media (max-width:960px) { .zone__chrome .chrome__cta { height:40px; } }
@@ -659,12 +661,12 @@
       .peers__cue-tip { animation:none !important; }
     }
 
-    .review { position:fixed; z-index:40; left:var(--edge-x); top:42%; display:grid; gap:10px; padding:12px 14px; border:1px solid rgba(22,21,20,.2); border-radius:14px; background:rgba(241,236,236,.92); font:500 11px/1 Manrope,sans-serif; letter-spacing:.04em; color:var(--ink); }
+    .review { position:fixed; z-index:40; left:var(--edge-x); top:118px; display:grid; gap:10px; padding:12px 14px; border:1px solid rgba(22,21,20,.2); border-radius:14px; background:rgba(241,236,236,.92); font:500 11px/1 Manrope,sans-serif; letter-spacing:.04em; color:var(--ink); }
     .review__row { display:flex; align-items:center; gap:6px; }
     .review__row--menu,.review__row--marks { display:none; }
-    html:not(.in-manifest) .review__row--menu { display:flex; }
+    html:not(.past-hero) .review__row--menu { display:flex; }
     html.philosophy-ready .review__row--marks { display:flex; }
-    html.in-manifest:not(.philosophy-ready) .review { display:none; }
+    html.past-hero:not(.philosophy-ready) .review { display:none; }
     .review__row .small { width:44px; opacity:.5; font-size:10px; letter-spacing:.08em; text-transform:uppercase; }
     .review button { padding:7px 10px; border:1px solid rgba(22,21,20,.25); border-radius:999px; background:transparent; color:var(--ink); font:inherit; cursor:pointer; }
     .review button.is-on { background:var(--ink); color:var(--bg-light); border-color:var(--ink); }
@@ -1246,6 +1248,7 @@
       wrap.className = 'needle-wrap';
       needle.replaceWith(wrap); wrap.appendChild(needle);
       // Выноски от лимба к принципам.
+      const root = document.documentElement;
       const NS = 'http://www.w3.org/2000/svg';
       // Выносок к принципам больше нет (Эли, 22.10): стрелка сама показывает на принцип.
       const leads = [];
@@ -1337,7 +1340,7 @@
         let titleP = clamp01((p - .48) / .17);                      // заголовок: стартует вместе со спуском компаса…
         const tenetP = tenets.map((t, i) => clamp01((p - (.60 + i * .07)) / .11));
         // «Философия» собрана целиком — можно показывать выбор знака.
-        root.classList.toggle('philosophy-ready', on && tenetP[tenetP.length - 1] >= 1 && leave < .05);
+        root.classList.toggle('philosophy-ready', on && tenetP[tenetP.length - 1] >= .75 && leave < .05);
         const out = 1;                                              // блок не гаснет: уходит листом
         // Угловая подпись гаснет на выходе: иначе она проезжает по логотипу героя.
         stage.style.setProperty('--corners', (clamp01((p - .09) / .03) * clamp01(1 + exit / 140)).toFixed(3));
@@ -1742,11 +1745,12 @@
             lastY = y;
             if (goingDown !== down) { down = goingDown; shell.classList.toggle('is-down', goingDown); }
           }
-          let theme = 'light';
+          let theme = 'light', hide = false;
           for (const block of blocks) {
             const box = block.getBoundingClientRect();
-            if (box.top <= 56 && box.bottom > 56) { theme = block.dataset.theme; break; }
+            if (box.top <= 56 && box.bottom > 56) { theme = block.dataset.theme; hide = block.dataset.chrome === 'hide'; break; }
           }
+          shell.classList.toggle('is-hidden', hide);
           const dark = theme === 'dark';
           if (dark !== onDark) { onDark = dark; shell.classList.toggle('chrome--dark', !dark); }
         });
@@ -1769,6 +1773,9 @@
       document.addEventListener('click', e => { const b = e.target.closest('button[data-menu]'); if (!b) return; off = b.dataset.menu === 'off'; try { localStorage.setItem('tp-nomenu', off ? '1' : '0'); } catch (err) {} apply(); });
       burger?.addEventListener('click', () => { const open = hero.classList.toggle('menu-open'); burger.setAttribute('aria-expanded', String(open)); });
       apply();
+      // Строка «Меню» — только пока виден первый экран.
+      const onScroll = () => root.classList.toggle('past-hero', scrollY > innerHeight * .55);
+      addEventListener('scroll', onScroll, { passive:true }); onScroll();
     })();
   </script>
 </body>
