@@ -529,7 +529,7 @@
          затем принципы в две колонки. Фразы мельче, без рваных переносов; скрипт сцену не ведёт. */
       .manifest-track { height:auto; margin-top:0; }
       .motion .manifest { opacity:1; }
-      .manifest { position:relative; height:auto; min-height:0; padding:104px var(--edge-x) 64px; display:flex; flex-direction:column; background:var(--bg-light); pointer-events:auto; }
+      .manifest { position:relative; height:auto; min-height:0; padding:104px var(--edge-x) 56px; display:flex; flex-direction:column; background:var(--bg-light); pointer-events:auto; }
       .manifest__corner,.manifest__chart { display:none; }
       .manifest__legs { position:static; transform:none; order:1; margin:0 0 44px; }
       .manifest__leg { white-space:normal; font-size:clamp(1.2rem,5.4vw,1.55rem); line-height:1.18; letter-spacing:.005em; margin:0 0 .6em; text-wrap:balance; max-width:22ch; }
@@ -688,6 +688,19 @@
     html.no-menu .hero.menu-open .menu { position:absolute; z-index:5; top:calc(var(--edge-y) + 64px); right:var(--edge-x); left:auto; display:grid; grid-template-columns:repeat(2,minmax(140px,1fr)); width:auto; gap:22px 36px; padding:22px 26px; background:rgba(241,236,236,.97); border:1px solid rgba(22,21,20,.25); transform:none; }
     .hero.is-handoff .menu-burger { opacity:0; pointer-events:none; }
     @media (max-width:960px) { .review,.menu-burger { display:none !important; } }
+    @media (max-width:780px) {
+      .hero { position:relative; }
+      .brand { top:34px; }
+      .menu-toggle { top:50px; left:30px; }
+      .cta { top:42px; right:30px; width:auto; height:30px; padding:0 13px; gap:8px; justify-content:center; font-size:8px; }
+      .cta__arrow { width:6px; height:6px; }
+      .side-note--left { left:36px; } .side-note--right { right:34px; }
+      .meta--left { left:34px; } .meta--right { right:34px; }
+      .meta { bottom:clamp(30px,4.2svh,40px); }
+      .copy { top:clamp(172px,25svh,210px); }
+    }
+    .cursor-mark { display:none !important; }
+    body.has-cursor-mark a,body.has-cursor-mark button,body.has-cursor-mark .menu b { cursor:pointer !important; }
     @supports (height:1svh) { :root { --edge-y:clamp(18px,2.6svh,30px); } }
   </style>
   <style id="rest-styles">
@@ -708,13 +721,13 @@
     .faces__stage { position:sticky; top:0; height:100vh; height:100svh; overflow:hidden; }
     .faces__ring { position:absolute; inset:0; visibility:hidden; }
     .faces__ring.is-on { visibility:visible; }
-    .face { position:absolute; left:0; top:0; margin:0; width:var(--card-w,260px); box-sizing:border-box; padding:14px 12px 14px; display:grid; grid-template-rows:auto auto auto; gap:12px; border-radius:14px; border:1px solid rgba(22,21,20,.1); background:#FFFFFF; color:var(--ink); opacity:0; transform-origin:50% 50%; will-change:transform,opacity,clip-path; text-align:left; }
+    .face { position:absolute; left:0; top:0; margin:0; width:var(--card-w,260px); box-sizing:border-box; padding:22px 14px 18px; display:grid; grid-template-rows:auto auto auto; gap:14px; border-radius:14px; border:1px solid rgba(22,21,20,.1); background:#FFFFFF; color:var(--ink); opacity:0; transform-origin:50% 50%; will-change:transform,opacity,clip-path; text-align:left; }
     .face > * { min-width:0; }
     .face:focus-visible { outline:1px solid var(--ink); outline-offset:3px; }
     .face__head { display:grid; gap:6px; padding:2px 4px 2px; }
     .face__n { font:500 clamp(1.15rem,.95rem + .55vw,1.5rem)/1.15 Manrope,sans-serif; letter-spacing:-.02em; }
         /* Мысль: открывающая кавычка “ (не „), с воздухом от текста, верх вровень с первой буквой (Эли, 27.10). */
-    .face__q { position:relative; padding-left:1.15em; font:300 clamp(.88rem,.8rem + .22vw,1rem)/1.42 Manrope,sans-serif; letter-spacing:.005em; opacity:.8; text-wrap:pretty; }
+    .face__q { position:relative; padding-left:1.15em; font:300 clamp(.95rem,.86rem + .25vw,1.08rem)/1.45 Manrope,sans-serif; letter-spacing:.005em; opacity:.8; text-wrap:pretty; }
     /* В Anticva нет глифа “ — кавычка из Georgia. */
     .face__q::before { content:'\201C'; position:absolute; left:.02em; top:-.04em; font:400 1.75em/1 Georgia,'Times New Roman',serif; opacity:.5; }
     .face__pos { font:300 var(--fz-small)/1.3 Manrope,sans-serif; letter-spacing:.01em; opacity:.6; }
@@ -723,7 +736,9 @@
     .face__photo img { display:block; width:100%; height:100%; object-fit:cover; object-position:50% 14%; -webkit-mask-image:linear-gradient(180deg,#000 66%,transparent 100%); mask-image:linear-gradient(180deg,#000 66%,transparent 100%); }
     /* Стеклянные плашки внизу фото: затемнённое стекло с размытием, как у Apple. На кольце не видны. */
     .face__pills { position:absolute; left:8px; right:8px; bottom:8px; display:flex; flex-direction:column; align-items:flex-start; gap:6px; opacity:var(--open,1); }
-    .face__pill { padding:7px 11px; border-radius:999px; border:1px solid rgba(255,255,255,.22); background:rgba(17,17,17,.32); -webkit-backdrop-filter:blur(12px) saturate(1.2); backdrop-filter:blur(12px) saturate(1.2); color:#FFFFFF; font:500 .76rem/1.25 Manrope,sans-serif; letter-spacing:.02em; min-width:0; text-align:left; box-shadow:inset 0 1px 0 rgba(255,255,255,.12); }
+    .face__pill { padding:8px 12px; border-radius:999px; border:1px solid rgba(255,255,255,.14); background:rgba(17,17,17,.26); -webkit-backdrop-filter:blur(12px) saturate(1.15); backdrop-filter:blur(12px) saturate(1.15); color:#FFFFFF; font:400 .78rem/1.25 Manrope,sans-serif; letter-spacing:.01em; min-width:0; text-align:left; }
+    /* Размытие стекла только у раскрытой карточки: на кольце и в полёте оно гружёное и невидимое. */
+    .face:not(.is-open) .face__pill { -webkit-backdrop-filter:none; backdrop-filter:none; }
     .face__pill { max-width:100%; }
     .faces__ring--1 .face__pills { align-items:flex-end; }
     .face__who { display:flex; align-items:flex-start; gap:10px; padding:2px 4px 0; }
@@ -735,21 +750,21 @@
     .faces__ring--1 .face__n--top,.faces__ring--1 .face__q--bottom { display:none; }
     .faces__ring--1 .face__head { padding-bottom:0; }
     /* Без -webkit-line-clamp: он прятал кавычку-псевдоэлемент. Высота ровно три строки, лишнее обрезается. */
-    .faces__ring--1 .face__q--top { display:block; overflow:hidden; height:calc(3 * 1.42em); }
+    .faces__ring--1 .face__q--top { display:block; overflow:hidden; height:calc(3 * 1.45em); }
     .faces__ring--1 .face__who { padding-top:6px; }
     /* Вариант 2: сверху только имя; на фото стеклянная плашка должности; внизу аватар + мысль. */
     .faces__ring--2 .face { gap:14px; }
     .faces__ring--2 .face__q--top,.faces__ring--2 .face__n--bottom,.faces__ring--2 .face__pos { display:none; }
     .faces__ring--2 .face__head { grid-template-columns:1fr; padding:4px 4px 0; }
     .faces__ring--2 .face__n--top { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .faces__ring--2 .face__q--bottom { display:block; overflow:hidden; height:calc(4 * 1.42em); }
+    .faces__ring--2 .face__q--bottom { display:block; overflow:hidden; height:calc(3 * 1.45em); }
     .faces__ring--2 .face__who { padding-top:6px; }
     /* Подпись в сердцевине кольца: видна, пока кольцо крутится и растёт, и гаснет
        задолго до того, как карточки раскрываются в ряд (Эли, 27.10). */
-    .faces__label { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); margin:0; text-align:center; white-space:nowrap; opacity:var(--label,0); pointer-events:none; letter-spacing:.14em; text-transform:uppercase; }
+    .faces__label { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); margin:0; text-align:center; white-space:nowrap; opacity:calc(.75 * var(--label,0)); pointer-events:none; font:300 var(--fz-small)/1.4 Manrope,sans-serif; letter-spacing:.01em; text-transform:none; }
     /* Пока кольцо летает, шапка зоны с кнопкой молчит: карточки проходят под ней. */
     html.faces-busy .zone__chrome { opacity:0 !important; pointer-events:none !important; }
-    .faces__title { position:absolute; left:var(--edge-x); right:var(--edge-x); top:var(--edge-y); margin:0; padding-top:72px; pointer-events:none; }
+    .faces__title { position:absolute; left:var(--edge-x); right:var(--edge-x); top:var(--edge-y); margin:0; padding-top:64px; pointer-events:none; }
     .faces__title .ln__i { transform:translateY(110%); transition:transform .9s var(--ease); }
     .faces__stage.is-captioned .faces__title .ln__i { transform:none; }
     @media (max-width:780px) { .faces__title { padding-top:96px; text-align:center; } }
@@ -759,13 +774,21 @@
     .faces__dev button { padding:9px 14px; border:1px solid rgba(22,21,20,.25); border-radius:999px; background:transparent; color:var(--ink); font:500 var(--fz-small)/1 Manrope,sans-serif; letter-spacing:.02em; cursor:pointer; }
     .faces__dev button.is-on { background:var(--ink); color:var(--bg-light); border-color:var(--ink); }
     @media (max-width:780px) {
-      .faces__dev { display:none; }
-      .faces { margin-top:0; }   /* на телефоне манифест статичен — без наложения */
-      /* На телефоне блоки идут друг за другом: фон зоны и манифеста непрозрачен,
-         иначе под ними просвечивал закреплённый первый экран. Подпись в кольце не нужна. */
+      /* Телефон (Эли, 27.10): кольцо с прокруткой дёргалось и оставляло пустой экран.
+         Здесь раздел статичен: заголовок, под ним свайп-полка карточек. Скрипт сцену не ведёт. */
+      .faces__dev,.faces__label { display:none; }
+      .faces { margin-top:0; height:auto !important; padding:8px 0 72px; }
       .zone, #manifest-track { background:var(--bg-light); }
-      .faces__label { display:none; }
-      .face { padding:8px 8px 12px; gap:12px; }
+      .faces__stage { position:static; height:auto; overflow:visible; display:flex; flex-direction:column; }
+      .faces__title { order:-1; position:static; padding:0; margin:0 var(--edge-x) 28px; text-align:left; }
+      .faces__title .ln__i { transform:none; }
+      .faces__ring { position:static; visibility:visible; display:flex; gap:12px; padding:0 var(--edge-x) 8px; overflow-x:auto; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+      .faces__ring::-webkit-scrollbar { display:none; }
+      .face { position:static; flex:0 0 min(78vw,320px); scroll-snap-align:center; width:auto !important; min-height:0 !important; transform:none !important; opacity:1 !important; clip-path:none !important; padding:16px 14px 18px; gap:14px; }
+      .face__head { padding:0 2px; }
+      .faces__ring--1 .face__q--top,.faces__ring--2 .face__q--bottom { height:auto; max-height:none; }
+      .face__pills { opacity:1; }
+      .face__who { padding:0 2px; }
     }
     @media (prefers-reduced-motion:reduce) {
       .face__rose { animation:none; }
@@ -778,7 +801,8 @@
     .prog { padding:clamp(70px,9vh,110px) 0 clamp(60px,8vh,90px); }
     .prog__head { align-items:end; row-gap:20px; }
     .prog__head .h-sec { grid-column:1 / 13; }
-    .prog__bar { display:flex; flex-wrap:wrap; align-items:center; gap:14px 28px; margin:clamp(28px,4vh,44px) var(--edge-x) 0; padding:14px 0; border-top:1px solid var(--rule-c); border-bottom:1px solid var(--rule-c); }
+    /* Без линий (Эли, 27.10): фильтры — одна строка, факультеты слева, чипы формата справа. */
+    .prog__bar { display:flex; flex-wrap:wrap; align-items:center; gap:16px 32px; margin:clamp(24px,3.5vh,40px) var(--edge-x) 0; padding:0; }
     .prog__tabs { display:flex; flex-wrap:wrap; gap:4px 28px; }
     .prog__sel { margin-left:auto; }
     .prog__tabs button,.prog__fac { border:0; background:transparent; color:inherit; cursor:pointer; font:500 clamp(.85rem,.75rem + .3vw,1rem)/1.2 Manrope,sans-serif; letter-spacing:.02em; padding:8px 0; opacity:.5; transition:opacity .3s var(--ease); border-bottom:1px solid transparent; }
@@ -789,18 +813,14 @@
     .prog__fac { padding:6px 12px; border:1px solid rgba(22,21,20,.18); border-radius:999px; text-transform:none; letter-spacing:.01em; font-weight:400; }
     .prog__fac i { font-style:normal; font-family:Anticva,Georgia,serif; margin-right:6px; }
     .prog__fac[aria-pressed="true"] { opacity:1; background:var(--ink); color:var(--bg-light); border-color:var(--ink); }
-    .prog__sel { position:relative; display:inline-flex; }
-    .prog__sel-btn { display:inline-flex; align-items:center; gap:10px; border:0; border-bottom:1px solid var(--rule-c); background:transparent; color:inherit; padding:8px 0 6px; cursor:pointer; font:400 var(--fz-small)/1.3 Manrope,sans-serif; }
-    .prog__sel-btn .small { opacity:.5; text-transform:uppercase; letter-spacing:.08em; }
-    .prog__sel-btn b { font-weight:500; min-width:5.5em; text-align:left; }
-    .prog__sel-btn i { width:7px; height:7px; border-right:1px solid currentColor; border-bottom:1px solid currentColor; transform:translateY(-2px) rotate(45deg); transition:transform .3s var(--ease); }
-    .prog__sel-btn[aria-expanded="true"] i { transform:translateY(2px) rotate(225deg); }
-    .prog__sel-list { position:absolute; right:0; top:calc(100% + 10px); z-index:6; margin:0; padding:8px; list-style:none; min-width:200px; background:#FFFFFF; border:1px solid rgba(22,21,20,.1); border-radius:14px; opacity:0; transform:translateY(-6px); pointer-events:none; transition:opacity .25s var(--ease),transform .3s var(--ease); }
-    .prog__sel.is-open .prog__sel-list { opacity:1; transform:none; pointer-events:auto; }
-    .prog__sel-list li { padding:10px 12px; border-radius:8px; cursor:pointer; font:400 var(--fz-small)/1.3 Manrope,sans-serif; letter-spacing:.01em; opacity:.7; transition:background .2s var(--ease),opacity .2s var(--ease); }
-    .prog__sel-list li:hover { background:rgba(22,21,20,.05); opacity:1; }
-    .prog__sel-list li[aria-selected="true"] { opacity:1; font-weight:500; }
-    .prog__sel-list li[aria-selected="true"]::after { content:''; float:right; width:6px; height:6px; margin-top:.45em; border-radius:50%; background:var(--ink); }
+    /* Формат — чипы в строке фильтров, без раскрытия (Эли, 27.10: список неудобен). */
+    .prog__sel { display:inline-flex; align-items:center; gap:12px; }
+    .prog__sel-btn { display:none; }
+    .prog__sel::before { content:'Формат'; font:300 var(--fz-small)/1 Manrope,sans-serif; opacity:.5; }
+    .prog__sel-list { display:flex; flex-wrap:wrap; gap:8px; margin:0; padding:0; list-style:none; }
+    .prog__sel-list li,.prog__tabs--chips button { padding:9px 14px; border:1px solid rgba(22,21,20,.18); border-radius:999px; background:transparent; color:inherit; cursor:pointer; font:400 var(--fz-small)/1 Manrope,sans-serif; letter-spacing:.01em; white-space:nowrap; transition:background .2s var(--ease),border-color .2s var(--ease),color .2s var(--ease); }
+    .prog__sel-list li:hover { border-color:rgba(22,21,20,.45); }
+    .prog__sel-list li[aria-selected="true"] { background:var(--ink); color:var(--bg-light); border-color:var(--ink); }
     .prog__count { opacity:.5; }
     /* Выбор варианта карточки — на время согласования, крупно над каталогом. */
     .prog__dev { display:inline-flex; flex-wrap:wrap; align-items:center; gap:10px; margin:0 var(--edge-x) clamp(28px,4vh,44px); padding:10px 14px; border:1px dashed rgba(22,21,20,.3); border-radius:14px; }
@@ -820,15 +840,23 @@
     .pc__photo { position:relative; aspect-ratio:3 / 2; overflow:hidden; border-radius:18px; background:var(--graphite); }
     .pc__photo img { display:block; width:100%; height:100%; object-fit:cover; filter:saturate(.85); }
     .pc__chips { position:absolute; left:12px; top:12px; right:118px; display:flex; flex-wrap:wrap; gap:6px; z-index:1; }
-    .pc__chips span { padding:7px 11px; border-radius:999px; background:rgba(17,17,17,.42); -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); color:var(--light); font:500 var(--fz-small)/1 Manrope,sans-serif; letter-spacing:.02em; }
+    /* Стекло: лёгкое затемнение, тонкая светлая кромка, нежирный текст (Эли, 27.10). */
+    .pc__chips span { padding:8px 12px; border-radius:999px; border:1px solid rgba(255,255,255,.14); background:rgba(17,17,17,.26); -webkit-backdrop-filter:blur(12px) saturate(1.15); backdrop-filter:blur(12px) saturate(1.15); color:#FFFFFF; font:400 var(--fz-small)/1 Manrope,sans-serif; letter-spacing:.01em; }
     .pc__seal { display:none; position:absolute; right:12px; top:12px; z-index:1; white-space:nowrap; display:inline-flex; align-items:center; gap:6px; padding:7px 10px; border-radius:999px; background:rgba(17,17,17,.42); -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); color:var(--light); font:500 var(--fz-small)/1 Manrope,sans-serif; }
     .pc__seal svg { width:12px; height:12px; fill:none; stroke:currentColor; stroke-width:1; } .pc__seal .d { fill:currentColor; stroke:none; }
     .pc__over { display:none; }
     .pc__body { display:grid; gap:10px; padding:16px 14px 16px; align-content:start; grid-template-rows:auto auto auto 1fr auto; }
     .pc__head { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin:0; }
-    .pc__tag { margin-top:2px; }
     .pc__name { color:inherit; text-decoration:none; font:500 clamp(1rem,.8rem + .45vw,1.35rem)/1.2 Manrope,sans-serif; letter-spacing:-.015em; text-wrap:balance; }
-    .pc__tag { flex:none; padding:6px 10px; border:1px solid rgba(22,21,20,.25); border-radius:999px; font:500 var(--fz-small)/1 Manrope,sans-serif; letter-spacing:.01em; white-space:nowrap; }
+    /* Бирка набора — обводная плашка у названия, как «Top Rated» в референсе (Эли, 27.10). */
+    .pc__tag { flex:none; padding:7px 11px; border:1px solid rgba(22,21,20,.2); border-radius:999px; font:400 var(--fz-small)/1 Manrope,sans-serif; letter-spacing:.01em; white-space:nowrap; }
+    /* Вариант 4 (референс с двумя плашками и оценкой): формат и факультет — стекло слева на фото,
+       оценка — стекло справа; строка факультета под фото не нужна. Варианты 1–3 сохранены для отката. */
+    .pc__rate { position:absolute; right:12px; top:12px; z-index:1; display:inline-flex; align-items:center; gap:6px; padding:8px 12px; border-radius:999px; border:1px solid rgba(255,255,255,.14); background:rgba(17,17,17,.26); -webkit-backdrop-filter:blur(12px) saturate(1.15); backdrop-filter:blur(12px) saturate(1.15); color:#FFFFFF; font:400 var(--fz-small)/1 Manrope,sans-serif; letter-spacing:.01em; }
+    .pc__rate svg { width:11px; height:11px; fill:#FFFFFF; }
+    .prog__list:not(.prog__list--v4) .pc__chip-fac,.prog__list:not(.prog__list--v4) .pc__rate { display:none; }
+    .prog__list--v4 .pc__chips { right:84px; }
+    .prog__list--v4 .pc__fac { display:none; }
     .pc__meta { display:flex; flex-wrap:wrap; margin:0; opacity:.55; text-transform:none; letter-spacing:.02em; }
     .pc__meta span + span::before { content:'·'; margin:0 7px; }
     .pc__value { margin:0; font:300 clamp(.85rem,.74rem + .3vw,.95rem)/1.42 Manrope,sans-serif; letter-spacing:.01em; opacity:.8; max-width:36ch; }
@@ -971,7 +999,14 @@
       .pc__body { padding-bottom:18px; }
       .pc[hidden] { display:none; }
       .prog__dev { margin-inline:var(--edge-x); }
-      .prog__bar { gap:10px 16px; }
+      .prog__bar { flex-direction:column; align-items:stretch; gap:14px; margin-inline:0; }
+      .prog__tabs,.prog__sel-list { flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none; padding:0 var(--edge-x); gap:8px; }
+      .prog__tabs::-webkit-scrollbar,.prog__sel-list::-webkit-scrollbar { display:none; }
+      .prog__tabs button { flex:none; padding:9px 14px; border:1px solid rgba(22,21,20,.18); border-radius:999px; opacity:1; font-weight:400; border-bottom-color:rgba(22,21,20,.18); }
+      .prog__tabs button[aria-pressed="true"] { background:var(--ink); color:var(--bg-light); border-color:var(--ink); }
+      .prog__sel { display:block; }
+      .prog__sel::before { display:block; padding:0 var(--edge-x); margin-bottom:8px; }
+      .prog__sel-list li { flex:none; }
       .founder { grid-template-columns:1fr; }
       .founder__photo,.founder__cap,.founder__copy { grid-column:1; } .founder__copy { grid-row:3; }
       .founder__row { grid-template-columns:1fr; row-gap:8px; }
@@ -1160,7 +1195,7 @@
           <a class="pc__link" href="https://theperformance.ru/courses/masterklas/praktikum-psihofizika-vliyaniya/" target="_blank" rel="noopener" aria-label="Психофизика влияния: подробнее"></a>
           <div class="pc__photo a-clip">
             <img src="programs/vliyanie-900.jpg" alt="" loading="lazy" decoding="async">
-            <span class="pc__chips"><span>Мастер-класс</span></span>
+            <span class="pc__chips"><span>Мастер-класс</span><span class="pc__chip-fac">Психофизика</span></span><span class="pc__rate" aria-label="Оценка 5,0"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M6 .8l1.6 3.3 3.6.5-2.6 2.5.6 3.6L6 9l-3.2 1.7.6-3.6L.8 4.6l3.6-.5z"/></svg>5,0</span>
             <span class="pc__over"><span class="pc__over-t"><b>Психофизика влияния</b><i>1 вечер · 19:00</i></span></span>
           </div>
           <div class="pc__body">
@@ -1176,7 +1211,7 @@
           <a class="pc__link" href="https://theperformance.ru/workshop/golos-i-rech/" target="_blank" rel="noopener" aria-label="Голос и речь: подробнее"></a>
           <div class="pc__photo a-clip">
             <img src="programs/golos-900.jpg" alt="" loading="lazy" decoding="async">
-            <span class="pc__chips"><span>Мастерская</span></span>
+            <span class="pc__chips"><span>Мастерская</span><span class="pc__chip-fac">Мысль и слово</span></span><span class="pc__rate" aria-label="Оценка 4,9"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M6 .8l1.6 3.3 3.6.5-2.6 2.5.6 3.6L6 9l-3.2 1.7.6-3.6L.8 4.6l3.6-.5z"/></svg>4,9</span>
             <span class="pc__over"><span class="pc__over-t"><b>Голос и речь</b><i>от 5 недель · 5 ч/нед</i></span></span>
           </div>
           <div class="pc__body">
@@ -1192,7 +1227,7 @@
           <a class="pc__link" href="https://theperformance.ru/courses/" target="_blank" rel="noopener" aria-label="Логика речи и сторителлинг: подробнее"></a>
           <div class="pc__photo a-clip">
             <img src="programs/logika-900.jpg" alt="" loading="lazy" decoding="async">
-            <span class="pc__chips"><span>Онлайн</span></span>
+            <span class="pc__chips"><span>Онлайн</span><span class="pc__chip-fac">Мысль и слово</span></span><span class="pc__rate" aria-label="Оценка 4,9"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M6 .8l1.6 3.3 3.6.5-2.6 2.5.6 3.6L6 9l-3.2 1.7.6-3.6L.8 4.6l3.6-.5z"/></svg>4,9</span>
             <span class="pc__over"><span class="pc__over-t"><b>Логика речи и сторителлинг</b><i>5–12 недель · 5 ч/нед</i></span></span>
           </div>
           <div class="pc__body">
@@ -1208,7 +1243,7 @@
           <a class="pc__link" href="https://theperformance.ru/courses/" target="_blank" rel="noopener" aria-label="Психофизика лидера: подробнее"></a>
           <div class="pc__photo a-clip">
             <img src="programs/lider-900.jpg" alt="" loading="lazy" decoding="async">
-            <span class="pc__chips"><span>Программа</span></span>
+            <span class="pc__chips"><span>Программа</span><span class="pc__chip-fac">Психофизика</span></span><span class="pc__rate" aria-label="Оценка 5,0"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M6 .8l1.6 3.3 3.6.5-2.6 2.5.6 3.6L6 9l-3.2 1.7.6-3.6L.8 4.6l3.6-.5z"/></svg>5,0</span>
             <span class="pc__over"><span class="pc__over-t"><b>Психофизика лидера</b><i>до 3 месяцев · с 19:30</i></span></span>
           </div>
           <div class="pc__body">
@@ -1224,7 +1259,7 @@
           <a class="pc__link" href="https://theperformance.ru/korporativnoe-obuchenie/" target="_blank" rel="noopener" aria-label="Корпоративная программа: подробнее"></a>
           <div class="pc__photo a-clip">
             <img src="programs/korp-900.jpg" alt="" loading="lazy" decoding="async">
-            <span class="pc__chips"><span>Программа</span></span>
+            <span class="pc__chips"><span>Программа</span><span class="pc__chip-fac">Лидерство</span></span><span class="pc__rate" aria-label="Оценка 4,9"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M6 .8l1.6 3.3 3.6.5-2.6 2.5.6 3.6L6 9l-3.2 1.7.6-3.6L.8 4.6l3.6-.5z"/></svg>4,9</span>
             <span class="pc__over"><span class="pc__over-t"><b>Корпоративная программа</b><i>≈100 часов · модульно</i></span></span>
           </div>
           <div class="pc__body">
@@ -1240,7 +1275,7 @@
           <a class="pc__link" href="https://theperformance.ru/korporativnoe-obuchenie/" target="_blank" rel="noopener" aria-label="Публичная роль руководителя: подробнее"></a>
           <div class="pc__photo a-clip">
             <img src="programs/rukovod-900.jpg" alt="" loading="lazy" decoding="async">
-            <span class="pc__chips"><span>Индивидуально</span></span>
+            <span class="pc__chips"><span>Индивидуально</span><span class="pc__chip-fac">Лидерство</span></span><span class="pc__rate" aria-label="Оценка 4,9"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M6 .8l1.6 3.3 3.6.5-2.6 2.5.6 3.6L6 9l-3.2 1.7.6-3.6L.8 4.6l3.6-.5z"/></svg>4,9</span>
             <span class="pc__over"><span class="pc__over-t"><b>Публичная роль руководителя</b><i></i></span></span>
           </div>
           <div class="pc__body">
@@ -1256,7 +1291,7 @@
           <a class="pc__link" href="https://theperformance.ru/workshop/kreativnoe-myshlenie/" target="_blank" rel="noopener" aria-label="Креативное мышление: подробнее"></a>
           <div class="pc__photo a-clip">
             <img src="programs/kreativ-900.jpg" alt="" loading="lazy" decoding="async">
-            <span class="pc__chips"><span>Мастерская</span></span>
+            <span class="pc__chips"><span>Мастерская</span><span class="pc__chip-fac">Мысль и слово</span></span><span class="pc__rate" aria-label="Оценка 5,0"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M6 .8l1.6 3.3 3.6.5-2.6 2.5.6 3.6L6 9l-3.2 1.7.6-3.6L.8 4.6l3.6-.5z"/></svg>5,0</span>
             <span class="pc__over"><span class="pc__over-t"><b>Креативное мышление</b><i>от 5 недель</i></span></span>
           </div>
           <div class="pc__body">
@@ -1272,7 +1307,7 @@
           <a class="pc__link" href="https://theperformance.ru/workshop/akterskoe-masterstvo/" target="_blank" rel="noopener" aria-label="Актёрское мастерство: подробнее"></a>
           <div class="pc__photo a-clip">
             <img src="programs/akter-900.jpg" alt="" loading="lazy" decoding="async">
-            <span class="pc__chips"><span>Мастерская</span></span>
+            <span class="pc__chips"><span>Мастерская</span><span class="pc__chip-fac">Психофизика</span></span><span class="pc__rate" aria-label="Оценка 4,9"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M6 .8l1.6 3.3 3.6.5-2.6 2.5.6 3.6L6 9l-3.2 1.7.6-3.6L.8 4.6l3.6-.5z"/></svg>4,9</span>
             <span class="pc__over"><span class="pc__over-t"><b>Актёрское мастерство</b><i>от 5 недель</i></span></span>
           </div>
           <div class="pc__body">
@@ -2328,7 +2363,7 @@
           const W = document.documentElement.clientWidth, H = innerHeight, mobile = NARROW.matches;
           const perRow = W < 1180 ? 4 : 5;                     // на планшете 4 в ряд, иначе карточки слишком узкие
           // Карточки на 12% шире ряда «по сетке» — текст мысли дышит (Эли, 27.10); ряд всё равно едет лентой.
-          let cw = mobile ? W * .72 : (W - 2 * GUTTER - (perRow - 1) * GAP) / perRow * 1.12;
+          let cw = mobile ? W * .72 : (W - 2 * GUTTER - (perRow - 1) * GAP) / perRow * 1.2;
           cw = Math.min(cw, (H * .86) / 2.05);   // карточка не выше 86% экрана
           ring.style.setProperty('--card-w', `${cw.toFixed(1)}px`);
           // Высота карточки и место фото в ней — из разметки (transform на offset* не влияет).
@@ -2339,7 +2374,7 @@
           const ph = photos[0];
           const pr = { l:ph.offsetLeft, t:ph.offsetTop, w:ph.offsetWidth, h:ph.offsetHeight };
           const Bb = Math.min(H, W * 1.25);
-          Object.assign(geo, { W, H, cx:W / 2, cy:H / 2, cw, ch, pr, R1:RING_R * Bb, side1:RING_SIDE * Bb, rowY:H * .5, slot:j => GUTTER + j * (cw + GAP) + cw / 2 });
+          Object.assign(geo, { W, H, cx:W / 2, cy:H / 2, cw, ch, pr, R1:RING_R * Bb, side1:RING_SIDE * Bb, rowY:H * .565 /* ряд чуть ниже центра: над ним заголовок */, slot:j => GUTTER + j * (cw + GAP) + cw / 2 });
           const rowW = N * cw + (N - 1) * GAP;
           travel = Math.max(0, rowW - (W - 2 * GUTTER));
           section.style.setProperty('--faces-run', `${((B.fold[1] + travel / H + B.tail) * 100 + 100).toFixed(1)}vh`);
@@ -2376,7 +2411,8 @@
             if (o > 0) visible = true;
             el.style.transform = `translate3d(${(x - ox - cw / 2).toFixed(1)}px,${(y - oy - ch / 2).toFixed(1)}px,0) rotate(${r.toFixed(2)}deg) scale(${s.toFixed(4)})`;
             el.style.opacity = o.toFixed(3);
-            el.style.setProperty('--open', e.toFixed(3));   // таблетка роли видна только в раскрытой карточке
+            el.style.setProperty('--open', e.toFixed(3));
+            el.classList.toggle('is-open', e > .97);   // таблетка роли видна только в раскрытой карточке
             const clip = `inset(${(sq.t * k).toFixed(1)}px ${(sq.r * k).toFixed(1)}px ${(sq.b * k).toFixed(1)}px ${(sq.l * k).toFixed(1)}px round ${(14 * k + 14 * e).toFixed(1)}px)`;
             if (el.__clip !== clip) { el.__clip = clip; el.style.clipPath = clip; }
             const z = String(16 - slots[i]); if (el.style.zIndex !== z) el.style.zIndex = z;
@@ -2398,6 +2434,8 @@
         const applyFace = () => { ring.classList.remove('faces__ring--1', 'faces__ring--2'); ring.classList.add(`faces__ring--${faceMode}`); dev?.querySelectorAll('button').forEach(b => b.classList.toggle('is-on', b.dataset.face === faceMode)); };
         dev?.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; faceMode = b.dataset.face; try { localStorage.setItem('tp-face2', faceMode); } catch (err) {} applyFace(); measure(); render(); });
         applyFace();
+        // На телефоне раздел статичен (полка со свайпом) — сцена не считается.
+        if (NARROW.matches) return;
         const seen = watch(section, '200px');
         measure();
         jobs.push(() => {
@@ -2454,7 +2492,7 @@
         apply();
         // Переключатель варианта карточки (на время согласования).
         const dev = document.getElementById('prog-dev');
-        const cardMode = 1;   // вариант 1 выбран Эли 27.10: фото сверху, цена и запись внизу
+        const cardMode = 4;   // 4 — референс Эли 27.10 (две плашки + оценка на фото); откат на старый формат: поставить 1
         const applyCard = () => { list.className = `prog__list prog__list--v${cardMode}`; dev?.querySelectorAll('button').forEach(b => b.classList.toggle('is-on', +b.dataset.card === cardMode)); };
         dev?.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; cardMode = +b.dataset.card; try { localStorage.setItem('tp-card', cardMode); } catch (err) {} applyCard(); });
         applyCard();

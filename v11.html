@@ -529,7 +529,7 @@
          затем принципы в две колонки. Фразы мельче, без рваных переносов; скрипт сцену не ведёт. */
       .manifest-track { height:auto; margin-top:0; }
       .motion .manifest { opacity:1; }
-      .manifest { position:relative; height:auto; min-height:0; padding:104px var(--edge-x) 64px; display:flex; flex-direction:column; background:var(--bg-light); pointer-events:auto; }
+      .manifest { position:relative; height:auto; min-height:0; padding:104px var(--edge-x) 56px; display:flex; flex-direction:column; background:var(--bg-light); pointer-events:auto; }
       .manifest__corner,.manifest__chart { display:none; }
       .manifest__legs { position:static; transform:none; order:1; margin:0 0 44px; }
       .manifest__leg { white-space:normal; font-size:clamp(1.2rem,5.4vw,1.55rem); line-height:1.18; letter-spacing:.005em; margin:0 0 .6em; text-wrap:balance; max-width:22ch; }
@@ -678,6 +678,19 @@
     html.no-menu .hero.menu-open .menu { position:absolute; z-index:5; top:calc(var(--edge-y) + 64px); right:var(--edge-x); left:auto; display:grid; grid-template-columns:repeat(2,minmax(140px,1fr)); width:auto; gap:22px 36px; padding:22px 26px; background:rgba(241,236,236,.97); border:1px solid rgba(22,21,20,.25); transform:none; }
     .hero.is-handoff .menu-burger { opacity:0; pointer-events:none; }
     @media (max-width:960px) { .review,.menu-burger { display:none !important; } }
+    @media (max-width:780px) {
+      .hero { position:relative; }
+      .brand { top:34px; }
+      .menu-toggle { top:50px; left:30px; }
+      .cta { top:42px; right:30px; width:auto; height:30px; padding:0 13px; gap:8px; justify-content:center; font-size:8px; }
+      .cta__arrow { width:6px; height:6px; }
+      .side-note--left { left:36px; } .side-note--right { right:34px; }
+      .meta--left { left:34px; } .meta--right { right:34px; }
+      .meta { bottom:clamp(30px,4.2svh,40px); }
+      .copy { top:clamp(172px,25svh,210px); }
+    }
+    .cursor-mark { display:none !important; }
+    body.has-cursor-mark a,body.has-cursor-mark button,body.has-cursor-mark .menu b { cursor:pointer !important; }
     @supports (height:1svh) { :root { --edge-y:clamp(18px,2.6svh,30px); } }
   </style>
 </head>
