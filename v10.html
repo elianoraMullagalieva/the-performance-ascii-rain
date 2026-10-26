@@ -525,25 +525,24 @@
     .manifest__chart circle { fill:var(--bg-light); stroke:var(--ink); stroke-width:1; }
 
     @media (max-width:780px) {
+      /* Телефон (Эли, 27.10): порядок — цитата из трёх фраз, затем крупная «Философия»,
+         затем принципы в две колонки. Фразы мельче, без рваных переносов; скрипт сцену не ведёт. */
       .manifest-track { height:auto; margin-top:0; }
-      /* На телефоне сцену не ведёт скрипт — лист виден сразу, а не ждёт прокрутки. */
       .motion .manifest { opacity:1; }
-      .manifest__title { position:static; margin:90px 0 28px; }
-      .manifest__title .l { opacity:1 !important; transform:none !important; filter:none !important; }
-      .manifest__n { --mk:1; }
-      .manifest__tenet { position:static; width:auto; margin-bottom:28px; opacity:1 !important; }
-      .manifest__tn .ln__i,.manifest__td { transform:none !important; opacity:1 !important; filter:none !important; }
-      .manifest__chart { display:none; }
-      /* Без пустого хвоста: лист кончается на четвёртом принципе, угловая
-         подпись на телефоне не нужна — её ведёт прокрутка, которой здесь нет. */
-      .manifest { position:relative; height:auto; min-height:0; padding:110px var(--edge-x) 40px; }
-      .manifest__corner { display:none; }
-      .manifest__legs { position:static; transform:none; }
-      .manifest__leg { white-space:normal; font-size:clamp(1.5rem,7vw,2.1rem); margin-bottom:.5em; }
+      .manifest { position:relative; height:auto; min-height:0; padding:104px var(--edge-x) 64px; display:flex; flex-direction:column; background:var(--bg-light); pointer-events:auto; }
+      .manifest__corner,.manifest__chart { display:none; }
+      .manifest__legs { position:static; transform:none; order:1; margin:0 0 44px; }
+      .manifest__leg { white-space:normal; font-size:clamp(1.2rem,5.4vw,1.55rem); line-height:1.18; letter-spacing:.005em; margin:0 0 .6em; text-wrap:balance; max-width:22ch; }
       .manifest__leg:nth-child(1),.manifest__leg:nth-child(2),.manifest__leg:nth-child(3) { padding-left:0; }
       .manifest__w { opacity:1 !important; filter:none !important; transform:none !important; }
-      .manifest { background:var(--bg-light); pointer-events:auto; }
-      .manifest__corner--bl { bottom:40px; }
+      .manifest__title { position:static; order:2; margin:0 0 36px; padding-top:40px; border-top:1px solid rgba(22,21,20,.14); text-align:left; font-size:clamp(2.75rem,12.4vw,3.6rem); line-height:1; }
+      .manifest__title .l { opacity:1 !important; transform:none !important; filter:none !important; }
+      .manifest__tenets { order:3; display:grid; grid-template-columns:1fr 1fr; gap:32px 18px; }
+      .manifest__n { --mk:1; width:24px; height:24px; margin-bottom:10px; }
+      .manifest__tenet { position:static; width:auto; margin:0; opacity:1 !important; }
+      .manifest__tn { font-size:1.02rem; margin-bottom:6px; }
+      .manifest__td { font-size:.8rem; line-height:1.38; }
+      .manifest__tn .ln__i,.manifest__td { transform:none !important; opacity:1 !important; filter:none !important; }
     }
     @media (prefers-reduced-motion:reduce) {
       .manifest-track { height:auto; margin-top:0; }
@@ -553,6 +552,7 @@
   </style>
   <style id="manifest-img-styles">
     .manifest__leg:nth-child(3) { padding-left:calc(29% + 6px); }
+    @media (max-width:780px) { .manifest__leg:nth-child(3) { padding-left:0; } }
     /* Вставки-картинки в фразах: кадр чуть ниже базовой линии, лёгкий наклон
        на внутреннем слое (внешний слой двигает скрипт). */
     .manifest__img { display:inline-block; vertical-align:-.14em; width:1.55em; height:1.04em; margin:0 .06em; }
