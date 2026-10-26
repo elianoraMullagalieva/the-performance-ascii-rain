@@ -1371,9 +1371,17 @@
       // лежит в --turn, дыхание складывается с ним в CSS.
       const base = compass.querySelector('.compass__base');
       let handoff = false, frame = 0, turnTarget = 0, turnNow = 0, lastNow = 0;
+      // Инерция (Эли, 27.10: «на дорогих сайтах есть разгон и торможение»): прокрутка задаёт
+      // цель, а сцена догоняет её с экспоненциальным замедлением — любой рывок колёсика
+      // превращается в плавный ход. pS/leaveS — сглаженные значения, pending — надо ли ещё дорисовывать.
+      const SMOOTH = 6.5;
+      let pS = -1, leaveS = 0, pending = false, frameDt = 0;
+      const chase = (cur, target, dt) => cur + (target - cur) * (1 - Math.exp(-dt * SMOOTH));
       const breathe = (now) => {
         const t = now / 1000, dt = lastNow ? Math.min((now - lastNow) / 1000, .1) : 0;
         lastNow = now;
+        frameDt = dt;
+        if (pending) paint();
         if (handoff) {
           // Поворот догоняет цель с инерцией: прокрутка задаёт «куда», время — «как».
           // Угол стрелки героя (слежение за курсором доезжает до нуля сам) вычитается:
@@ -1397,7 +1405,11 @@
         const r = track.getBoundingClientRect(), travel = track.offsetHeight - innerHeight;
         // Шкала актов кончается на .9: последний принцип дописан к .88, дальше
         // хвост в ~35vh — и трек отпускает лист. Пустого экрана после нет.
-        const p = clamp01(-r.top / (travel - innerHeight * .35)) * .9;
+        const pRaw = clamp01(-r.top / (travel - innerHeight * .35)) * .9;
+        const offscreen = r.bottom <= 0 || r.top >= innerHeight;
+        // Первый кадр, прыжок по якорю или сцена вне экрана — без догоняния, сразу в цель.
+        if (pS < 0 || offscreen || Math.abs(pRaw - pS) > .35 || REDUCE) pS = pRaw; else pS = chase(pS, pRaw, frameDt);
+        const p = pS;
         // Когда трек кончился, лист едет вверх; компас живёт в прилипшем герое
         // и уехал бы отдельно — сдвигаем его на ту же величину.
         const exit = Math.min(0, r.bottom - innerHeight);
@@ -1405,7 +1417,10 @@
         // Герой закреплён; когда лист манифеста целиком ушёл за верх, он не должен просвечивать под зоной.
         // Уход: принципы и заголовок гаснут лесенкой и уплывают вверх, компас растворяется —
         // следующий блок влетает снизу ещё до того, как они ушли (пересечение во времени, не в месте).
-        const leave = clamp01(-exit / (innerHeight * .55));
+        const leaveRaw = clamp01(-exit / (innerHeight * .55));
+        leaveS = (offscreen || REDUCE || Math.abs(leaveRaw - leaveS) > .5) ? leaveRaw : chase(leaveS, leaveRaw, frameDt);
+        const leave = leaveS;
+        pending = Math.abs(pRaw - pS) > .0004 || Math.abs(leaveRaw - leaveS) > .0008;
         const cLeave = easeIO(clamp01((leave - .05) / .45));
         if (on !== handoff) {
           handoff = on; hero.classList.toggle('is-handoff', on);
