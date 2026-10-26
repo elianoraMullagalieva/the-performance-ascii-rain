@@ -476,7 +476,8 @@
     .needle-wrap { position:absolute; top:0; right:0; bottom:0; left:0; inset:0; z-index:2; transform-origin:50% 50%; transform:rotate(calc(var(--turn,0deg) + var(--breath,0deg))); }
     /* Дрейф лимба в покое: ставит скрипт, только пока манифест на экране. */
     .hero.is-handoff .compass__base { transform-origin:50% 50%; will-change:transform; }
-    .manifest__corner--bl { left:var(--edge-x); bottom:var(--edge-y); }
+    /* Угловая подпись («мысль» → «одна система») убрана (Эли, 27.10). */
+    .manifest__corner--bl { display:none; }
     .manifest__corner { position:absolute; margin:0; font:300 clamp(.75rem,.7rem + .1vw,.8125rem)/1.4 Onest,Manrope,sans-serif; letter-spacing:.08em; text-transform:uppercase; opacity:calc(.6 * var(--corners,1)); }
     /* ── Философия ── */
     .manifest__title { position:absolute; left:0; right:0; top:var(--title-y,17%); margin:0; text-align:center; font-family:Anticva,Georgia,serif; font-size:clamp(2.3rem,1.1rem + 3.4vw,4.3rem); font-weight:400; line-height:1.1; letter-spacing:.01em; text-transform:uppercase; }
@@ -484,11 +485,11 @@
     .manifest__tenets { margin:0; padding:0; list-style:none; }
     .manifest__tenet { position:absolute; width:clamp(220px,15.5vw,270px); }
     /* Принципы за пределами лимба: компас в центре занимает 34% ширины. */
-    .manifest__tenet--1 { left:8%; top:37%; }
-    .manifest__tenet--2 { left:74%; top:34%; }
-    .manifest__tenet--3 { left:74%; top:70%; }
+    .manifest__tenet--1 { left:8%; top:33%; }
+    .manifest__tenet--2 { left:74%; top:30%; }
+    .manifest__tenet--3 { left:74%; top:63%; }
     /* Четвёртый — ниже третьего по левому краю, но с запасом от угловой подписи. */
-    .manifest__tenet--4 { left:8%; top:67%; }
+    .manifest__tenet--4 { left:8%; top:60%; }
     /* Знак принципа: тонкий кружок с точками из языка компаса (вместо 01/02/03).
        Кружок прорисовывается, точки всплывают — скрипт ведёт --mk от 0 до 1. */
     .manifest__n { display:block; width:30px; height:30px; margin-bottom:12px; color:var(--ink); }
@@ -712,36 +713,46 @@
     .face:focus-visible { outline:1px solid var(--ink); outline-offset:3px; }
     .face__head { display:grid; gap:6px; padding:2px 4px 2px; }
     .face__n { font:500 clamp(1.15rem,.95rem + .55vw,1.5rem)/1.15 Manrope,sans-serif; letter-spacing:-.02em; }
-    /* Мысль: декоративная кавычка Anticva, висящая слева. */
-    .face__q { position:relative; padding-left:.95em; font:300 clamp(.84rem,.76rem + .22vw,.97rem)/1.4 Manrope,sans-serif; letter-spacing:.005em; opacity:.78; text-wrap:pretty; }
-    .face__q::before { content:'\201E'; position:absolute; left:-.02em; top:-.18em; font:400 2.1em/1 Anticva,Georgia,serif; opacity:.45; }
+        /* Мысль: открывающая кавычка “ (не „), с воздухом от текста, верх вровень с первой буквой (Эли, 27.10). */
+    .face__q { position:relative; padding-left:1.15em; font:300 clamp(.88rem,.8rem + .22vw,1rem)/1.42 Manrope,sans-serif; letter-spacing:.005em; opacity:.8; text-wrap:pretty; }
+    /* В Anticva нет глифа “ — кавычка из Georgia. */
+    .face__q::before { content:'\201C'; position:absolute; left:.02em; top:-.04em; font:400 1.75em/1 Georgia,'Times New Roman',serif; opacity:.5; }
     .face__pos { font:300 var(--fz-small)/1.3 Manrope,sans-serif; letter-spacing:.01em; opacity:.6; }
     .face__pos-pill { display:none; }
     .face__photo { position:relative; aspect-ratio:1 / 1.04; border-radius:12px; overflow:hidden; background:var(--graphite); }
     .face__photo img { display:block; width:100%; height:100%; object-fit:cover; object-position:50% 14%; -webkit-mask-image:linear-gradient(180deg,#000 66%,transparent 100%); mask-image:linear-gradient(180deg,#000 66%,transparent 100%); }
     /* Стеклянные плашки внизу фото: затемнённое стекло с размытием, как у Apple. На кольце не видны. */
     .face__pills { position:absolute; left:8px; right:8px; bottom:8px; display:flex; flex-direction:column; align-items:flex-start; gap:6px; opacity:var(--open,1); }
-    .face__pill { padding:7px 11px; border-radius:999px; border:1px solid rgba(255,255,255,.22); background:rgba(17,17,17,.32); -webkit-backdrop-filter:blur(12px) saturate(1.2); backdrop-filter:blur(12px) saturate(1.2); color:#FFFFFF; font:500 .76rem/1 Manrope,sans-serif; letter-spacing:.02em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; box-shadow:inset 0 1px 0 rgba(255,255,255,.12); }
+    .face__pill { padding:7px 11px; border-radius:999px; border:1px solid rgba(255,255,255,.22); background:rgba(17,17,17,.32); -webkit-backdrop-filter:blur(12px) saturate(1.2); backdrop-filter:blur(12px) saturate(1.2); color:#FFFFFF; font:500 .76rem/1.25 Manrope,sans-serif; letter-spacing:.02em; min-width:0; text-align:left; box-shadow:inset 0 1px 0 rgba(255,255,255,.12); }
     .face__pill { max-width:100%; }
     .faces__ring--1 .face__pills { align-items:flex-end; }
     .face__who { display:flex; align-items:flex-start; gap:10px; padding:2px 4px 0; }
     .face__who i { flex:none; width:34px; height:34px; border-radius:50%; background:var(--img) center 22%/cover; border:1px solid rgba(22,21,20,.12); }
     .face__who-t { display:grid; gap:3px; min-width:0; }
     .face__who-t .face__n { font-size:clamp(.95rem,.85rem + .3vw,1.1rem); }
-    /* Вариант 1: мысль сверху (ближе к фото), внизу имя + должность; на фото — только программа. */
+    /* Вариант 1: мысль сверху (ближе к фото), внизу имя + должность; на фото — плашка должности. */
     .faces__ring--1 .face { gap:10px; }
-    .faces__ring--1 .face__n--top,.faces__ring--1 .face__q--bottom,.faces__ring--1 .face__pill--pos { display:none; }
+    .faces__ring--1 .face__n--top,.faces__ring--1 .face__q--bottom { display:none; }
     .faces__ring--1 .face__head { padding-bottom:0; }
-    .faces__ring--1 .face__q--top { display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:3; overflow:hidden; height:calc(3 * 1.4em); }
+    /* Без -webkit-line-clamp: он прятал кавычку-псевдоэлемент. Высота ровно три строки, лишнее обрезается. */
+    .faces__ring--1 .face__q--top { display:block; overflow:hidden; height:calc(3 * 1.42em); }
     .faces__ring--1 .face__who { padding-top:6px; }
-    /* Вариант 2: сверху только имя; на фото две стеклянные плашки — должность и программа; внизу аватар + мысль. */
+    /* Вариант 2: сверху только имя; на фото стеклянная плашка должности; внизу аватар + мысль. */
     .faces__ring--2 .face { gap:14px; }
     .faces__ring--2 .face__q--top,.faces__ring--2 .face__n--bottom,.faces__ring--2 .face__pos { display:none; }
     .faces__ring--2 .face__head { grid-template-columns:1fr; padding:4px 4px 0; }
     .faces__ring--2 .face__n--top { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .faces__ring--2 .face__q--bottom { display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:4; overflow:hidden; height:calc(4 * 1.4em); }
+    .faces__ring--2 .face__q--bottom { display:block; overflow:hidden; height:calc(4 * 1.42em); }
     .faces__ring--2 .face__who { padding-top:6px; }
-    .faces__label { display:none; }
+    /* Подпись в сердцевине кольца: видна, пока кольцо крутится и растёт, и гаснет
+       задолго до того, как карточки раскрываются в ряд (Эли, 27.10). */
+    .faces__label { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); margin:0; text-align:center; white-space:nowrap; opacity:var(--label,0); pointer-events:none; letter-spacing:.14em; text-transform:uppercase; }
+    /* Пока кольцо летает, шапка зоны с кнопкой молчит: карточки проходят под ней. */
+    html.faces-busy .zone__chrome { opacity:0 !important; pointer-events:none !important; }
+    .faces__title { position:absolute; left:var(--edge-x); right:var(--edge-x); top:var(--edge-y); margin:0; padding-top:72px; pointer-events:none; }
+    .faces__title .ln__i { transform:translateY(110%); transition:transform .9s var(--ease); }
+    .faces__stage.is-captioned .faces__title .ln__i { transform:none; }
+    @media (max-width:780px) { .faces__title { padding-top:96px; text-align:center; } }
     .faces__dev { position:absolute; right:var(--edge-x); bottom:var(--edge-y); z-index:5; display:flex; flex-wrap:wrap; justify-content:flex-end; align-items:center; gap:8px; opacity:0; pointer-events:none; transition:opacity .6s var(--ease); }
     .faces__stage.is-captioned .faces__dev { opacity:1; pointer-events:auto; }
     .faces__dev .small { opacity:.5; margin-right:4px; }
@@ -750,6 +761,10 @@
     @media (max-width:780px) {
       .faces__dev { display:none; }
       .faces { margin-top:0; }   /* на телефоне манифест статичен — без наложения */
+      /* На телефоне блоки идут друг за другом: фон зоны и манифеста непрозрачен,
+         иначе под ними просвечивал закреплённый первый экран. Подпись в кольце не нужна. */
+      .zone, #manifest-track { background:var(--bg-light); }
+      .faces__label { display:none; }
       .face { padding:8px 8px 12px; gap:12px; }
     }
     @media (prefers-reduced-motion:reduce) {
@@ -774,8 +789,18 @@
     .prog__fac { padding:6px 12px; border:1px solid rgba(22,21,20,.18); border-radius:999px; text-transform:none; letter-spacing:.01em; font-weight:400; }
     .prog__fac i { font-style:normal; font-family:Anticva,Georgia,serif; margin-right:6px; }
     .prog__fac[aria-pressed="true"] { opacity:1; background:var(--ink); color:var(--bg-light); border-color:var(--ink); }
-    .prog__sel { display:inline-flex; align-items:center; gap:8px; }
-    .prog__sel select { appearance:none; -webkit-appearance:none; border:0; border-bottom:1px solid var(--rule-c); background:transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' fill='none' stroke='%23161514'%3E%3Cpath d='M2 3.5l3 3 3-3'/%3E%3C/svg%3E") right center no-repeat; color:inherit; font:400 var(--fz-small)/1.3 Manrope,sans-serif; padding:2px 16px 2px 0; cursor:pointer; }
+    .prog__sel { position:relative; display:inline-flex; }
+    .prog__sel-btn { display:inline-flex; align-items:center; gap:10px; border:0; border-bottom:1px solid var(--rule-c); background:transparent; color:inherit; padding:8px 0 6px; cursor:pointer; font:400 var(--fz-small)/1.3 Manrope,sans-serif; }
+    .prog__sel-btn .small { opacity:.5; text-transform:uppercase; letter-spacing:.08em; }
+    .prog__sel-btn b { font-weight:500; min-width:5.5em; text-align:left; }
+    .prog__sel-btn i { width:7px; height:7px; border-right:1px solid currentColor; border-bottom:1px solid currentColor; transform:translateY(-2px) rotate(45deg); transition:transform .3s var(--ease); }
+    .prog__sel-btn[aria-expanded="true"] i { transform:translateY(2px) rotate(225deg); }
+    .prog__sel-list { position:absolute; right:0; top:calc(100% + 10px); z-index:6; margin:0; padding:8px; list-style:none; min-width:200px; background:#FFFFFF; border:1px solid rgba(22,21,20,.1); border-radius:14px; opacity:0; transform:translateY(-6px); pointer-events:none; transition:opacity .25s var(--ease),transform .3s var(--ease); }
+    .prog__sel.is-open .prog__sel-list { opacity:1; transform:none; pointer-events:auto; }
+    .prog__sel-list li { padding:10px 12px; border-radius:8px; cursor:pointer; font:400 var(--fz-small)/1.3 Manrope,sans-serif; letter-spacing:.01em; opacity:.7; transition:background .2s var(--ease),opacity .2s var(--ease); }
+    .prog__sel-list li:hover { background:rgba(22,21,20,.05); opacity:1; }
+    .prog__sel-list li[aria-selected="true"] { opacity:1; font-weight:500; }
+    .prog__sel-list li[aria-selected="true"]::after { content:''; float:right; width:6px; height:6px; margin-top:.45em; border-radius:50%; background:var(--ink); }
     .prog__count { opacity:.5; }
     /* Выбор варианта карточки — на время согласования, крупно над каталогом. */
     .prog__dev { display:inline-flex; flex-wrap:wrap; align-items:center; gap:10px; margin:0 var(--edge-x) clamp(28px,4vh,44px); padding:10px 14px; border:1px dashed rgba(22,21,20,.3); border-radius:14px; }
@@ -799,7 +824,7 @@
     .pc__seal { display:none; position:absolute; right:12px; top:12px; z-index:1; white-space:nowrap; display:inline-flex; align-items:center; gap:6px; padding:7px 10px; border-radius:999px; background:rgba(17,17,17,.42); -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); color:var(--light); font:500 var(--fz-small)/1 Manrope,sans-serif; }
     .pc__seal svg { width:12px; height:12px; fill:none; stroke:currentColor; stroke-width:1; } .pc__seal .d { fill:currentColor; stroke:none; }
     .pc__over { display:none; }
-    .pc__body { display:grid; gap:8px; padding:16px 14px 12px; align-content:start; grid-template-rows:auto auto auto 1fr auto; }
+    .pc__body { display:grid; gap:10px; padding:16px 14px 16px; align-content:start; grid-template-rows:auto auto auto 1fr auto; }
     .pc__head { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin:0; }
     .pc__tag { margin-top:2px; }
     .pc__name { color:inherit; text-decoration:none; font:500 clamp(1rem,.8rem + .45vw,1.35rem)/1.2 Manrope,sans-serif; letter-spacing:-.015em; text-wrap:balance; }
@@ -808,13 +833,15 @@
     .pc__meta span + span::before { content:'·'; margin:0 7px; }
     .pc__value { margin:0; font:300 clamp(.85rem,.74rem + .3vw,.95rem)/1.42 Manrope,sans-serif; letter-spacing:.01em; opacity:.8; max-width:36ch; }
     .pc__stats { display:none; }
-    .pc__foot { display:flex; align-items:center; justify-content:space-between; gap:10px; margin:6px 0 0; align-self:end; }
+    .pc__foot { display:flex; align-items:center; justify-content:space-between; gap:10px; margin:18px 0 0; align-self:end; }
     .pc__price { font:500 clamp(1rem,.85rem + .45vw,1.25rem)/1.2 Manrope,sans-serif; letter-spacing:-.01em; }
     .pc__price--soft { font:300 var(--fz-small)/1.3 Manrope,sans-serif; opacity:.5; text-transform:none; letter-spacing:.02em; max-width:12em; }
-    .pc__btn { display:inline-flex; align-items:center; gap:10px; color:var(--light); background:var(--ink); text-decoration:none; padding:11px 10px 11px 16px; border-radius:999px; font:500 var(--fz-small)/1 Manrope,sans-serif; letter-spacing:.02em; transition:transform .25s var(--ease); }
-    .pc__btn img { width:22px; height:22px; padding:5px; border-radius:50%; background:var(--light); box-sizing:border-box; }
-    .pc__btn:hover { transform:translateY(-1px); }
-    /* Вариант 2: текст сверху, фото снизу (чипы на фото внизу). */
+    /* Кнопка — как «Запросить участие» в шапке: прямоугольник с обводкой, прописные, та же стрелка (Эли, 27.10). */
+    .pc__btn { display:inline-flex; align-items:center; justify-content:space-between; gap:12px; height:44px; padding:0 14px 0 16px; border:1px solid var(--ink); color:var(--ink); background:transparent; text-decoration:none; border-radius:0; font:500 clamp(11px,.8vw,12px)/1 Manrope,sans-serif; letter-spacing:.06em; text-transform:uppercase; transition:background .25s var(--ease),color .25s var(--ease); }
+    .pc__btn img { width:12px; height:12px; }
+    .pc__btn:hover { background:var(--ink); color:var(--light); }
+    .pc__btn:hover img { filter:brightness(0) invert(1); }
+        /* Вариант 2: текст сверху, фото снизу (чипы на фото внизу). */
     .prog__list--v2 .pc { grid-template-rows:1fr auto; }
     .prog__list--v2 .pc__photo { order:2; }
     .prog__list--v2 .pc__body { order:1; }
@@ -1025,7 +1052,7 @@
          Без заголовка: после Философии карточки летают кольцом (видно только квадрат
          фото), растут, выстраиваются в ряд и раскрываются целиком. Карточка — по референсу Sienna Brooks
          (белая, фото растворяется книзу, всё по левому краю), два варианта по словам Эли (22.10):
-         1 — мысль сверху, внизу аватар + имя + должность, на фото пилюля программы;
+         1 — мысль сверху, внизу аватар + имя + должность;
          2 — имя + пилюля должности сверху, внизу аватар + мысль. Должности условные. -->
     <section class="faces" id="peers" data-theme="light" aria-label="Среда единомышленников">
       <div class="faces__stage" id="faces-stage">
@@ -1034,76 +1061,78 @@
             <div class="face__head">
               <span class="face__q face__q--top">Самое трудное — замолчать вовремя. Здесь учат паузе как инструменту</span>
               <span class="face__n face__n--top">Александр Ровный</span>
-              <span class="face__pos-pill">Генеральный директор</span>
+              <span class="face__pos-pill">Генеральный директор, группа «Волга-Сталь»</span>
             </div>
-            <div class="face__photo"><img src="people/p1-600.jpg" srcset="people/p1-600.jpg 600w, people/p1-900.jpg 900w" sizes="(max-width:780px) 70vw, 20vw" alt="" decoding="async" draggable="false"><span class="face__pills"><span class="face__pill face__pill--pos">Генеральный директор</span><span class="face__pill face__pill--prog" title="Психофизика лидера">Психофизика</span></span></div>
-            <div class="face__who"><i style="--img:url(people/p1-600.jpg)"></i><span class="face__who-t"><b class="face__n face__n--bottom">Александр Ровный</b><span class="face__pos">Генеральный директор, промышленная группа</span><span class="face__q face__q--bottom">Самое трудное — замолчать вовремя. Здесь учат паузе как инструменту</span></span></div>
+            <div class="face__photo"><img src="people/p1-600.jpg" srcset="people/p1-600.jpg 600w, people/p1-900.jpg 900w" sizes="(max-width:780px) 70vw, 20vw" alt="" decoding="async" draggable="false"><span class="face__pills"><span class="face__pill face__pill--pos">Генеральный директор, группа «Волга-Сталь»</span></span></div>
+            <div class="face__who"><i style="--img:url(people/p1-600.jpg)"></i><span class="face__who-t"><b class="face__n face__n--bottom">Александр Ровный</b><span class="face__pos">Генеральный директор, группа «Волга-Сталь»</span><span class="face__q face__q--bottom">Самое трудное — замолчать вовремя. Здесь учат паузе как инструменту</span></span></div>
           </figure>
           <figure class="face" data-focus=".45" tabindex="0">
             <div class="face__head">
               <span class="face__q face__q--top">Я перестал готовить речь и начал готовить мысль. Слова приходят сами</span>
               <span class="face__n face__n--top">Марк Лёвин</span>
-              <span class="face__pos-pill">Предприниматель</span>
+              <span class="face__pos-pill">Основатель бренда одежды «Лёвин»</span>
             </div>
-            <div class="face__photo"><img src="people/p2-600.jpg" srcset="people/p2-600.jpg 600w, people/p2-900.jpg 900w" sizes="(max-width:780px) 70vw, 20vw" alt="" decoding="async" draggable="false"><span class="face__pills"><span class="face__pill face__pill--pos">Предприниматель</span><span class="face__pill face__pill--prog" title="Логика речи и сторителлинг">Логика речи</span></span></div>
-            <div class="face__who"><i style="--img:url(people/p2-600.jpg)"></i><span class="face__who-t"><b class="face__n face__n--bottom">Марк Лёвин</b><span class="face__pos">Предприниматель, основатель бренда</span><span class="face__q face__q--bottom">Я перестал готовить речь и начал готовить мысль. Слова приходят сами</span></span></div>
+            <div class="face__photo"><img src="people/p2-600.jpg" srcset="people/p2-600.jpg 600w, people/p2-900.jpg 900w" sizes="(max-width:780px) 70vw, 20vw" alt="" decoding="async" draggable="false"><span class="face__pills"><span class="face__pill face__pill--pos">Основатель бренда одежды «Лёвин»</span></span></div>
+            <div class="face__who"><i style="--img:url(people/p2-600.jpg)"></i><span class="face__who-t"><b class="face__n face__n--bottom">Марк Лёвин</b><span class="face__pos">Основатель бренда одежды «Лёвин»</span><span class="face__q face__q--bottom">Я перестал готовить речь и начал готовить мысль. Слова приходят сами</span></span></div>
           </figure>
           <figure class="face" data-focus=".45" tabindex="0">
             <div class="face__head">
               <span class="face__q face__q--top">Аргумент работает, когда его слышат, а не когда он верен</span>
               <span class="face__n face__n--top">Анна Светлова</span>
-              <span class="face__pos-pill">Руководитель направления</span>
+              <span class="face__pos-pill">Руководитель направления, Газпром нефть</span>
             </div>
-            <div class="face__photo"><img src="people/p3-600.jpg" srcset="people/p3-600.jpg 600w, people/p3-900.jpg 900w" sizes="(max-width:780px) 70vw, 20vw" alt="" decoding="async" draggable="false"><span class="face__pills"><span class="face__pill face__pill--pos">Руководитель направления</span><span class="face__pill face__pill--prog" title="Голос и речь">Голос и речь</span></span></div>
-            <div class="face__who"><i style="--img:url(people/p3-600.jpg)"></i><span class="face__who-t"><b class="face__n face__n--bottom">Анна Светлова</b><span class="face__pos">Руководитель направления, Газпром</span><span class="face__q face__q--bottom">Аргумент работает, когда его слышат, а не когда он верен</span></span></div>
+            <div class="face__photo"><img src="people/p3-600.jpg" srcset="people/p3-600.jpg 600w, people/p3-900.jpg 900w" sizes="(max-width:780px) 70vw, 20vw" alt="" decoding="async" draggable="false"><span class="face__pills"><span class="face__pill face__pill--pos">Руководитель направления, Газпром нефть</span></span></div>
+            <div class="face__who"><i style="--img:url(people/p3-600.jpg)"></i><span class="face__who-t"><b class="face__n face__n--bottom">Анна Светлова</b><span class="face__pos">Руководитель направления, Газпром нефть</span><span class="face__q face__q--bottom">Аргумент работает, когда его слышат, а не когда он верен</span></span></div>
           </figure>
           <figure class="face" data-focus=".45" tabindex="0">
             <div class="face__head">
               <span class="face__q face__q--top">Понятно — это когда меняется решение собеседника</span>
               <span class="face__n face__n--top">Илья Берг</span>
-              <span class="face__pos-pill">Лектор</span>
+              <span class="face__pos-pill">Доцент НИУ ВШЭ, лектор</span>
             </div>
-            <div class="face__photo"><img src="people/p4-600.jpg" srcset="people/p4-600.jpg 600w, people/p4-900.jpg 900w" sizes="(max-width:780px) 70vw, 20vw" alt="" decoding="async" draggable="false"><span class="face__pills"><span class="face__pill face__pill--pos">Лектор</span><span class="face__pill face__pill--prog" title="Креативное мышление">Креатив</span></span></div>
-            <div class="face__who"><i style="--img:url(people/p4-600.jpg)"></i><span class="face__who-t"><b class="face__n face__n--bottom">Илья Берг</b><span class="face__pos">Лектор, НИУ ВШЭ</span><span class="face__q face__q--bottom">Понятно — это когда меняется решение собеседника</span></span></div>
+            <div class="face__photo"><img src="people/p4-600.jpg" srcset="people/p4-600.jpg 600w, people/p4-900.jpg 900w" sizes="(max-width:780px) 70vw, 20vw" alt="" decoding="async" draggable="false"><span class="face__pills"><span class="face__pill face__pill--pos">Доцент НИУ ВШЭ, лектор</span></span></div>
+            <div class="face__who"><i style="--img:url(people/p4-600.jpg)"></i><span class="face__who-t"><b class="face__n face__n--bottom">Илья Берг</b><span class="face__pos">Доцент НИУ ВШЭ, лектор</span><span class="face__q face__q--bottom">Понятно — это когда меняется решение собеседника</span></span></div>
           </figure>
           <figure class="face" data-focus=".45" tabindex="0">
             <div class="face__head">
               <span class="face__q face__q--top">Присутствие — это не громкость. Это точность внимания к человеку напротив</span>
               <span class="face__n face__n--top">Михаил Градов</span>
-              <span class="face__pos-pill">Архитектор</span>
+              <span class="face__pos-pill">Партнёр бюро «Градов и партнёры»</span>
             </div>
-            <div class="face__photo"><img src="people/p5-600.jpg" srcset="people/p5-600.jpg 600w, people/p5-900.jpg 900w" sizes="(max-width:780px) 70vw, 20vw" alt="" decoding="async" draggable="false"><span class="face__pills"><span class="face__pill face__pill--pos">Архитектор</span><span class="face__pill face__pill--prog" title="Актёрское мастерство">Актёрское</span></span></div>
-            <div class="face__who"><i style="--img:url(people/p5-600.jpg)"></i><span class="face__who-t"><b class="face__n face__n--bottom">Михаил Градов</b><span class="face__pos">Архитектор, партнёр бюро</span><span class="face__q face__q--bottom">Присутствие — это не громкость. Это точность внимания к человеку напротив</span></span></div>
+            <div class="face__photo"><img src="people/p5-600.jpg" srcset="people/p5-600.jpg 600w, people/p5-900.jpg 900w" sizes="(max-width:780px) 70vw, 20vw" alt="" decoding="async" draggable="false"><span class="face__pills"><span class="face__pill face__pill--pos">Партнёр бюро «Градов и партнёры»</span></span></div>
+            <div class="face__who"><i style="--img:url(people/p5-600.jpg)"></i><span class="face__who-t"><b class="face__n face__n--bottom">Михаил Градов</b><span class="face__pos">Партнёр бюро «Градов и партнёры»</span><span class="face__q face__q--bottom">Присутствие — это не громкость. Это точность внимания к человеку напротив</span></span></div>
           </figure>
           <figure class="face" data-focus=".45" tabindex="0">
             <div class="face__head">
               <span class="face__q face__q--top">Влияние начинается там, где я беру ответственность за каждое слово</span>
               <span class="face__n face__n--top">Артём Снегирёв</span>
-              <span class="face__pos-pill">Продюсер</span>
+              <span class="face__pos-pill">Продюсер, киностудия «Снег»</span>
             </div>
-            <div class="face__photo"><img src="people/p6-600.jpg" srcset="people/p6-600.jpg 600w, people/p6-900.jpg 900w" sizes="(max-width:780px) 70vw, 20vw" alt="" decoding="async" draggable="false"><span class="face__pills"><span class="face__pill face__pill--pos">Продюсер</span><span class="face__pill face__pill--prog" title="Психофизика влияния">Психофизика</span></span></div>
-            <div class="face__who"><i style="--img:url(people/p6-600.jpg)"></i><span class="face__who-t"><b class="face__n face__n--bottom">Артём Снегирёв</b><span class="face__pos">Продюсер, кино и телевидение</span><span class="face__q face__q--bottom">Влияние начинается там, где я беру ответственность за каждое слово</span></span></div>
+            <div class="face__photo"><img src="people/p6-600.jpg" srcset="people/p6-600.jpg 600w, people/p6-900.jpg 900w" sizes="(max-width:780px) 70vw, 20vw" alt="" decoding="async" draggable="false"><span class="face__pills"><span class="face__pill face__pill--pos">Продюсер, киностудия «Снег»</span></span></div>
+            <div class="face__who"><i style="--img:url(people/p6-600.jpg)"></i><span class="face__who-t"><b class="face__n face__n--bottom">Артём Снегирёв</b><span class="face__pos">Продюсер, киностудия «Снег»</span><span class="face__q face__q--bottom">Влияние начинается там, где я беру ответственность за каждое слово</span></span></div>
           </figure>
           <figure class="face" data-focus=".45" tabindex="0">
             <div class="face__head">
               <span class="face__q face__q--top">Переговоры выигрывает не тот, кто говорит больше, а тот, кто точнее формулирует</span>
               <span class="face__n face__n--top">Вера Долина</span>
-              <span class="face__pos-pill">Партнёр юридической фирмы</span>
+              <span class="face__pos-pill">Партнёр юридической фирмы «Долина и партнёры»</span>
             </div>
-            <div class="face__photo"><img src="people/p7-600.jpg" srcset="people/p7-600.jpg 600w, people/p7-900.jpg 900w" sizes="(max-width:780px) 70vw, 20vw" alt="" decoding="async" draggable="false"><span class="face__pills"><span class="face__pill face__pill--pos">Партнёр юридической фирмы</span><span class="face__pill face__pill--prog" title="Логика речи и сторителлинг">Логика речи</span></span></div>
-            <div class="face__who"><i style="--img:url(people/p7-600.jpg)"></i><span class="face__who-t"><b class="face__n face__n--bottom">Вера Долина</b><span class="face__pos">Партнёр юридической фирмы</span><span class="face__q face__q--bottom">Переговоры выигрывает не тот, кто говорит больше, а тот, кто точнее формулирует</span></span></div>
+            <div class="face__photo"><img src="people/p7-600.jpg" srcset="people/p7-600.jpg 600w, people/p7-900.jpg 900w" sizes="(max-width:780px) 70vw, 20vw" alt="" decoding="async" draggable="false"><span class="face__pills"><span class="face__pill face__pill--pos">Партнёр юридической фирмы «Долина и партнёры»</span></span></div>
+            <div class="face__who"><i style="--img:url(people/p7-600.jpg)"></i><span class="face__who-t"><b class="face__n face__n--bottom">Вера Долина</b><span class="face__pos">Партнёр юридической фирмы «Долина и партнёры»</span><span class="face__q face__q--bottom">Переговоры выигрывает не тот, кто говорит больше, а тот, кто точнее формулирует</span></span></div>
           </figure>
           <figure class="face" data-focus=".45" tabindex="0">
             <div class="face__head">
               <span class="face__q face__q--top">Я научилась слышать вопрос до того, как его задали</span>
               <span class="face__n face__n--top">Полина Март</span>
-              <span class="face__pos-pill">Врач</span>
+              <span class="face__pos-pill">Главный врач клиники «Март»</span>
             </div>
-            <div class="face__photo"><img src="people/p8-600.jpg" srcset="people/p8-600.jpg 600w, people/p8-900.jpg 900w" sizes="(max-width:780px) 70vw, 20vw" alt="" decoding="async" draggable="false"><span class="face__pills"><span class="face__pill face__pill--pos">Врач</span><span class="face__pill face__pill--prog" title="Голос и речь">Голос и речь</span></span></div>
-            <div class="face__who"><i style="--img:url(people/p8-600.jpg)"></i><span class="face__who-t"><b class="face__n face__n--bottom">Полина Март</b><span class="face__pos">Врач, руководитель клиники</span><span class="face__q face__q--bottom">Я научилась слышать вопрос до того, как его задали</span></span></div>
+            <div class="face__photo"><img src="people/p8-600.jpg" srcset="people/p8-600.jpg 600w, people/p8-900.jpg 900w" sizes="(max-width:780px) 70vw, 20vw" alt="" decoding="async" draggable="false"><span class="face__pills"><span class="face__pill face__pill--pos">Главный врач клиники «Март»</span></span></div>
+            <div class="face__who"><i style="--img:url(people/p8-600.jpg)"></i><span class="face__who-t"><b class="face__n face__n--bottom">Полина Март</b><span class="face__pos">Главный врач клиники «Март»</span><span class="face__q face__q--bottom">Я научилась слышать вопрос до того, как его задали</span></span></div>
           </figure>
         </div>
         <p class="small faces__label" id="faces-label" aria-hidden="true">Среда единомышленников</p>
+        <!-- Заголовок раздела — как «Философия» и «Программы»; появляется, когда ряд собрался (Эли, 27.10). -->
+        <h2 class="h-sec faces__title" id="faces-title"><span class="ln"><span class="ln__i">Среда единомышленников</span></span></h2>
         <!-- Выбор варианта карточки участника — на время согласования. -->
         <div class="faces__dev" id="faces-dev"><span class="small">Вариант карточки</span><button type="button" data-face="1">1 · мысль сверху, имя и должность внизу</button><button type="button" data-face="2">2 · имя и должность сверху, мысль внизу</button></div>
       </div>
@@ -1114,7 +1143,6 @@
          (вкладки формата: Программа / Мастерская / Мастер-класс / Онлайн / Индивидуально;
          в карточке: тип, название, стоимость, набор, запись). Данные — с theperformance.ru. -->
     <section class="prog" id="programs" data-theme="light" data-chrome="hide" aria-labelledby="prog-title">
-      <div class="prog__dev" id="prog-dev"><span class="small">На согласование · вариант карточки</span><button type="button" data-card="1">1 · Фото сверху, цена и запись внизу</button><button type="button" data-card="2">2 · Текст сверху, фото снизу</button><button type="button" data-card="3">3 · Название на фото, три показателя</button></div>
       <header class="g prog__head">
         <h2 class="h-sec a-rise" id="prog-title" data-in><span class="ln"><span class="ln__i">Программы</span></span></h2>
       </header>
@@ -1122,9 +1150,10 @@
            формат — тихий селект справа, набор и счётчик убраны (порядок — ближайший набор первым). -->
       <div class="prog__bar" id="prog-filter" data-in>
         <nav class="prog__tabs a-fade" aria-label="Факультет">
-          <button type="button" data-fac="" aria-pressed="true">Все</button><button type="button" data-fac="1" aria-pressed="false"><i>I</i>Мысль и слово</button><button type="button" data-fac="2" aria-pressed="false"><i>II</i>Психофизика</button><button type="button" data-fac="3" aria-pressed="false"><i>III</i>Лидерство</button>
+          <button type="button" data-fac="" aria-pressed="true">Все</button><button type="button" data-fac="1" aria-pressed="false">Мысль и слово</button><button type="button" data-fac="2" aria-pressed="false">Психофизика</button><button type="button" data-fac="3" aria-pressed="false">Лидерство</button>
         </nav>
-        <label class="prog__sel a-fade" style="--d:120ms"><span class="small">Формат</span><select id="prog-format"><option value="">любой</option><option>Программа</option><option>Мастерская</option><option>Мастер-класс</option><option>Онлайн</option><option>Индивидуально</option></select></label>
+        <!-- Формат: свой выпадающий список (системный select не в стиле сайта — Эли, 27.10). -->
+        <div class="prog__sel a-fade" id="prog-sel" style="--d:120ms"><button type="button" class="prog__sel-btn" aria-haspopup="listbox" aria-expanded="false"><span class="small">Формат</span><b id="prog-format-label">любой</b><i aria-hidden="true"></i></button><ul class="prog__sel-list" role="listbox" aria-label="Формат"><li role="option" data-format="" aria-selected="true">любой</li><li role="option" data-format="Программа">Программа</li><li role="option" data-format="Мастерская">Мастерская</li><li role="option" data-format="Мастер-класс">Мастер-класс</li><li role="option" data-format="Онлайн">Онлайн</li><li role="option" data-format="Индивидуально">Индивидуально</li></ul></div>
       </div>
       <ul class="prog__list prog__list--v1" id="prog-list">
         <li class="pc" data-fac="2" data-format="Мастер-класс" data-date="2026-10" data-in>
@@ -1135,7 +1164,7 @@
             <span class="pc__over"><span class="pc__over-t"><b>Психофизика влияния</b><i>1 вечер · 19:00</i></span></span>
           </div>
           <div class="pc__body">
-            <p class="small pc__fac"><i>II</i>Психофизика</p>
+            <p class="small pc__fac">Психофизика</p>
             <p class="pc__head"><span class="pc__name">Психофизика влияния</span><span class="pc__tag">старт 29 октября</span></p>
             <p class="pc__value">Практикум по актёрскому мастерству: один вечер, чтобы почувствовать присутствие.</p>
             <p class="small pc__meta">1 вечер · 19:00 · С. Шенталинский</p>
@@ -1151,7 +1180,7 @@
             <span class="pc__over"><span class="pc__over-t"><b>Голос и речь</b><i>от 5 недель · 5 ч/нед</i></span></span>
           </div>
           <div class="pc__body">
-            <p class="small pc__fac"><i>I</i>Мысль и слово</p>
+            <p class="small pc__fac">Мысль и слово</p>
             <p class="pc__head"><span class="pc__name">Голос и речь</span><span class="pc__tag">набор в ноябре</span></p>
             <p class="pc__value">Дыхание, тембр, дикция: голос, который держит внимание без усилия.</p>
             <p class="small pc__meta">от 5 недель · 5 ч/нед · В. Мархасев</p>
@@ -1167,7 +1196,7 @@
             <span class="pc__over"><span class="pc__over-t"><b>Логика речи и сторителлинг</b><i>5–12 недель · 5 ч/нед</i></span></span>
           </div>
           <div class="pc__body">
-            <p class="small pc__fac"><i>I</i>Мысль и слово</p>
+            <p class="small pc__fac">Мысль и слово</p>
             <p class="pc__head"><span class="pc__name">Логика речи и сторителлинг</span><span class="pc__tag">набор в ноябре</span></p>
             <p class="pc__value">Структура мысли и история, которую слушают до конца. Занятия в Zoom.</p>
             <p class="small pc__meta">5–12 недель · 5 ч/нед</p>
@@ -1183,7 +1212,7 @@
             <span class="pc__over"><span class="pc__over-t"><b>Психофизика лидера</b><i>до 3 месяцев · с 19:30</i></span></span>
           </div>
           <div class="pc__body">
-            <p class="small pc__fac"><i>II</i>Психофизика</p>
+            <p class="small pc__fac">Психофизика</p>
             <p class="pc__head"><span class="pc__name">Психофизика лидера</span><span class="pc__tag">набор в ноябре</span></p>
             <p class="pc__value">Школа Станиславского для руководителя: тело, внимание, присутствие.</p>
             <p class="small pc__meta">до 3 месяцев · с 19:30 · С. Шенталинский</p>
@@ -1199,7 +1228,7 @@
             <span class="pc__over"><span class="pc__over-t"><b>Корпоративная программа</b><i>≈100 часов · модульно</i></span></span>
           </div>
           <div class="pc__body">
-            <p class="small pc__fac"><i>III</i>Лидерство</p>
+            <p class="small pc__fac">Лидерство</p>
             <p class="pc__head"><span class="pc__name">Корпоративная программа</span><span class="pc__tag">набор открыт</span></p>
             <p class="pc__value">Публичные выступления и деловые коммуникации для команды, под задачи компании.</p>
             <p class="small pc__meta">≈100 часов · модульно</p>
@@ -1215,7 +1244,7 @@
             <span class="pc__over"><span class="pc__over-t"><b>Публичная роль руководителя</b><i></i></span></span>
           </div>
           <div class="pc__body">
-            <p class="small pc__fac"><i>III</i>Лидерство</p>
+            <p class="small pc__fac">Лидерство</p>
             <p class="pc__head"><span class="pc__name">Публичная роль руководителя</span><span class="pc__tag">набор открыт</span></p>
             <p class="pc__value">Индивидуальная работа над стратегическими выступлениями и лидерской коммуникацией.</p>
             <p class="small pc__meta"></p>
@@ -1231,7 +1260,7 @@
             <span class="pc__over"><span class="pc__over-t"><b>Креативное мышление</b><i>от 5 недель</i></span></span>
           </div>
           <div class="pc__body">
-            <p class="small pc__fac"><i>I</i>Мысль и слово</p>
+            <p class="small pc__fac">Мысль и слово</p>
             <p class="pc__head"><span class="pc__name">Креативное мышление</span><span class="pc__tag">набор в декабре</span></p>
             <p class="pc__value">Нестандартные решения и импровизация в мысли — до того, как она станет словом.</p>
             <p class="small pc__meta">от 5 недель</p>
@@ -1247,7 +1276,7 @@
             <span class="pc__over"><span class="pc__over-t"><b>Актёрское мастерство</b><i>от 5 недель</i></span></span>
           </div>
           <div class="pc__body">
-            <p class="small pc__fac"><i>II</i>Психофизика</p>
+            <p class="small pc__fac">Психофизика</p>
             <p class="pc__head"><span class="pc__name">Актёрское мастерство</span><span class="pc__tag">набор в декабре</span></p>
             <p class="pc__value">Контакт, импровизация и поведение в сложных коммуникациях через актёрский тренинг.</p>
             <p class="small pc__meta">от 5 недель</p>
@@ -1868,7 +1897,7 @@
         const s = stage.getBoundingClientRect();
         const w = compass.offsetWidth, restTop = innerHeight * .504;
         const topK = Math.min(s.width * .2555, 437) / w, topY = s.height * .31 - w / 2;
-        const midK = Math.min(s.width * .34, 600) / w, midY = s.height * .60 - w / 2;
+        const midK = Math.min(s.width * .34, 600) / w, midY = s.height * .54 - w / 2;   // компас выше на ~10% (Эли, 27.10)
         const y1 = restTop + (topY - restTop) * lift, k1 = 1 + (topK - 1) * lift;
         const yy = y1 + (midY - y1) * drop, k = k1 + (midK - k1) * drop;
         // Покачивание — один полуоборот синуса на каждый переезд, в одну сторону.
@@ -1878,7 +1907,9 @@
         const cx = s.width / 2, cy = yy + w / 2;
 
         // …но не раньше, чем верх компаса окажется на 30px ниже нижней кромки заголовка.
-        if (titleP > 0) { const ct = compass.getBoundingClientRect().top, tb = title.getBoundingClientRect().bottom; if (ct < tb + 30) titleP = 0; }
+        // Ворота действуют только пока компас едет вниз: в невысоком окне он в покое стоит
+        // почти вплотную к заголовку, и заголовок без этого не появлялся вовсе (Эли, 27.10).
+        if (titleP > 0 && drop < .999) { const ct = compass.getBoundingClientRect().top, tb = title.getBoundingClientRect().bottom; if (ct < tb + 30) titleP = 0; }
         // Акт 1: слова.
         words.forEach((w, i) => {
           const t = clamp01((inP - (i / words.length) * .72) / .28);
@@ -2288,14 +2319,16 @@
         const photos = cards.map(el => el.querySelector('.face__photo'));
         const focus = cards.map(el => Math.min(1, Math.max(0, parseFloat(el.dataset.focus || '.5'))));
         const GUTTER = 24, GAP = 16, SPIN = 4, RING_R = .40, RING_SIDE = .15, G0 = .55;
-        const B = { appear:[.22, .62], fly:[.18, .78], grow:[.2, 1.8], spinStop:[1.55, 1.8], fold:[1.8, 2.5], tail:.15 };
+        // Такты сжаты: от кольца до ряда — два экрана прокрутки, а не три (Эли, 27.10).
+        const B = { appear:[.22, .62], fly:[.18, .78], grow:[.2, 1.2], spinStop:[1.0, 1.2], fold:[1.2, 1.7], tail:.15 };
         const rad = d => d * Math.PI / 180, mix = (a, b, t) => a + (b - a) * t;
         const smooth = (a, b, x) => { const t = clamp01((x - a) / (b - a)); return t * t * (3 - 2 * t); };
         const geo = {}; let slots = cards.map((_, i) => i), unwrap = new Array(N).fill(0), spin = 0, travel = 0, captioned = false;
         const measure = () => {
           const W = document.documentElement.clientWidth, H = innerHeight, mobile = NARROW.matches;
           const perRow = W < 1180 ? 4 : 5;                     // на планшете 4 в ряд, иначе карточки слишком узкие
-          let cw = mobile ? W * .72 : (W - 2 * GUTTER - (perRow - 1) * GAP) / perRow;
+          // Карточки на 12% шире ряда «по сетке» — текст мысли дышит (Эли, 27.10); ряд всё равно едет лентой.
+          let cw = mobile ? W * .72 : (W - 2 * GUTTER - (perRow - 1) * GAP) / perRow * 1.12;
           cw = Math.min(cw, (H * .86) / 2.05);   // карточка не выше 86% экрана
           ring.style.setProperty('--card-w', `${cw.toFixed(1)}px`);
           // Высота карточки и место фото в ней — из разметки (transform на offset* не влияет).
@@ -2349,6 +2382,12 @@
             const z = String(16 - slots[i]); if (el.style.zIndex !== z) el.style.zIndex = z;
           });
           ring.classList.toggle('is-on', visible);
+          // Подпись в центре: появляется с кольцом, гаснет к 1.45 — до остановки вращения и раскрытия.
+          const label = span(pH, B.appear[0] + .1, B.appear[1] + .2) * (1 - span(pH, .8, 1.0));
+          stage.style.setProperty('--label', (visible ? label : 0).toFixed(3));
+          // Шапка зоны молчит, пока кольцо летает и пока готовый ряд уезжает вверх (логотип ложился на карточки).
+          const leaving = section.getBoundingClientRect().bottom < geo.H + 40;
+          document.documentElement.classList.toggle('faces-busy', visible && (foldRaw < .98 || leaving));
           captioned = foldRaw >= .98;
           ring.classList.toggle('is-captioned', captioned);
           stage.classList.toggle('is-captioned', captioned);
@@ -2386,7 +2425,14 @@
         const facBtns = [...document.querySelectorAll('.prog__tabs button')];
         const fmtBtns = [];
         const sectors = [];
-        const fmt = document.getElementById('prog-format'), date = null;
+        const date = null;
+        // Свой список формата: кнопка открывает, пункт выбирает, клик вне и Esc закрывают.
+        const sel = document.getElementById('prog-sel'), selBtn = sel?.querySelector('.prog__sel-btn'), selLabel = document.getElementById('prog-format-label');
+        const selItems = sel ? [...sel.querySelectorAll('[role="option"]')] : [];
+        const selOpen = on => { if (!sel) return; sel.classList.toggle('is-open', on); selBtn.setAttribute('aria-expanded', String(on)); };
+        selBtn?.addEventListener('click', () => selOpen(!sel.classList.contains('is-open')));
+        document.addEventListener('click', e => { if (sel && !sel.contains(e.target)) selOpen(false); });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') selOpen(false); });
         const count = document.getElementById('prog-n'), empty = document.getElementById('prog-empty');
         const state = { fac:'', format:'', date:'' };
         const plural = n => n % 10 === 1 && n % 100 !== 11 ? 'программа' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 'программы' : 'программ';
@@ -2404,11 +2450,11 @@
         };
         facBtns.forEach(b => b.addEventListener('click', () => { state.fac = b.dataset.fac || ''; apply(); }));
         fmtBtns.forEach(b => b.addEventListener('click', () => { state.format = b.dataset.format || ''; fmtBtns.forEach(x => x.setAttribute('aria-pressed', String(x === b))); apply(); }));
-        date?.addEventListener('change', () => { state.date = date.value; apply(); });
+        selItems.forEach(li => li.addEventListener('click', () => { state.format = li.dataset.format || ''; selItems.forEach(x => x.setAttribute('aria-selected', String(x === li))); if (selLabel) selLabel.textContent = li.textContent; selOpen(false); apply(); }));
         apply();
         // Переключатель варианта карточки (на время согласования).
         const dev = document.getElementById('prog-dev');
-        let cardMode = 1; try { cardMode = +(localStorage.getItem('tp-card') || 1) || 1; } catch (e) {}
+        const cardMode = 1;   // вариант 1 выбран Эли 27.10: фото сверху, цена и запись внизу
         const applyCard = () => { list.className = `prog__list prog__list--v${cardMode}`; dev?.querySelectorAll('button').forEach(b => b.classList.toggle('is-on', +b.dataset.card === cardMode)); };
         dev?.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; cardMode = +b.dataset.card; try { localStorage.setItem('tp-card', cardMode); } catch (err) {} applyCard(); });
         applyCard();

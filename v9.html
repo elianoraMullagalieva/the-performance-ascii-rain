@@ -476,7 +476,8 @@
     .needle-wrap { position:absolute; top:0; right:0; bottom:0; left:0; inset:0; z-index:2; transform-origin:50% 50%; transform:rotate(calc(var(--turn,0deg) + var(--breath,0deg))); }
     /* Дрейф лимба в покое: ставит скрипт, только пока манифест на экране. */
     .hero.is-handoff .compass__base { transform-origin:50% 50%; will-change:transform; }
-    .manifest__corner--bl { left:var(--edge-x); bottom:var(--edge-y); }
+    /* Угловая подпись («мысль» → «одна система») убрана (Эли, 27.10). */
+    .manifest__corner--bl { display:none; }
     .manifest__corner { position:absolute; margin:0; font:300 clamp(.75rem,.7rem + .1vw,.8125rem)/1.4 Onest,Manrope,sans-serif; letter-spacing:.08em; text-transform:uppercase; opacity:calc(.6 * var(--corners,1)); }
     /* ── Философия ── */
     .manifest__title { position:absolute; left:0; right:0; top:var(--title-y,17%); margin:0; text-align:center; font-family:Anticva,Georgia,serif; font-size:clamp(2.3rem,1.1rem + 3.4vw,4.3rem); font-weight:400; line-height:1.1; letter-spacing:.01em; text-transform:uppercase; }
@@ -484,11 +485,11 @@
     .manifest__tenets { margin:0; padding:0; list-style:none; }
     .manifest__tenet { position:absolute; width:clamp(220px,15.5vw,270px); }
     /* Принципы за пределами лимба: компас в центре занимает 34% ширины. */
-    .manifest__tenet--1 { left:8%; top:37%; }
-    .manifest__tenet--2 { left:74%; top:34%; }
-    .manifest__tenet--3 { left:74%; top:70%; }
+    .manifest__tenet--1 { left:8%; top:33%; }
+    .manifest__tenet--2 { left:74%; top:30%; }
+    .manifest__tenet--3 { left:74%; top:63%; }
     /* Четвёртый — ниже третьего по левому краю, но с запасом от угловой подписи. */
-    .manifest__tenet--4 { left:8%; top:67%; }
+    .manifest__tenet--4 { left:8%; top:60%; }
     /* Знак принципа: тонкий кружок с точками из языка компаса (вместо 01/02/03).
        Кружок прорисовывается, точки всплывают — скрипт ведёт --mk от 0 до 1. */
     .manifest__n { display:block; width:30px; height:30px; margin-bottom:12px; color:var(--ink); }
@@ -1389,7 +1390,7 @@
         const s = stage.getBoundingClientRect();
         const w = compass.offsetWidth, restTop = innerHeight * .504;
         const topK = Math.min(s.width * .2555, 437) / w, topY = s.height * .31 - w / 2;
-        const midK = Math.min(s.width * .34, 600) / w, midY = s.height * .60 - w / 2;
+        const midK = Math.min(s.width * .34, 600) / w, midY = s.height * .54 - w / 2;   // компас выше на ~10% (Эли, 27.10)
         const y1 = restTop + (topY - restTop) * lift, k1 = 1 + (topK - 1) * lift;
         const yy = y1 + (midY - y1) * drop, k = k1 + (midK - k1) * drop;
         // Покачивание — один полуоборот синуса на каждый переезд, в одну сторону.
@@ -1399,7 +1400,9 @@
         const cx = s.width / 2, cy = yy + w / 2;
 
         // …но не раньше, чем верх компаса окажется на 30px ниже нижней кромки заголовка.
-        if (titleP > 0) { const ct = compass.getBoundingClientRect().top, tb = title.getBoundingClientRect().bottom; if (ct < tb + 30) titleP = 0; }
+        // Ворота действуют только пока компас едет вниз: в невысоком окне он в покое стоит
+        // почти вплотную к заголовку, и заголовок без этого не появлялся вовсе (Эли, 27.10).
+        if (titleP > 0 && drop < .999) { const ct = compass.getBoundingClientRect().top, tb = title.getBoundingClientRect().bottom; if (ct < tb + 30) titleP = 0; }
         // Акт 1: слова.
         words.forEach((w, i) => {
           const t = clamp01((inP - (i / words.length) * .72) / .28);
