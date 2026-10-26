@@ -2586,7 +2586,8 @@
           });
           ring.classList.toggle('is-on', visible);
           // Подпись в центре: появляется с кольцом, гаснет к 1.45 — до остановки вращения и раскрытия.
-          const label = span(pH, B.appear[0] + .1, B.appear[1] + .2) * (1 - span(pH, .8, 1.0));
+          // Подпись — только когда кольцо прилетело и встало (Эли, 27.10): после посадки, до остановки вращения.
+          const label = span(pH, B.fly[1] + .06, B.fly[1] + .18) * (1 - span(pH, 1.02, 1.16));
           stage.style.setProperty('--label', (visible ? label : 0).toFixed(3));
           // Шапка зоны молчит, пока кольцо летает и пока готовый ряд уезжает вверх (логотип ложился на карточки).
           const leaving = section.getBoundingClientRect().bottom < geo.H + 40;
