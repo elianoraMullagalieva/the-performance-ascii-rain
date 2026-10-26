@@ -675,7 +675,36 @@
     .menu-burger i:nth-child(2) { width:16px; margin-left:auto; }
     html.no-menu .hero .menu { display:none; }
     html.no-menu .menu-burger { display:flex; }
-    html.no-menu .hero.menu-open .menu { position:absolute; z-index:5; top:calc(var(--edge-y) + 64px); right:var(--edge-x); left:auto; display:grid; grid-template-columns:repeat(2,minmax(140px,1fr)); width:auto; gap:22px 36px; padding:22px 26px; background:rgba(241,236,236,.97); border:1px solid rgba(22,21,20,.25); transform:none; }
+    /* Выдвижное меню (референс Эли 27.10, Osmo stacked drawer): панель справа, мягкий ход,
+       пункты проявляются лесенкой после панели; при закрытии — обратно, быстрее. */
+    .drawer { position:fixed; inset:0; z-index:60; pointer-events:none; }
+    .drawer__veil { position:absolute; top:0; right:0; bottom:0; left:0; inset:0; background:rgba(17,17,17,.36); opacity:0; transition:opacity .7s cubic-bezier(.16,1,.3,1); }
+    .drawer__panel { position:absolute; top:0; right:0; bottom:0; width:min(440px,100%); display:flex; flex-direction:column; padding:calc(var(--edge-y) + 72px) 40px 36px; background:var(--bg-light); color:var(--ink); overflow:auto; transform:translate3d(100%,0,0); transition:transform .85s cubic-bezier(.76,0,.24,1); box-shadow:-1px 0 0 rgba(22,21,20,.08); }
+    html.drawer-open .drawer { pointer-events:auto; }
+    html.drawer-open .drawer__veil { opacity:1; }
+    html.drawer-open .drawer__panel { transform:none; }
+    .drawer__close { position:absolute; top:var(--edge-y); right:40px; display:flex; align-items:center; gap:10px; height:50px; padding:0; border:0; background:transparent; color:inherit; cursor:pointer; font-size:clamp(11px,1vw,13px); font-weight:500; letter-spacing:.06em; text-transform:uppercase; }
+    .drawer__close i { position:relative; width:14px; height:14px; }
+    .drawer__close i::before,.drawer__close i::after { content:''; position:absolute; left:0; top:6.5px; width:14px; height:1px; background:currentColor; transform:rotate(45deg); }
+    .drawer__close i::after { transform:rotate(-45deg); }
+    .drawer__nav { display:grid; gap:30px; }
+    .drawer__group { display:grid; gap:8px; }
+    .drawer__group b { font:300 .76rem/1.3 Manrope,sans-serif; letter-spacing:.05em; text-transform:uppercase; opacity:.5; margin-bottom:2px; }
+    .drawer__group a { display:block; width:max-content; color:inherit; text-decoration:none; font:400 clamp(1.45rem,1.3rem + .6vw,1.85rem)/1.15 Manrope,sans-serif; letter-spacing:-.01em; transition:opacity .25s; }
+    .drawer__group a:hover { opacity:.55; }
+    .drawer__foot { margin-top:auto; padding-top:36px; display:grid; gap:16px; }
+    .drawer__cta { display:flex; align-items:center; justify-content:space-between; height:50px; padding:0 17px; border:1px solid var(--ink); color:inherit; text-decoration:none; font-size:clamp(11px,1vw,13px); font-weight:500; letter-spacing:.06em; text-transform:uppercase; }
+    .drawer__cta img { width:12px; height:12px; }
+    .drawer__meta { margin:0; font:300 .78rem/1.5 Manrope,sans-serif; letter-spacing:.02em; opacity:.6; }
+    .drawer .d-in { opacity:0; transform:translate3d(0,22px,0); transition:opacity .35s ease, transform .35s ease; }
+    html.drawer-open .drawer .d-in { opacity:1; transform:none; transition:opacity .55s cubic-bezier(.16,1,.3,1) var(--d,0ms), transform .8s cubic-bezier(.16,1,.3,1) var(--d,0ms); }
+    html.drawer-open { overflow:hidden; }
+    /* Бургер → крестик */
+    .menu-burger i,.menu-toggle i { transition:transform .45s cubic-bezier(.16,1,.3,1),opacity .3s,width .3s; transform-origin:50% 50%; }
+    html.drawer-open .menu-burger i:nth-child(1),html.drawer-open .menu-toggle i:nth-child(1) { transform:translateY(7px) rotate(45deg); }
+    html.drawer-open .menu-burger i:nth-child(2),html.drawer-open .menu-toggle i:nth-child(2) { opacity:0; }
+    html.drawer-open .menu-burger i:nth-child(3),html.drawer-open .menu-toggle i:nth-child(3) { transform:translateY(-7px) rotate(-45deg); }
+    @media (max-width:960px) { .hero.menu-open .menu { display:none !important; } .drawer__panel { padding:calc(var(--edge-y) + 64px) 28px 28px; } .drawer__close { right:28px; } }
     .hero.is-handoff .menu-burger { opacity:0; pointer-events:none; }
     @media (max-width:960px) { .review,.menu-burger { display:none !important; } }
     @media (max-width:780px) {
@@ -752,6 +781,14 @@
 
   <!-- Та же обвязка, что на первом экране: не двигается, только цвет. -->
 
+  <div class="drawer" id="drawer" aria-hidden="true">
+    <div class="drawer__veil" id="drawer-veil"></div>
+    <aside class="drawer__panel" role="dialog" aria-label="Меню">
+      <button class="drawer__close" id="drawer-close" type="button">Закрыть <i aria-hidden="true"></i></button>
+      <nav class="drawer__nav" id="drawer-nav" aria-label="Меню"></nav>
+      <div class="drawer__foot d-in"><a class="drawer__cta" href="https://t.me/theperformance_assistant" target="_blank" rel="noopener"><span>Запросить участие</span><img src="figma-arrow.svg" alt=""></a><p class="drawer__meta">Москва / Online · Приём заявок открыт</p></div>
+    </aside>
+  </div>
   <i class="cursor-mark" aria-hidden="true"></i>
   <script>
     // Страховка: если заставка не довела себя до конца за 9 секунд (нет
@@ -1779,7 +1816,25 @@
       let off = false; try { off = localStorage.getItem('tp-nomenu') === '1'; } catch (e) {}
       const apply = () => { root.classList.toggle('no-menu', off); if (!off) hero.classList.remove('menu-open'); document.querySelectorAll('button[data-menu]').forEach(b => b.classList.toggle('is-on', (b.dataset.menu === 'off') === off)); };
       document.addEventListener('click', e => { const b = e.target.closest('button[data-menu]'); if (!b) return; off = b.dataset.menu === 'off'; try { localStorage.setItem('tp-nomenu', off ? '1' : '0'); } catch (err) {} apply(); });
-      burger?.addEventListener('click', () => { const open = hero.classList.toggle('menu-open'); burger.setAttribute('aria-expanded', String(open)); });
+      // Выдвижное меню: пункты — копия меню первого экрана (якоря те же), лесенка задержек.
+      const drawer = document.getElementById('drawer'), dnav = document.getElementById('drawer-nav');
+      if (drawer && dnav) {
+        let k = 0;
+        document.querySelectorAll('.hero .menu .menu__group').forEach(g => {
+          const box = document.createElement('div'); box.className = 'drawer__group';
+          const b = g.querySelector('b'); if (b) { const t = document.createElement('b'); t.textContent = b.textContent; t.className = 'd-in'; t.style.setProperty('--d', `${220 + k++ * 45}ms`); box.appendChild(t); }
+          g.querySelectorAll('a').forEach(a => { const l = a.cloneNode(true); l.className = 'd-in'; l.style.setProperty('--d', `${220 + k++ * 45}ms`); box.appendChild(l); });
+          dnav.appendChild(box);
+        });
+        drawer.querySelector('.drawer__foot').style.setProperty('--d', `${220 + k * 45}ms`);
+      }
+      const toggles = [burger, document.querySelector('.menu-toggle')].filter(Boolean);
+      const setDrawer = open => { root.classList.toggle('drawer-open', open); drawer?.setAttribute('aria-hidden', String(!open)); toggles.forEach(t => { t.setAttribute('aria-expanded', String(open)); t.setAttribute('aria-label', open ? 'Закрыть меню' : 'Открыть меню'); }); hero.classList.remove('menu-open'); };
+      toggles.forEach(t => t.addEventListener('click', e => { e.stopImmediatePropagation(); setDrawer(!root.classList.contains('drawer-open')); }, true));
+      document.getElementById('drawer-close')?.addEventListener('click', () => setDrawer(false));
+      document.getElementById('drawer-veil')?.addEventListener('click', () => setDrawer(false));
+      dnav?.addEventListener('click', e => { if (e.target.closest('a')) setDrawer(false); });
+      document.addEventListener('keydown', e => { if (e.key === 'Escape') setDrawer(false); });
       apply();
       // Строка «Меню» — только пока виден первый экран.
       const onScroll = () => root.classList.toggle('past-hero', scrollY > innerHeight * .55);
