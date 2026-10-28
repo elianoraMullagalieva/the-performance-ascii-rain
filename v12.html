@@ -746,6 +746,27 @@
     html.lite .face__pill,html.lite .pc__chips span,html.lite .pc__rate,html.lite .pc__tag { -webkit-backdrop-filter:none !important; backdrop-filter:none !important; background:rgba(17,17,17,.5) !important; }
     html.lite .pc__tag { background:rgba(255,255,255,.28) !important; }
     html.lite .face,html.lite .veil__line .l { will-change:auto !important; }
+    /* Низкие окна (ноутбук 13", окно с панелями браузера; Эли, 28.10): всё компактнее,
+       заголовки одного масштаба, первый экран и «Философия» влезают целиком, компас не упирается в край. */
+    @media (min-width:781px) and (max-height:780px) {
+      :root { --fz-h:clamp(1.7rem,.8rem + 2.3vw,2.9rem); }
+      .copy { top:16%; }
+      .title { font-size:clamp(40px,3.9vw,56px); letter-spacing:-2px; }
+      .eyebrow { margin-bottom:10px; }
+      .compass { top:44%; width:min(27vw,46vh); height:min(27vw,46vh); }
+      .side-note { top:33%; }
+      .manifest__title { --title-y:11%; font-size:var(--fz-h); }
+      .manifest__tenet { width:clamp(220px,18vw,300px); }
+      .manifest__tenet--1 { top:27%; } .manifest__tenet--2 { top:25%; } .manifest__tenet--3 { top:62%; } .manifest__tenet--4 { top:60%; }
+      .manifest__n { width:24px; height:24px; margin-bottom:8px; }
+      .manifest__tn { font-size:clamp(1.05rem,.8rem + .7vw,1.3rem); margin-bottom:6px; }
+      .manifest__td { font-size:clamp(.78rem,.62rem + .4vw,.9rem); line-height:1.32; }
+    }
+    @media (min-width:781px) and (max-height:680px) {
+      .title { font-size:clamp(36px,3.4vw,48px); }
+      .compass { top:42%; width:min(25vw,44vh); height:min(25vw,44vh); }
+      .manifest__tenet--1 { top:24%; } .manifest__tenet--2 { top:22%; } .manifest__tenet--3 { top:62%; } .manifest__tenet--4 { top:60%; }
+    }
     .cursor-mark { display:none !important; }
     body.has-cursor-mark a,body.has-cursor-mark button,body.has-cursor-mark .menu b { cursor:pointer !important; }
     @supports (height:1svh) { :root { --edge-y:clamp(18px,2.6svh,30px); } }
@@ -843,6 +864,17 @@
       .face__rose { animation:none; }
       .faces__label { transition:none; }
     }
+    /* Низкие окна (ноутбук 13"): мельче мысль, фото кадрировано ближе к макушке, карточка короче (Эли, 28.10). */
+    @media (min-width:781px) and (max-height:780px) {
+      .face { padding:16px 12px 14px; gap:10px; }
+      .face__q { font-size:clamp(.82rem,.7rem + .3vw,.92rem); line-height:1.4; }
+      .faces__ring--1 .face__q--top { height:calc(3 * 1.4em); }
+      .faces__ring--2 .face__q--bottom { height:calc(3 * 1.4em); }
+      .face__photo { aspect-ratio:1 / .84; }
+      .face__photo img { object-position:50% 6%; }
+      .face__pill { font-size:.72rem; padding:7px 10px; }
+    }
+    @media (min-width:781px) and (max-height:680px) { .face__photo { aspect-ratio:1 / .78; } }
 
     /* ───────── 3. Программы ─────────
        Плотный каталог: одна строка фильтров (вкладки формата, факультеты, набор),
@@ -2045,7 +2077,8 @@
         const s = stage.getBoundingClientRect();
         const w = compass.offsetWidth, restTop = innerHeight * .504;
         const topK = Math.min(s.width * .2555, 437) / w, topY = s.height * .31 - w / 2;
-        const midK = Math.min(s.width * .34, 600) / w, midY = s.height * .54 - w / 2;   // компас выше на ~10% (Эли, 27.10)
+        // Компас: не шире 34% ширины и не выше 60% высоты экрана — на низких окнах он мешал заголовку (28.10).
+        const short = s.height < 780, midK = Math.min(s.width * .34, s.height * .6, 600) / w, midY = s.height * (short ? .58 : .54) - w / 2;
         const y1 = restTop + (topY - restTop) * lift, k1 = 1 + (topK - 1) * lift;
         const yy = y1 + (midY - y1) * drop, k = k1 + (midK - k1) * drop;
         // Покачивание — один полуоборот синуса на каждый переезд, в одну сторону.
