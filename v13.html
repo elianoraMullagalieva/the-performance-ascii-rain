@@ -870,11 +870,12 @@
       .face__q { font-size:clamp(.82rem,.7rem + .3vw,.92rem); line-height:1.4; }
       .faces__ring--1 .face__q--top { height:calc(3 * 1.4em); }
       .faces__ring--2 .face__q--bottom { height:calc(3 * 1.4em); }
-      .face__photo { aspect-ratio:1 / .84; }
-      .face__photo img { object-position:50% 6%; }
+      /* Портреты 3:4, макушка на 30% высоты снимка: при окне 1/.9 сдвиг 73% даёт ~20px над головой, подбородок выше плашки. */
+      .face__photo { aspect-ratio:1 / .9; }
+      .face__photo img { object-position:50% 73%; }
       .face__pill { font-size:.72rem; padding:7px 10px; }
     }
-    @media (min-width:781px) and (max-height:680px) { .face__photo { aspect-ratio:1 / .78; } }
+    @media (min-width:781px) and (max-height:680px) { .face__photo { aspect-ratio:1 / .84; } .face__photo img { object-position:50% 64%; } }
 
     /* ───────── 3. Программы ─────────
        Плотный каталог: одна строка фильтров (вкладки формата, факультеты, набор),
