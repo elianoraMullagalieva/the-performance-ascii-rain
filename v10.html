@@ -829,8 +829,6 @@
     .faces__ring--2 .face__who { padding-top:6px; }
     /* Подпись в сердцевине кольца: видна, пока кольцо крутится и растёт, и гаснет
        задолго до того, как карточки раскрываются в ряд (Эли, 27.10). */
-    /* Подпись в сердцевине — как имя на карточке, в две строки (Эли, 27.10). */
-    .faces__label { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); margin:0; text-align:center; white-space:nowrap; color:var(--ink); opacity:var(--label,0); pointer-events:none; font:500 clamp(1.15rem,.95rem + .55vw,1.5rem)/1.15 Manrope,sans-serif; letter-spacing:-.02em; text-transform:none; }
     /* Пока кольцо летает, шапка зоны с кнопкой молчит: карточки проходят под ней. */
     html.faces-busy .zone__chrome { opacity:0 !important; pointer-events:none !important; }
     /* Заголовок стоит над рядом: его низ на 36px выше карточек (Эли, 27.10). --row-top пишет скрипт. */
@@ -838,6 +836,14 @@
     .faces__title .ln__i { transform:translateY(110%); transition:transform .9s var(--ease); }
     .faces__stage.is-captioned .faces__title .ln__i { transform:none; }
     @media (max-width:780px) { .faces__title { padding-top:96px; text-align:center; } }
+    /* Стрелки листания ряда: появляются вместе с рядом, под карточками справа. */
+    .faces__nav { position:absolute; right:var(--edge-x); top:calc(var(--row-top,50vh) + var(--row-h,0px) + 28px); display:flex; gap:8px; opacity:0; pointer-events:none; transition:opacity .6s var(--ease); }
+    .faces__stage.is-captioned .faces__nav { opacity:1; pointer-events:auto; }
+    .faces__arrow { position:relative; width:44px; height:44px; padding:0; border:1px solid rgba(22,21,20,.25); background:transparent; cursor:pointer; transition:border-color .25s var(--ease),opacity .25s; }
+    .faces__arrow:hover { border-color:var(--ink); }
+    .faces__arrow[disabled] { opacity:.3; cursor:default; }
+    .faces__arrow i { position:absolute; left:50%; top:50%; width:9px; height:9px; border-right:1px solid var(--ink); border-top:1px solid var(--ink); transform:translate(-60%,-50%) rotate(45deg); }
+    .faces__arrow[data-dir="-1"] i { transform:translate(-40%,-50%) rotate(-135deg); }
     .faces__dev { position:absolute; right:var(--edge-x); bottom:var(--edge-y); z-index:5; display:flex; flex-wrap:wrap; justify-content:flex-end; align-items:center; gap:8px; opacity:0; pointer-events:none; transition:opacity .6s var(--ease); }
     .faces__stage.is-captioned .faces__dev { opacity:1; pointer-events:auto; }
     .faces__dev .small { opacity:.5; margin-right:4px; }
@@ -846,7 +852,7 @@
     @media (max-width:780px) {
       /* Телефон (Эли, 27.10): кольцо с прокруткой дёргалось и оставляло пустой экран.
          Здесь раздел статичен: заголовок, под ним свайп-полка карточек. Скрипт сцену не ведёт. */
-      .faces__dev,.faces__label { display:none; }
+      .faces__dev,.faces__label,.faces__nav { display:none; }
       .faces { margin-top:0; height:auto !important; padding:8px 0 72px; }
       .zone, #manifest-track { background:var(--bg-light); }
       .faces__stage { position:static; height:auto; overflow:visible; display:flex; flex-direction:column; }
@@ -1247,9 +1253,10 @@
             <div class="face__who"><i style="--img:url(people/p8-600.jpg)"></i><span class="face__who-t"><b class="face__n face__n--bottom">Полина Март</b><span class="face__pos">Главный врач клиники «Март»</span><span class="face__q face__q--bottom">Я научилась слышать вопрос до того, как его задали</span></span></div>
           </figure>
         </div>
-        <p class="faces__label" id="faces-label" aria-hidden="true">Среда<br>единомышленников</p>
         <!-- Заголовок раздела — как «Философия» и «Программы»; появляется, когда ряд собрался (Эли, 27.10). -->
         <h2 class="h-sec faces__title" id="faces-title"><span class="ln"><span class="ln__i">Среда единомышленников</span></span></h2>
+        <!-- Стрелки для тех, кто хочет листать ряд (Эли, 28.10): прокрутка колесом ряд не двигает. -->
+        <div class="faces__nav" id="faces-nav"><button type="button" class="faces__arrow" data-dir="-1" aria-label="Предыдущие"><i></i></button><button type="button" class="faces__arrow" data-dir="1" aria-label="Следующие"><i></i></button></div>
         <!-- Выбор варианта карточки участника — на время согласования. -->
         <div class="faces__dev" id="faces-dev"><span class="small">Вариант карточки</span><button type="button" data-face="1">1 · мысль сверху, имя и должность внизу</button><button type="button" data-face="2">2 · имя и должность сверху, мысль внизу</button></div>
       </div>
@@ -2581,6 +2588,7 @@
         const rad = d => d * Math.PI / 180, mix = (a, b, t) => a + (b - a) * t;
         const smooth = (a, b, x) => { const t = clamp01((x - a) / (b - a)); return t * t * (3 - 2 * t); };
         const geo = {}; let slots = cards.map((_, i) => i), unwrap = new Array(N).fill(0), spin = 0, travel = 0, captioned = false;
+        let shiftTarget = 0, shiftNow = 0;   // сдвиг ряда стрелками
         const measure = () => {
           const W = document.documentElement.clientWidth, H = innerHeight, mobile = NARROW.matches;
           const perRow = W < 1180 ? 4 : 5;                     // на планшете 4 в ряд, иначе карточки слишком узкие
@@ -2600,7 +2608,10 @@
           stage.style.setProperty('--row-top', `${(H * .575 - ch / 2).toFixed(1)}px`);
           const rowW = N * cw + (N - 1) * GAP;
           travel = Math.max(0, rowW - (W - 2 * GUTTER));
-          section.style.setProperty('--faces-run', `${((B.fold[1] + travel / H + B.tail) * 100 + 100).toFixed(1)}vh`);
+          stage.style.setProperty('--row-h', `${ch}px`);
+          // Ряд не едет от прокрутки (Эли, 28.10): длина дорожки без запаса на сдвиг, листают стрелками.
+          shiftTarget = Math.min(shiftTarget, travel);
+          section.style.setProperty('--faces-run', `${((B.fold[1] + B.tail) * 100 + 100).toFixed(1)}vh`);
         };
         // Лесенка влёта по карточкам Эли не понравилась (28.10) — влетают вместе: STAG = 0.
         const STAG = 0;
@@ -2615,7 +2626,7 @@
         const render = () => {
           if (!geo.pr) return;
           const foldRaw = REDUCE ? 1 : span(pH, B.fold[0], B.fold[1]);
-          const strip = span(pH, B.fold[1], B.fold[1] + travel / geo.H), shift = travel * strip;
+          const shift = shiftNow;
           const poses = cards.map((_, i) => pose(i, pH));
           if (foldRaw <= 0) {
             const byX = poses.map((_, i) => i).sort((a, b) => poses[a].x - poses[b].x);
@@ -2649,8 +2660,6 @@
           ring.classList.toggle('is-on', visible);
           // Подпись в центре: появляется с кольцом, гаснет к 1.45 — до остановки вращения и раскрытия.
           // Подпись — только когда кольцо прилетело и встало (Эли, 27.10): после посадки, до остановки вращения.
-          const label = span(pH, B.fly[1] + .06, B.fly[1] + .18) * (1 - span(pH, .92, 1.06));
-          stage.style.setProperty('--label', (visible ? label : 0).toFixed(3));
           // Шапка зоны молчит, пока кольцо летает и пока готовый ряд уезжает вверх (логотип ложился на карточки).
           const leaving = section.getBoundingClientRect().bottom < geo.H + 40;
           document.documentElement.classList.toggle('faces-busy', visible && (foldRaw < .98 || leaving));
@@ -2689,8 +2698,14 @@
           }
           const speed = SPIN * (1 - smooth(B.spinStop[0], B.spinStop[1], pH));
           if (pH > B.fly[0] && speed > 0) { spin += dt * speed; dirty = true; }
+          if (Math.abs(shiftTarget - shiftNow) > .3) { shiftNow += (shiftTarget - shiftNow) * (1 - Math.exp(-dt * 7)); dirty = true; } else if (shiftNow !== shiftTarget) { shiftNow = shiftTarget; dirty = true; }
           if (dirty) render();
         });
+        // Стрелки: шаг — одна карточка; у краёв стрелка гаснет.
+        const nav = document.getElementById('faces-nav');
+        const updateNav = () => { if (!nav) return; nav.querySelector('[data-dir="-1"]').disabled = shiftTarget <= 0; nav.querySelector('[data-dir="1"]').disabled = shiftTarget >= travel - 1; };
+        nav?.addEventListener('click', e => { const b = e.target.closest('.faces__arrow'); if (!b) return; const step = geo.cw + GAP; shiftTarget = Math.max(0, Math.min(travel, Math.round((shiftTarget + step * +b.dataset.dir) / step) * step)); updateNav(); });
+        updateNav();
         render();
       });
 
