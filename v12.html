@@ -1064,22 +1064,25 @@
     .flip__stage { position:sticky; top:0; height:100vh; height:100svh; overflow:hidden; background:var(--ink); }
     .flip__a,.flip__b { position:absolute; inset:0; will-change:transform; }
     .flip__a { color:var(--light); }
-    .flip__a img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:50% 30%; filter:saturate(.85); }
-    .flip__shade { position:absolute; inset:0; background:linear-gradient(180deg,rgba(17,17,17,.1),rgba(17,17,17,.55)); }
     .flip__dim { position:absolute; inset:0; background:var(--ink); opacity:var(--dim,0); }
     .flip__a-copy { position:absolute; left:var(--edge-x); right:var(--edge-x); bottom:clamp(40px,7vh,80px); display:grid; gap:14px; }
     .flip__a-copy .h-sec { color:var(--light); }
     .flip__a-copy .small { opacity:.75; }
     .flip__b { background:var(--bg-light); color:var(--ink); transform:translate3d(0,100%,0); overflow:auto; }
-    .flip__b .founder { min-height:100%; align-content:center; padding-top:clamp(70px,10vh,120px); padding-bottom:clamp(56px,8vh,96px); grid-template-columns:repeat(12,minmax(0,1fr)); }
-    .flip__b .founder__photo,.flip__b .founder__cap { display:none; }
-    .flip__b .founder__copy { grid-column:3 / 11; grid-row:1; }
+    /* Лист с прежней раскладкой (портрет слева, текст справа), вписанный в экран. */
+    .flip__b .founder { min-height:100%; align-content:center; padding-top:clamp(56px,8vh,96px); padding-bottom:clamp(48px,7vh,80px); }
+    .flip__b .founder__photo .shot { max-height:min(62vh,640px); margin-inline:auto 0; }
+    .flip__b .founder__photo .shot,.flip__b .founder__photo .ph { aspect-ratio:4 / 5; }
+    .flip__b .founder__photo .ph { height:100%; }
+    .flip__b .founder__copy { gap:clamp(18px,2.4vh,30px); }
+    .flip__b .founder__row { padding:16px 0; }
+    .flip__a-copy { left:var(--edge-x); right:var(--edge-x); bottom:auto; top:50%; transform:translateY(-50%); gap:18px; }
+    .flip__a-copy .h-sec { font-size:clamp(3rem,1.5rem + 5vw,6.5rem); }
     .flip__hint { position:absolute; right:var(--edge-x); bottom:clamp(40px,7vh,80px); margin:0; color:var(--light); opacity:.7; }
     @media (max-width:960px) { .flip__b .founder__copy { grid-column:1 / 13; } }
     @media (max-width:780px) {
       .flip__b .founder { grid-template-columns:1fr; padding-top:72px; }
       .flip__b .founder__copy { grid-column:1; }
-      .flip__a-copy { bottom:56px; }
       .flip__hint { display:none; }
     }
   </style>
@@ -1382,12 +1385,11 @@
       <p class="small prog__note a-fade" data-in>Стоимость и зачисление&nbsp;— после 30-минутной встречи с&nbsp;продюсером.</p>
     </section>
 
-    <!-- 5. Основатель — перелистывание страниц. Фото временное (клуб): портрет 4:5 делает заказчица. -->
+    <!-- 5. Основатель — перелистывание: тёмная обложка с заголовком → лист с портретом и текстом (прежняя раскладка). -->
     <section class="flip" id="founder" data-theme="dark" aria-label="Основатель">
       <div class="flip__stage" id="flip-stage">
         <div class="flip__a" id="flip-a">
-          <img src="club/club.jpg" alt="" decoding="async" loading="lazy">
-          <span class="flip__shade"></span><span class="flip__dim"></span>
+          <span class="flip__dim"></span>
           <div class="flip__a-copy"><h2 class="h-sec">Основатель</h2><p class="small">Натали Дюваль&nbsp;&nbsp;—&nbsp;&nbsp;основатель института</p></div>
           <p class="small flip__hint">Листайте</p>
         </div>
@@ -2491,8 +2493,8 @@
           travel = Math.max(0, rowW - (W - 2 * GUTTER));
           section.style.setProperty('--faces-run', `${((B.fold[1] + travel / H + B.tail) * 100 + 100).toFixed(1)}vh`);
         };
-        // Оркестр (Эли, 27.10): карточки выходят не разом — у каждой своя задержка влёта.
-        const STAG = .045;
+        // Лесенка влёта по карточкам Эли не понравилась (28.10) — влетают вместе: STAG = 0.
+        const STAG = 0;
         const pose = (i, pH) => {
           const g = mix(G0, 1, span(pH, B.grow[0], B.grow[1])), theta = i * (360 / N) + spin, R = geo.R1 * g;
           const d = i * STAG;
@@ -2516,7 +2518,7 @@
           cards.forEach((el, i) => {
             const p = poses[i];
             // Раскладка в ряд — по одной, слева направо: у каждого места своя задержка.
-            const fd = slots[i] * .03, fi = REDUCE ? 1 : span(pH, B.fold[0] + fd, B.fold[1] + fd);
+            const fd = 0, fi = REDUCE ? 1 : span(pH, B.fold[0] + fd, B.fold[1] + fd);
             const e = easeInOut(fi), eX = easeInOut(span(fi, 0, .6)), eY = easeInOut(span(fi, .4, 1));
             if (fi < eMin) eMin = fi;
             // Квадрат фото: сторона = ширина фото, положение по высоте — по фокусу.

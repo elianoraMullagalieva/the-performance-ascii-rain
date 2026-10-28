@@ -2546,8 +2546,8 @@
           travel = Math.max(0, rowW - (W - 2 * GUTTER));
           section.style.setProperty('--faces-run', `${((B.fold[1] + travel / H + B.tail) * 100 + 100).toFixed(1)}vh`);
         };
-        // Оркестр (Эли, 27.10): карточки выходят не разом — у каждой своя задержка влёта.
-        const STAG = .045;
+        // Лесенка влёта по карточкам Эли не понравилась (28.10) — влетают вместе: STAG = 0.
+        const STAG = 0;
         const pose = (i, pH) => {
           const g = mix(G0, 1, span(pH, B.grow[0], B.grow[1])), theta = i * (360 / N) + spin, R = geo.R1 * g;
           const d = i * STAG;
@@ -2571,7 +2571,7 @@
           cards.forEach((el, i) => {
             const p = poses[i];
             // Раскладка в ряд — по одной, слева направо: у каждого места своя задержка.
-            const fd = slots[i] * .03, fi = REDUCE ? 1 : span(pH, B.fold[0] + fd, B.fold[1] + fd);
+            const fd = 0, fi = REDUCE ? 1 : span(pH, B.fold[0] + fd, B.fold[1] + fd);
             const e = easeInOut(fi), eX = easeInOut(span(fi, 0, .6)), eY = easeInOut(span(fi, .4, 1));
             if (fi < eMin) eMin = fi;
             // Квадрат фото: сторона = ширина фото, положение по высоте — по фокусу.
