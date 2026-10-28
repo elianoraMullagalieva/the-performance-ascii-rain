@@ -11,6 +11,18 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400&family=Manrope:wght@300;400;500;600&family=Onest:wght@300&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
   <noscript><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400&family=Manrope:wght@300;400;500;600&family=Onest:wght@300&display=swap" rel="stylesheet"></noscript>
   <script>document.documentElement.classList.add('is-preloading');if ('scrollRestoration' in history) history.scrollRestoration = 'manual';scrollTo(0, 0);addEventListener('pageshow', () => scrollTo(0, 0));</script>
+  <script>
+    // Облегчённый режим: Safari 15 и старше — сразу; любой браузер — если в первые секунды
+    // после загрузки больше 30% кадров длиннее 34 мс. Можно включить вручную: ?lite=1.
+    (function () {
+      var ua = navigator.userAgent, root = document.documentElement;
+      var oldSafari = /Version\/(1[0-5])\./.test(ua) && /Safari/.test(ua) && !/Chrome|CriOS|YaBrowser|Edg/.test(ua);
+      if (oldSafari || /[?&]lite=1/.test(location.search)) root.classList.add('lite');
+      var n = 0, slow = 0, last = 0;
+      function tick(t) { if (last) { n++; if (t - last > 34) slow++; } last = t; if (n < 180) requestAnimationFrame(tick); else if (slow / n > .3) root.classList.add('lite'); }
+      addEventListener('load', function () { setTimeout(function () { requestAnimationFrame(tick); }, 1500); });
+    })();
+  </script>
   <link rel="preload" href="three.min.js" as="script">
   <!-- Без defer: инлайновый скрипт ниже создаёт WebGLRenderer прямо во время
        разбора страницы, поэтому THREE обязан быть уже определён. Отложить
@@ -728,6 +740,12 @@
       .meta { bottom:clamp(30px,4.2svh,40px); }
       .copy { top:clamp(172px,25svh,210px); }
     }
+    /* Облегчённый режим (html.lite): Safari ≤15 и любой браузер с просадкой кадров при загрузке.
+       Движение остаётся, уходят размытия и стекло — самое тяжёлое для старых GPU. */
+    html.lite [style*="blur"],html.lite .veil__line .l,html.lite .manifest__w,html.lite .manifest__title .l,html.lite .manifest__tn .ln__i,html.lite .manifest__td { filter:none !important; }
+    html.lite .face__pill,html.lite .pc__chips span,html.lite .pc__rate,html.lite .pc__tag { -webkit-backdrop-filter:none !important; backdrop-filter:none !important; background:rgba(17,17,17,.5) !important; }
+    html.lite .pc__tag { background:rgba(255,255,255,.28) !important; }
+    html.lite .face,html.lite .veil__line .l { will-change:auto !important; }
     .cursor-mark { display:none !important; }
     body.has-cursor-mark a,body.has-cursor-mark button,body.has-cursor-mark .menu b { cursor:pointer !important; }
     @supports (height:1svh) { :root { --edge-y:clamp(18px,2.6svh,30px); } }
@@ -1061,12 +1079,16 @@
        Страница А — фото на весь экран с заголовком; страница Б — текст. Б наезжает снизу,
        А уходит вверх медленнее и приглушается. Начатое перелистывание доводится само. */
     .flip { position:relative; height:200vh; height:200svh; }
-    .flip__stage { position:sticky; top:0; height:100vh; height:100svh; overflow:hidden; background:var(--ink); }
+    .flip__stage { position:sticky; top:0; height:100vh; height:100svh; overflow:hidden; background:var(--bg-light); }
     .flip__a,.flip__b { position:absolute; inset:0; will-change:transform; }
-    .flip__a { color:var(--light); }
-    .flip__dim { position:absolute; inset:0; background:var(--ink); opacity:var(--dim,0); }
+    /* Обложка светлая (чёрный экран Эли не понравился, 28.10): заголовок слева, большой компас-основа справа. */
+    .flip__a { color:var(--ink); background:var(--bg-light); }
+    .flip__a-cmp { position:absolute; right:calc(var(--edge-x) - 6vw); top:50%; width:min(44vw,560px); aspect-ratio:1; transform:translateY(-50%); opacity:.55; }
+    .flip__a-cmp img { display:block; width:100%; height:100%; }
+    .flip__b { box-shadow:0 -24px 60px rgba(17,17,17,.12); }
+    .flip__dim { position:absolute; inset:0; background:var(--ink); opacity:calc(var(--dim,0) * .35); }
     .flip__a-copy { position:absolute; left:var(--edge-x); right:var(--edge-x); bottom:clamp(40px,7vh,80px); display:grid; gap:14px; }
-    .flip__a-copy .h-sec { color:var(--light); }
+    .flip__a-copy .h-sec { color:var(--ink); }
     .flip__a-copy .small { opacity:.75; }
     .flip__b { background:var(--bg-light); color:var(--ink); transform:translate3d(0,100%,0); overflow:auto; }
     /* Лист с прежней раскладкой (портрет слева, текст справа), вписанный в экран. */
@@ -1078,12 +1100,14 @@
     .flip__b .founder__row { padding:16px 0; }
     .flip__a-copy { left:var(--edge-x); right:var(--edge-x); bottom:auto; top:50%; transform:translateY(-50%); gap:18px; }
     .flip__a-copy .h-sec { font-size:clamp(3rem,1.5rem + 5vw,6.5rem); }
-    .flip__hint { position:absolute; right:var(--edge-x); bottom:clamp(40px,7vh,80px); margin:0; color:var(--light); opacity:.7; }
+    .flip__hint { position:absolute; right:var(--edge-x); bottom:clamp(40px,7vh,80px); margin:0; opacity:.55; }
     @media (max-width:960px) { .flip__b .founder__copy { grid-column:1 / 13; } }
     @media (max-width:780px) {
       .flip__b .founder { grid-template-columns:1fr; padding-top:72px; }
       .flip__b .founder__copy { grid-column:1; }
       .flip__hint { display:none; }
+      .flip__a-cmp { right:auto; left:50%; top:auto; bottom:8vh; width:70vw; transform:translateX(-50%); opacity:.35; }
+      .flip__a-copy { top:30%; transform:none; }
     }
   </style>
 </head>
@@ -1402,7 +1426,7 @@
   <script>
     // Страховка: если заставка не довела себя до конца за 9 секунд (нет
     // WebGL, ошибка внутри, свёрнутая вкладка), сайт открывается сам.
-    setTimeout(() => {
+    const openWithoutGlobe = () => {
       const preloader = document.querySelector('.preloader');
       if (!preloader || preloader.classList.contains('is-complete')) return;
       const hero = document.querySelector('.hero');
@@ -1419,7 +1443,10 @@
       preloader.classList.add('is-complete');
       document.querySelectorAll('#three-canvas,#preloader-particles').forEach(c => { c.width=c.height=0; c.style.display='none'; });
       dispatchEvent(new Event('compass:interaction-ready'));
-    }, 9000);
+    };
+    setTimeout(openWithoutGlobe, 9000);
+    try { const _c = document.createElement('canvas'); if (!(_c.getContext('webgl') || _c.getContext('experimental-webgl'))) addEventListener('DOMContentLoaded', () => setTimeout(openWithoutGlobe, 300)); } catch (e) {}
+
 
     // Библиотека грузится параллельно — ждём её появления, но не дольше
     // шести секунд: дальше вступает страховка и открывает сайт.
