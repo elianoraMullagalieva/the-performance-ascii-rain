@@ -1327,9 +1327,10 @@
       // Инерция (Эли, 27.10: «на дорогих сайтах есть разгон и торможение»): прокрутка задаёт
       // цель, а сцена догоняет её с экспоненциальным замедлением — любой рывок колёсика
       // превращается в плавный ход. pS/leaveS — сглаженные значения, pending — надо ли ещё дорисовывать.
-      const SMOOTH = 6.5;
-      let pS = -1, leaveS = 0, pending = false, frameDt = 0;
-      const chase = (cur, target, dt) => cur + (target - cur) * (1 - Math.exp(-dt * SMOOTH));
+      // Пружина с критическим демпфированием (скорость с нуля, без перелёта); OMEGA — жёсткость.
+      const OMEGA = 11;
+      let pS = -1, leaveS = 0, vP = 0, vL = 0, pending = false, frameDt = 0;
+      const spring = (cur, v, target, dt) => { const h = Math.min(dt, .05); v += ((target - cur) * OMEGA * OMEGA - 2 * OMEGA * v) * h; return [cur + v * h, v]; };
       const breathe = (now) => {
         const t = now / 1000, dt = lastNow ? Math.min((now - lastNow) / 1000, .1) : 0;
         lastNow = now;
@@ -1361,7 +1362,7 @@
         const pRaw = clamp01(-r.top / (travel - innerHeight * .35)) * .9;
         const offscreen = r.bottom <= 0 || r.top >= innerHeight;
         // Первый кадр, прыжок по якорю или сцена вне экрана — без догоняния, сразу в цель.
-        if (pS < 0 || offscreen || Math.abs(pRaw - pS) > .35 || REDUCE) pS = pRaw; else pS = chase(pS, pRaw, frameDt);
+        if (pS < 0 || offscreen || Math.abs(pRaw - pS) > .35 || REDUCE) { pS = pRaw; vP = 0; } else [pS, vP] = spring(pS, vP, pRaw, frameDt);
         const p = pS;
         // Когда трек кончился, лист едет вверх; компас живёт в прилипшем герое
         // и уехал бы отдельно — сдвигаем его на ту же величину.
@@ -1371,9 +1372,9 @@
         // Уход: принципы и заголовок гаснут лесенкой и уплывают вверх, компас растворяется —
         // следующий блок влетает снизу ещё до того, как они ушли (пересечение во времени, не в месте).
         const leaveRaw = clamp01(-exit / (innerHeight * .55));
-        leaveS = (offscreen || REDUCE || Math.abs(leaveRaw - leaveS) > .5) ? leaveRaw : chase(leaveS, leaveRaw, frameDt);
+        if (offscreen || REDUCE || Math.abs(leaveRaw - leaveS) > .5) { leaveS = leaveRaw; vL = 0; } else [leaveS, vL] = spring(leaveS, vL, leaveRaw, frameDt);
         const leave = leaveS;
-        pending = Math.abs(pRaw - pS) > .0004 || Math.abs(leaveRaw - leaveS) > .0008;
+        pending = Math.abs(pRaw - pS) > .0004 || Math.abs(leaveRaw - leaveS) > .0008 || Math.abs(vP) > .002 || Math.abs(vL) > .004;
         const cLeave = easeIO(clamp01((leave - .05) / .45));
         if (on !== handoff) {
           handoff = on; hero.classList.toggle('is-handoff', on);
