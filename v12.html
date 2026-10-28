@@ -2468,7 +2468,7 @@
         const focus = cards.map(el => Math.min(1, Math.max(0, parseFloat(el.dataset.focus || '.5'))));
         const GUTTER = 24, GAP = 16, SPIN = 4, RING_R = .40, RING_SIDE = .15, G0 = .55;
         // Такты сжаты: от кольца до ряда — два экрана прокрутки, а не три (Эли, 27.10).
-        const B = { appear:[.22, .62], fly:[.18, .78], grow:[.2, 1.2], spinStop:[1.0, 1.2], fold:[1.2, 1.7], tail:.15 };
+        const B = { appear:[.22, .62], fly:[.18, .78], grow:[.2, 1.1], spinStop:[.9, 1.1], fold:[1.08, 1.75], tail:.15 };
         const rad = d => d * Math.PI / 180, mix = (a, b, t) => a + (b - a) * t;
         const smooth = (a, b, x) => { const t = clamp01((x - a) / (b - a)); return t * t * (3 - 2 * t); };
         const geo = {}; let slots = cards.map((_, i) => i), unwrap = new Array(N).fill(0), spin = 0, travel = 0, captioned = false;
@@ -2540,7 +2540,7 @@
           ring.classList.toggle('is-on', visible);
           // Подпись в центре: появляется с кольцом, гаснет к 1.45 — до остановки вращения и раскрытия.
           // Подпись — только когда кольцо прилетело и встало (Эли, 27.10): после посадки, до остановки вращения.
-          const label = span(pH, B.fly[1] + .06, B.fly[1] + .18) * (1 - span(pH, 1.02, 1.16));
+          const label = span(pH, B.fly[1] + .06, B.fly[1] + .18) * (1 - span(pH, .92, 1.06));
           stage.style.setProperty('--label', (visible ? label : 0).toFixed(3));
           // Шапка зоны молчит, пока кольцо летает и пока готовый ряд уезжает вверх (логотип ложился на карточки).
           const leaving = section.getBoundingClientRect().bottom < geo.H + 40;
@@ -2561,7 +2561,8 @@
         measure();
         // Инерция: прокрутка задаёт цель pRaw, сцена догоняет её по времени (см. манифест).
         let pRaw = 0, first = true;
-        const SMOOTH = 6.5;
+        // Тягучее, чем в манифесте: раскладка в ряд казалась резкой (Эли, 28.10).
+        const SMOOTH = 3.4;
         jobs.push(() => {
           if (!seen.on) return;
           const r = section.getBoundingClientRect();
