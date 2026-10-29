@@ -836,14 +836,16 @@
     .faces__title .ln__i { transform:translateY(110%); transition:transform .9s var(--ease); }
     .faces__stage.is-captioned .faces__title .ln__i { transform:none; }
     @media (max-width:780px) { .faces__title { padding-top:96px; text-align:center; } }
-    /* Стрелки листания ряда: появляются вместе с рядом, под карточками справа. */
-    .faces__nav { position:absolute; right:var(--edge-x); top:calc(var(--row-top,50vh) + var(--row-h,0px) + 28px); display:flex; gap:8px; opacity:0; pointer-events:none; transition:opacity .6s var(--ease); }
+    /* Стрелки листания ряда (Эли, 29.10): на одной линии с заголовком «Среда единомышленников»,
+       по его зрительному центру, справа; без рамок — только тонкие шевроны. */
+    .faces__nav { position:absolute; right:calc(var(--edge-x) - 12px); top:calc(var(--row-top,50vh) - 36px - var(--fz-h) * 1.111 * .5); transform:translateY(-56%); display:flex; gap:4px; opacity:0; pointer-events:none; transition:opacity .6s var(--ease); }
     .faces__stage.is-captioned .faces__nav { opacity:1; pointer-events:auto; }
-    .faces__arrow { position:relative; width:44px; height:44px; padding:0; border:1px solid rgba(22,21,20,.25); background:transparent; cursor:pointer; transition:border-color .25s var(--ease),opacity .25s; }
-    .faces__arrow:hover { border-color:var(--ink); }
-    .faces__arrow[disabled] { opacity:.3; cursor:default; }
-    .faces__arrow i { position:absolute; left:50%; top:50%; width:9px; height:9px; border-right:1px solid var(--ink); border-top:1px solid var(--ink); transform:translate(-60%,-50%) rotate(45deg); }
-    .faces__arrow[data-dir="-1"] i { transform:translate(-40%,-50%) rotate(-135deg); }
+    .faces__arrow { position:relative; width:48px; height:48px; padding:0; border:0; background:transparent; cursor:pointer; transition:opacity .25s var(--ease); }
+    .faces__arrow i { position:absolute; left:50%; top:50%; width:14px; height:14px; border-right:1px solid var(--ink); border-top:1px solid var(--ink); transform:translate(-70%,-50%) rotate(45deg); transition:transform .35s var(--ease); }
+    .faces__arrow[data-dir="-1"] i { transform:translate(-30%,-50%) rotate(-135deg); }
+    .faces__arrow:not([disabled]):hover i { transform:translate(-50%,-50%) rotate(45deg); }
+    .faces__arrow[data-dir="-1"]:not([disabled]):hover i { transform:translate(-50%,-50%) rotate(-135deg); }
+    .faces__arrow[disabled] { opacity:.25; cursor:default; }
     .faces__dev { position:absolute; right:var(--edge-x); bottom:var(--edge-y); z-index:5; display:flex; flex-wrap:wrap; justify-content:flex-end; align-items:center; gap:8px; opacity:0; pointer-events:none; transition:opacity .6s var(--ease); }
     .faces__stage.is-captioned .faces__dev { opacity:1; pointer-events:auto; }
     .faces__dev .small { opacity:.5; margin-right:4px; }
